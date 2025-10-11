@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartAssist – Campus Services Assistant</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tamuccBlue: '#003366',
+            tamuccTeal: '#007A78',
+            tamuccLight: '#00AEEF'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-tamuccBlue text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <img src="assets/logo.png" alt="SmartAssist Logo" class="h-10 w-10 rounded-full">
+        <h1 class="text-xl font-semibold">SmartAssist</h1>
+      </div>
+
+      <nav class="hidden md:flex space-x-6">
+        <a href="index.html" class="hover:text-tamuccLight">Home</a>
+        <a href="faq.html" class="hover:text-tamuccLight">Knowledge Base</a>
+        <a href="chat.html" class="hover:text-tamuccLight">Chat</a>
+        <a href="#" class="hover:text-tamuccLight">Appointments</a>
+        <a href="#" class="hover:text-tamuccLight">Feedback</a>
+      </nav>
+
+      <button id="menu-btn" class="md:hidden text-tamuccLight focus:outline-none">
+        ☰
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden bg-tamuccTeal md:hidden">
+      <a href="index.html" class="block px-4 py-2 hover:bg-tamuccLight">Home</a>
+      <a href="faq.html" class="block px-4 py-2 hover:bg-tamuccLight">Knowledge Base</a>
+      <a href="chat.html" class="block px-4 py-2 hover:bg-tamuccLight">Chat</a>
+      <a href="#" class="block px-4 py-2 hover:bg-tamuccLight">Appointments</a>
+      <a href="#" class="block px-4 py-2 hover:bg-tamuccLight">Feedback</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative bg-tamuccBlue text-white h-[70vh] flex items-center justify-center text-center">
+    <img src="assets/hero-bg.jpg" class="absolute inset-0 w-full h-full object-cover opacity-40" alt="">
+    <div class="relative z-10 max-w-2xl px-4">
+      <h2 class="text-4xl md:text-5xl font-bold mb-4">Your Campus Assistant, Anytime.</h2>
+      <p class="text-lg mb-6">Find professors, schedule appointments, and get help — all in one place.</p>
+      <a href="chat.html" class="bg-tamuccTeal text-white px-6 py-3 rounded-lg hover:bg-tamuccLight">Ask SmartAssist</a>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <h3 class="text-3xl font-semibold mb-8 text-tamuccBlue">What Can SmartAssist Do?</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-semibold mb-3 text-tamuccTeal">📚 Knowledge Base</h4>
+          <p>Search articles, FAQs, and guides to get instant answers 24/7.</p>
+        </div>
+
+        <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-semibold mb-3 text-tamuccTeal">🤖 AI Chatbot</h4>
+          <p>Chat with our AI-powered assistant for quick, intelligent help.</p>
+        </div>
+
+        <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-semibold mb-3 text-tamuccTeal">🗓️ Appointments</h4>
+          <p>Schedule and manage meetings with advisors or departments.</p>
+        </div>
+
+        <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-semibold mb-3 text-tamuccTeal">🎟️ Service Requests</h4>
+          <p>Submit and track support requests in real-time.</p>
+        </div>
+
+        <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-semibold mb-3 text-tamuccTeal">💬 Live Chat</h4>
+          <p>Connect directly with university staff when AI can’t help.</p>
+        </div>
+
+        <div class="bg-gray-100 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h4 class="text-xl font-semibold mb-3 text-tamuccTeal">📈 Feedback</h4>
+          <p>Share feedback to help improve campus services.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-tamuccBlue text-white py-6 text-center mt-12">
+    <p>© 2025 SmartAssist | TAMUCC Campus Services Assistant</p>
+    <p class="text-sm mt-2">Developed by [Your Team Name]</p>
+  </footer>
+
+  <!-- Floating Chat Widget -->
+  <div id="chat-widget" class="fixed bottom-6 right-6">
+    <button id="chat-btn" class="bg-tamuccTeal hover:bg-tamuccLight text-white p-4 rounded-full shadow-lg">
+      💬
+    </button>
+
+    <!-- Chat Modal -->
+    <div id="chat-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+      <div class="bg-white w-96 p-4 rounded-lg shadow-lg relative">
+        <button id="close-chat" class="absolute top-2 right-3 text-gray-500 text-xl">&times;</button>
+        <h3 class="text-lg font-semibold text-tamuccBlue mb-3">SmartAssist Chat</h3>
+        <div id="chat-box" class="border h-64 overflow-y-auto p-2 bg-gray-50 mb-3"></div>
+        <input id="chat-input" type="text" placeholder="Type your message..." class="w-full border rounded px-3 py-2">
+      </div>
+    </div>
+  </div>
+
+  <script src="js/chat-widget.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

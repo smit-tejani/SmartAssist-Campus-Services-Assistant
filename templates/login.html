@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartAssist | Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0067A5, #00A99D);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      width: 90%;
+      max-width: 400px;
+      padding: 2rem;
+      text-align: center;
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .login-logo img {
+      width: 90px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #0067A5;
+      margin-bottom: 1.2rem;
+      font-weight: 600;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 6px;
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+
+    input:focus, select:focus {
+      border-color: #00A99D;
+      outline: none;
+      box-shadow: 0 0 3px #00A99D;
+    }
+
+    .login-btn {
+      width: 100%;
+      background: #0067A5;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 1rem;
+    }
+
+    .login-btn:hover {
+      background: #00A99D;
+    }
+
+    .footer-text {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    .register-link {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #0067A5;
+    }
+
+    .register-link a {
+      color: #0067A5;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-logo">
+      <img src="{{ url_for('static', path='assets/images/logo.png') }}"
+          alt="SmartAssist Logo"
+          class="logo">
+    </div>
+    <h2>SmartAssist Login</h2>
+
+    <!-- Display error or success messages -->
+    {% if error %}
+      <p style="color: red; margin-bottom: 1rem;">{{ error }}</p>
+    {% elif message %}
+      <p style="color: green; margin-bottom: 1rem;">{{ message }}</p>
+    {% endif %}
+
+    <form action="/login" method="post">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="john@tamucc.edu" required />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter your password" required />
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select name="role" required>
+          <option value="">Select Role</option>
+          <option value="student">Student</option>
+          <option value="staff">Staff</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <button type="submit" class="login-btn">Sign In</button>
+    </form>
+
+    <p class="footer-text">
+      Don't have an account? <a href="/register">Register here</a>
+    </p>
+    <p class="footer-text">© 2025 TAMU-CC SmartAssist</p>
+  </div>
+</body>
+</html>
