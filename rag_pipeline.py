@@ -13,7 +13,7 @@ kb_collection = db.knowledge_base
 embed_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 # ---------------- OpenAI setup ----------------
-openai.api_key = " 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"  # <<< replace with your key
+openai.api_key = "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"  # <<< replace with your key
 
 # ---------------- RAG retrieval ----------------
 def retrieve_relevant_articles(question, top_k=3):

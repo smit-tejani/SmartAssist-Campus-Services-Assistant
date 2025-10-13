@@ -88,7 +88,104 @@ if __name__ == "__main__":
             "url": "https://www.tamucc.edu/admissions/graduate-students/application-process.php",
             "category": "Graduate Students",
             "title": "Graduate Student Application Process"
-        }
+        },
+        {
+            "url": "https://www.tamucc.edu/cost-and-aid/scholarships/index.php",
+            "category": "Scholarship & Financial Aid",
+            "title": "Enrollment Management Scholarships"
+        },
+        {
+            "url": "https://www.tamucc.edu/academics/colleges/index.php",
+            "category": "Colleges",
+            "title": "Colleges"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/index.php",
+            "category": "Colleges",
+            "title": "College of business"
+        },
+        {
+            "url": "https://www.tamucc.edu/education/index.php",
+            "category": "Colleges",
+            "title": "College of Education and Human Developement"
+        },
+          {
+            "url": "https://www.tamucc.edu/engineering/index.php",
+            "category": "Colleges",
+            "title": "College of Engineering and Computer Science"
+        },
+          {
+            "url": "https://www.tamucc.edu/science/index.php",
+            "category": "Colleges",
+            "title": "College of Science"
+        },
+        {
+            "url": "https://www.tamucc.edu/liberal-arts/index.php",
+            "category": "Colleges",
+            "title": "College of Liberal and Arts"
+        },
+        {
+            "url": "https://www.tamucc.edu/nursing-and-health-sciences/index.php",
+            "category": "Colleges",
+            "title": "College of Nursing & Health Sciences"
+        },
+        {
+            "url": "https://www.tamucc.edu/samc/index.php",
+            "category": "Colleges",
+            "title": "School of Arts, Media, & Communication"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/about/index.php",
+            "category": "College of Business",
+            "title": "About the college of business"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/strategic-plan/index.php",
+            "category": "College of Business",
+            "title": "College Of Business Strategic Plan"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/students/index.php",
+            "category": "College of Business",
+            "title": "Student Engagement Plan"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/advising/index.php",
+            "category": "College of Business",
+            "title": "Advising"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/graduate-programs/index.php",
+            "category": "College of Business",
+            "title": "Graduate Programs"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/undergraduate-programs/index.php",
+            "category": "College of Business",
+            "title": "Undergraduate Programs"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/centers-research/index.php",
+            "category": "College of Business",
+            "title": "Student and Research"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/student-resource-directory/index.php",
+            "category": "College of Business",
+            "title": "Student Resource Directory"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/student-resource-directory/prospective-student-resources.php",
+            "category": "College of Business",
+            "title": "Prospective Student Resources"
+        },
+        {
+            "url": "https://www.tamucc.edu/business/news-and-events/index.php",
+            "category": "College of Business",
+            "title": "News and Events"
+        },
+
+
     ]
 
     for page in pages:
