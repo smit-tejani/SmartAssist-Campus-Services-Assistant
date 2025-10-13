@@ -475,7 +475,7 @@
 </div>
 
 <!-- Chatbot Button -->
-<button class="chatbot-btn" onclick="window.location.href='chat.html'"><i class="fa-solid fa-comments"></i></button>
+<button class="chatbot-btn" onclick="window.location.href='chat'"><i class="fa-solid fa-comments"></i></button>
 
 <div id="ticket-modal" class="modal">
   <div class="modal-content">
@@ -574,14 +574,14 @@
   const raiseTicketSidebar = document.getElementById('raise-ticket-sidebar');
 
   // Open modal
-  [raiseTicketCard, raiseTicketSidebar].forEach(el => {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      modal.classList.add('show');
-      feedback.classList.add('hidden');
-      ticketForm.reset();
-    });
-  });
+  if (raiseTicketCard) {
+      raiseTicketCard.addEventListener('click', (e) => {
+        e.preventDefault();
+        modal.classList.add('show');
+        feedback.classList.add('hidden');
+        ticketForm.reset();
+      });
+    }
 
   // Close modal
   [closeBtn, cancelBtn].forEach(btn => btn.addEventListener('click', () => {
@@ -632,14 +632,14 @@
   const bookAppointmentSidebar = document.getElementById('book-appointment-sidebar');
 
   // Open modal
-  [bookAppointmentCard, bookAppointmentSidebar].forEach(el => {
-    el.addEventListener('click', (e) => {
+  if (bookAppointmentCard) {
+    bookAppointmentCard.addEventListener('click', (e) => {
       e.preventDefault();
       appointmentModal.classList.add('show');
       appointmentFeedback.classList.add('hidden');
       appointmentForm.reset();
     });
-  });
+  }
 
   // Close modal
   [closeAppointmentBtn, cancelAppointmentBtn].forEach(btn => btn.addEventListener('click', () => {
