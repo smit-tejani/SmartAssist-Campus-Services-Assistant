@@ -3,12 +3,15 @@ from pymongo import MongoClient
 from sentence_transformers import SentenceTransformer, util
 from huggingface_hub import InferenceClient
 import torch
+import os
 
 # ---------------- MongoDB setup ----------------
 # (Consider moving secrets out of source later, but left inline as in your original file.)
-client = MongoClient(
-    "mongodb+srv://Manny0715:Manmeet12345@cluster0.1pf6oxg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-)
+# client = MongoClient(
+#     "mongodb+srv://Manny0715:Manmeet12345@cluster0.1pf6oxg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# )
+MONGO_URI = os.getenv("MONGODB_URI", "mongodb://mongo:27017/smartassist")
+client = MongoClient(MONGO_URI)
 db = client.smartassist
 kb_collection = db.knowledge_base
 

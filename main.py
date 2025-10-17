@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import List
 from pymongo import MongoClient
+import os
 
 # ------------------ FastAPI App ------------------
 app = FastAPI()
@@ -11,7 +12,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")  # folder for HTML templates
 
 # ------------------ MongoDB Setup ------------------
-client = MongoClient("mongodb+srv://Manny0715:Manmeet12345@cluster0.1pf6oxg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")  # Replace with your MongoDB URL if needed
+# client = MongoClient("mongodb+srv://Manny0715:Manmeet12345@cluster0.1pf6oxg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")  # Replace with your MongoDB URL if needed
+MONGO_URI = os.getenv("MONGODB_URI", "mongodb://mongo:27017/smartassist")
+client = MongoClient(MONGO_URI)
 db = client.smartassist
 users_collection = db.users
 live_chat_collection = db.live_chat
