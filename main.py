@@ -130,10 +130,16 @@ async def get_chat_history(session_id: str):
     return messages
 
 # ------------------ Auth & Dashboards ------------------
-@app.get("/", response_class=HTMLResponse)
+from fastapi import FastAPI, Request
+@app.get("/")
+def landing(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/login", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
+# ---- Register (GET + POST) ----
 @app.get("/register", response_class=HTMLResponse)
 async def get_register(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
@@ -145,25 +151,35 @@ async def post_register(
     email: str = Form(...),
     password: str = Form(...),
     confirm_password: str = Form(...),
-    role: str = Form(...)
+    role: str = Form(...)           # keep required (see form below)
 ):
     if password != confirm_password:
-        return templates.TemplateResponse("register.html", {"request": request, "error": "Passwords do not match!"})
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "error": "Passwords do not match!"}
+        )
 
     if users_collection.find_one({"email": email}):
-        return templates.TemplateResponse("register.html", {"request": request, "error": "Email already registered!"})
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "error": "Email already registered!"}
+        )
 
     users_collection.insert_one({
         "full_name": full_name,
         "email": email,
-        "password": password,
+        "password": password,       # TODO: hash this
         "role": role
     })
-    return templates.TemplateResponse("login.html", {"request": request, "message": "Registration successful! Please login."})
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request, "message": "Registration successful! Please login."}
+    )
 
-@app.get("/login", response_class=HTMLResponse)
+
+""" @app.get("/login", response_class=HTMLResponse)
 async def get_login(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("login.html", {"request": request}) """
 
 @app.post("/login")
 async def post_login(

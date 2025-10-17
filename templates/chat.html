@@ -29,16 +29,26 @@
   <header class="backdrop-blur-md bg-white/10 border-b border-white/20 text-white shadow-lg">
     <div class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
       <div class="flex items-center space-x-3">
-      <img src="{{ url_for('static', path='assets/images/logo.png') }}"
-        alt="SmartAssist Logo"
-        class="h-10 w-10 object-contain rounded-lg shadow-md border border-gray-200">
+        <img src="{{ url_for('static', path='assets/images/logo.png') }}"
+          alt="SmartAssist Logo"
+          class="h-10 w-10 object-contain rounded-lg shadow-md border border-gray-200">
         <div>
           <h1 class="text-2xl font-semibold tracking-wide">SmartAssist</h1>
           <p class="text-xs text-white/70">TAMUCC Campus Assistant</p>
         </div>
       </div>
-      <div class="flex items-center space-x-4">
-        <span class="bg-green-500 text-xs px-3 py-1 rounded-full animate-pulse">Online</span>
+
+      <div class="flex items-center space-x-3">
+        <button id="end-live-chat"
+                class="hidden text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white hover:text-tamuccTeal transition">
+          End live chat
+        </button>
+
+        <button id="clear-chat"
+                class="text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white hover:text-tamuccTeal transition">
+          Clear Chat
+        </button>
+
         <a href="/student_home" class="hover:text-tamuccLight text-sm">Home</a>
       </div>
     </div>
@@ -54,12 +64,10 @@
           <div class="h-3 w-3 bg-green-400 rounded-full animate-pulse"></div>
           <h2 class="font-semibold text-lg">SmartAssist Virtual Assistant</h2>
         </div>
-        <button id="clear-chat" class="text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white hover:text-tamuccTeal transition">
-          Clear Chat
-        </button>
+        <span id="live-status" class="hidden text-xs bg-white/20 px-2 py-1 rounded">Live chat connected</span>
       </div>
 
-      <!-- Chat Window -->
+      <!-- Single Chat Window -->
       <div id="chat-window" class="flex-1 overflow-y-auto p-6 space-y-4 bg-tamuccGray">
         <div class="flex items-start space-x-3">
           <div class="w-10 h-10 bg-tamuccTeal rounded-full flex items-center justify-center text-white font-bold">S</div>
@@ -79,25 +87,13 @@
         </div>
       </div>
 
-      <!-- Input Area -->
+      <!-- Single Input Area (used by both bot & live chat) -->
       <div class="border-t border-gray-200 bg-white p-4 flex items-center space-x-3">
         <input id="chat-input" type="text" placeholder="Ask me anything about campus services..." 
                class="flex-grow bg-gray-100 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-tamuccTeal">
         <button id="send-btn" class="bg-tamuccTeal text-white px-5 py-3 rounded-full hover:bg-tamuccLight transition font-semibold">
           ➤
         </button>
-      </div>
-
-      <!-- Live Chat Container -->
-      <div id="live-chat-container" class="hidden flex flex-col border-t border-gray-200 bg-gray-50 p-4 space-y-3 flex-1 min-h-0">
-        <div id="live-chat-window" class="flex-1 overflow-y-auto p-2 space-y-2 bg-white rounded-lg shadow-inner min-h-0">
-          <!-- Admin messages will appear here -->
-        </div>
-        <div class="flex space-x-2">
-          <input id="live-chat-input" type="text" placeholder="Type your message to Admin..." 
-                class="flex-grow rounded-full px-4 py-2 border focus:outline-none focus:ring-2 focus:ring-tamuccTeal">
-          <button id="live-chat-send" class="bg-tamuccTeal text-white px-4 py-2 rounded-full hover:bg-tamuccLight">Send</button>
-        </div>
       </div>
     </div>
   </main>
@@ -110,71 +106,96 @@
     const clearChat = document.getElementById('clear-chat');
     const typingIndicator = document.getElementById('typing');
 
-    const liveChatContainer = document.getElementById('live-chat-container');
-    const liveChatWindow = document.getElementById('live-chat-window');
-    const liveChatInput = document.getElementById('live-chat-input');
-    const liveChatSend = document.getElementById('live-chat-send');
+    const endLiveBtn = document.getElementById('end-live-chat');
+    const liveStatus  = document.getElementById('live-status');
 
     // ---------- Persistent Session ----------
     let sessionId = localStorage.getItem('student_session_id');
     if (!sessionId) {
-        sessionId = crypto.randomUUID();
-        localStorage.setItem('student_session_id', sessionId);
+      sessionId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
+      localStorage.setItem('student_session_id', sessionId);
     }
 
-    // ---------- WebSocket for live chat ----------
+    // ---------- Live chat state ----------
+    let isLiveChat = false;
+
+    // ---------- WebSocket (created immediately; used when escalated) ----------
     const ws = new WebSocket(`ws://${window.location.host}/ws/student/${sessionId}`);
 
     ws.onopen = () => console.log('Connected to live chat WebSocket');
 
     ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
+      const data = JSON.parse(event.data);
 
-        if (data.type === 'message') {
-            const senderClass = data.sender === 'student' ? 'text-right text-blue-600' : 'text-left text-gray-800';
-            const prefix = data.sender === 'student' ? 'You: ' : 'Admin: ';
-            liveChatWindow.innerHTML += `<div class="${senderClass} font-medium">${prefix}${data.message}</div>`;
-            liveChatWindow.scrollTop = liveChatWindow.scrollHeight;
+      if (data.type === 'message') {
+        // server echoes both student/admin; only render admin here
+        if (data.sender === 'admin') {
+          appendMessage('admin', data.message);
         }
+      }
 
-        if (data.type === 'new_session') {
-            console.log('New session:', data.session_id);
-        }
+      if (data.type === 'new_session') {
+        console.log('New session:', data.session_id);
+      }
     };
 
     ws.onclose = () => {
-        liveChatWindow.innerHTML += `<div class="text-center text-gray-500 text-sm">Disconnected. Refresh to reconnect.</div>`;
+      if (isLiveChat) {
+        appendMessage('system', 'Live chat disconnected. You can try reconnecting.');
+        leaveLiveChatUI();
+      }
     };
 
     ws.onerror = (err) => console.error('WebSocket error:', err);
 
-    // ---------- Main Chat Functions ----------
-    function appendMessage(message, type = 'user', showLiveChat = false) {
-      const msgDiv = document.createElement('div');
-      msgDiv.classList.add('flex', 'items-start', 'space-x-3');
-      if (type === 'user') {
-        msgDiv.classList.add('justify-end');
-        msgDiv.innerHTML = `<div class="bg-tamuccTeal text-white px-4 py-2 rounded-2xl shadow max-w-[70%]">${message}</div>`;
-      } else {
-        msgDiv.innerHTML = `
-          <div class="w-10 h-10 bg-tamuccTeal rounded-full flex items-center justify-center text-white font-bold">S</div>
-          <div class="bg-white px-4 py-2 rounded-2xl shadow text-gray-800 max-w-[70%]">
-            ${message}
-            ${showLiveChat ? '<div class="mt-2"><a href="#" id="start-live-chat" class="text-tamuccTeal font-semibold underline">Start Live Chat with Admin</a></div>' : ''}
-          </div>
-        `;
-      }
-      chatWindow.appendChild(msgDiv);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
+    // ---------- UI helpers ----------
+    function avatar(letter, color='bg-tamuccTeal') {
+      return `<div class="w-10 h-10 ${color} rounded-full flex items-center justify-center text-white font-bold">${letter}</div>`;
     }
 
-    async function sendMessage() {
-      const text = chatInput.value.trim();
-      if (!text) return;
-      appendMessage(text, 'user');
-      chatInput.value = '';
-      typingIndicator.classList.remove('hidden');
+    function bubble(content, extra='') {
+      return `<div class="bg-white px-4 py-2 rounded-2xl shadow text-gray-800 max-w-[70%] ${extra}">${content}</div>`;
+    }
 
+    function appendMessage(role, text, opts = {}) {
+      const row = document.createElement('div');
+      row.classList.add('flex', 'items-start', 'space-x-3');
+
+      if (role === 'user') {
+        row.classList.add('justify-end');
+        row.innerHTML = `<div class="bg-tamuccTeal text-white px-4 py-2 rounded-2xl shadow max-w-[70%]">${text}</div>`;
+      } else if (role === 'bot') {
+        const html = renderMarkdown(text);        // ← convert MD to HTML
+        row.innerHTML = `${avatar('S')} ${bubble(html)}`;
+        enhanceLinks(row);                         // ← make links clickable & styled
+      } else if (role === 'admin') {
+        row.innerHTML = `${avatar('A','bg-blue-600')} ${bubble(`<span class="text-xs text-blue-600 font-semibold mr-2">Admin</span>${escapeHTML(text)}`)}`;
+      } else if (role === 'system') {
+        row.classList.add('w-full', 'justify-center');
+        row.innerHTML = `<div class="text-xs text-gray-500">${text}</div>`;
+      }
+      chatWindow.appendChild(row);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+
+      // Add "Start Live Chat" affordance under bot messages when suggested
+      if (opts.showLiveChatCTA) {
+        const cta = document.createElement('div');
+        cta.className = 'flex justify-start';
+        cta.innerHTML = `
+          <button id="start-live-chat"
+                  class="mt-2 text-sm bg-tamuccTeal/10 text-tamuccTeal px-3 py-1 rounded-full hover:bg-tamuccTeal/20">
+            Start Live Chat with Admin
+          </button>`;
+        chatWindow.appendChild(cta);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+    }
+
+    function escapeHTML(s) { return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    // ---------- Bot flow ----------
+    async function sendToBot(text) {
+      typingIndicator.classList.remove('hidden');
       try {
         const formData = new FormData();
         formData.append('question', text);
@@ -183,47 +204,127 @@
         const data = await res.json();
         typingIndicator.classList.add('hidden');
 
-        appendMessage(data.answer, 'bot', data.suggest_live_chat);
+        // When the backend suggests escalation, show CTA in the same bubble
+        appendMessage('bot', data.answer, { showLiveChatCTA: !!data.suggest_live_chat });
       } catch (err) {
         typingIndicator.classList.add('hidden');
-        appendMessage('Sorry, something went wrong. Please try again later.', 'bot');
+        appendMessage('bot', 'Sorry, something went wrong. Please try again later.');
       }
     }
 
-    sendBtn.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', e => e.key === 'Enter' && sendMessage());
+    // ---------- Live chat flow ----------
+    const AGENT_JOIN_DELAY = 2500; // 2.5s (set to 2000–3000 if you like)
 
-    clearChat.addEventListener('click', () => chatWindow.innerHTML = `
-      <div class="flex items-start space-x-3">
-        <div class="w-10 h-10 bg-tamuccTeal rounded-full flex items-center justify-center text-white font-bold">S</div>
-        <div class="bg-white px-4 py-2 rounded-2xl shadow text-gray-800 max-w-[70%]">
-          👋 Hi! I’m <strong>SmartAssist</strong>. How can I help you today?
-        </div>
-      </div>
-    `);
+function enterLiveChatUI() {
+  isLiveChat = true;
 
-    // ---------- Start Live Chat ----------
-    document.addEventListener('click', e => {
-      if (e.target && e.target.id === 'start-live-chat') {
-        e.preventDefault();
-        liveChatContainer.classList.remove('hidden');
-        liveChatWindow.innerHTML += `<div class="text-sm text-gray-500">You are now connected with a live admin.</div>`;
-        liveChatWindow.scrollTop = liveChatWindow.scrollHeight;
+  endLiveBtn.classList.remove('hidden');
+  removeLiveChatCTA();
+
+  // 1) show immediately
+  appendMessage('system', 'Connecting with live support team…');
+
+  // 2) show after a short delay
+  setTimeout(() => {
+    appendMessage('system', 'An Agent has joined the chat.');
+    // reveal the header badge only after the agent joins (optional)
+    liveStatus.classList.remove('hidden');
+  }, AGENT_JOIN_DELAY);
+}
+
+    
+    function renderMarkdown(md) {
+  const html = marked.parse(md, { mangle: false, headerIds: false });
+  return DOMPurify.sanitize(html);
+}
+function enhanceLinks(el) {
+  el.querySelectorAll('a').forEach(a => {
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.classList.add('text-tamuccTeal','underline','hover:text-tamuccLight');
+  });
+}
+
+
+    
+
+    function removeLiveChatCTA() {
+        document.querySelectorAll('#start-live-chat').forEach(btn => {
+          // remove the wrapper row if present so spacing also disappears
+          const wrap = btn.parentElement;
+          if (wrap) wrap.remove();
+          else btn.remove();
+        });
       }
+
+
+    function leaveLiveChatUI() {
+      isLiveChat = false;
+      endLiveBtn.classList.add('hidden');
+      liveStatus.classList.add('hidden');
+      appendMessage('system', 'Live chat ended. You can continue with the assistant.');
+    }
+
+    function sendToLiveChat(text) {
+        try {
+          ws.send(JSON.stringify({ message: text }));
+        } catch (e) {
+          appendMessage('system', 'Could not send message. Please try again.');
+        }
+      }
+
+      async function onSend() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        if (isLiveChat) {
+          // Live mode: render once, then send via WS
+          appendMessage('user', text);
+          chatInput.value = '';
+          sendToLiveChat(text);
+          return;
+        }
+
+        // Bot mode
+        appendMessage('user', text);
+        chatInput.value = '';
+        await sendToBot(text);
+      }
+
+
+    sendBtn.addEventListener('click', onSend);
+    chatInput.addEventListener('keypress', (e) => (e.key === 'Enter') && onSend());
+
+    // escalate by clicking the inline CTA
+    document.addEventListener('click', (e) => {
+  if (e.target && e.target.id === 'start-live-chat') {
+    e.preventDefault();
+    e.target.setAttribute('disabled', 'disabled');
+    removeLiveChatCTA();           // ← get it out of the DOM
+    enterLiveChatUI();
+  }
+});
+
+
+    // end live chat
+    endLiveBtn.addEventListener('click', () => {
+      leaveLiveChatUI();
     });
 
-    function sendLiveChatMessage() {
-      const msg = liveChatInput.value.trim();
-      if (!msg) return;
-      ws.send(JSON.stringify({ message: msg }));
-      liveChatInput.value = '';
-      liveChatWindow.innerHTML += `<div class="text-right text-blue-600 font-medium">You: ${msg}</div>`;
-      liveChatWindow.scrollTop = liveChatWindow.scrollHeight;
-    }
-
-    liveChatSend.addEventListener('click', sendLiveChatMessage);
-    liveChatInput.addEventListener('keypress', e => e.key === 'Enter' && sendLiveChatMessage());
-
+    // clear transcript
+    clearChat.addEventListener('click', () => {
+      chatWindow.innerHTML = `
+        <div class="flex items-start space-x-3">
+          <div class="w-10 h-10 bg-tamuccTeal rounded-full flex items-center justify-center text-white font-bold">S</div>
+          <div class="bg-white px-4 py-2 rounded-2xl shadow text-gray-800 max-w-[70%]">
+            👋 Hi! I’m <strong>SmartAssist</strong>. How can I help you today?
+          </div>
+        </div>`;
+      typingIndicator.classList.add('hidden');
+    });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
 </body>
 </html>
