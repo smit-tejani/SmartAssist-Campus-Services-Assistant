@@ -1,15 +1,23 @@
 name: Build & Push to Docker Hub
-on: { push: { branches: [ main ] } }
+on:
+  push:
+    branches: [main] # change if your default branch is not 'main'
+  workflow_dispatch: {} # lets you run it manually from Actions
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.smit8460 }}
           password: ${{ secrets.dckr_pat_WQL9fyI4ohY6zCvC8v3WDJ9XXH4 }}
-      - name: Build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/smartassist:latest .
-      - name: Push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/smartassist:latest
+
+      - name: Build image
+        run: docker build -t ${{ secrets.smit8460 }}/smartassist:latest .
+
+      - name: Push image
+        run: docker push ${{ secrets.smit8460 }}/smartassist:latest
