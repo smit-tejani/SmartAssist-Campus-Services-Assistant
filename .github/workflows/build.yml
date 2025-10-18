@@ -1,7 +1,7 @@
 name: Build & Push to Docker Hub
 on:
   push:
-    branches: [main] # change if your default branch is not 'main'
+    branches: [master] # change if your default branch is not 'main'
   workflow_dispatch: {} # lets you run it manually from Actions
 
 jobs:
