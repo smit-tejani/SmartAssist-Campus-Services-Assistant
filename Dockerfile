@@ -35,11 +35,12 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy the rest of the app
 COPY . .
 
-# Expose FastAPI port
-EXPOSE 8000
+# Spaces sets PORT (usually 7860). Listen on it.
+ENV PORT=7860
+EXPOSE 7860
 
 # Cache models (optional): mount to /root/.cache in compose for persistence
 # VOLUME ["/root/.cache"]
 
 # Default command: uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
