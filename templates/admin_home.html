@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmartAssist | Admin Dashboard</title>
+<title> SmartAssist | Admin Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -203,56 +203,81 @@
 </div>
 
 <script>
-const chatToggle = document.getElementById('chat-toggle');
-const chatPanel = document.getElementById('chat-panel');
-const closeChat = document.getElementById('close-chat');
-const chatList = document.getElementById('chat-list');
-const chatMessages = document.getElementById('chat-messages');
-const chatInput = document.getElementById('chat-input');
-const sendBtn = document.getElementById('send-btn');
+const chatToggle    = document.getElementById('chat-toggle');
+const chatPanel     = document.getElementById('chat-panel');
+const closeChat     = document.getElementById('close-chat');
+const chatList      = document.getElementById('chat-list');
+const chatMessages  = document.getElementById('chat-messages');
+const chatInput     = document.getElementById('chat-input');
+const sendBtn       = document.getElementById('send-btn');
 
 let ws;
 let selectedSession = null;
+const joinedSessions = new Set();      // sessions this admin has joined
+const sessionsIndex  = new Map();      // session_id -> {name,status}
 
-// Open/close panel
-chatToggle.onclick = () => chatPanel.classList.toggle('open');
-closeChat.onclick = () => chatPanel.classList.remove('open');
+// ---------- Open/close panel ----------
+chatToggle.onclick = () => {
+  chatPanel.classList.add('open');
+  chatToggle.classList.add('hidden'); // hide FAB when panel open
+};
+closeChat.onclick = () => {
+  chatPanel.classList.remove('open');
+  chatToggle.classList.remove('hidden'); // show FAB when panel closes
+};
 
-// ------------------- Helper Functions -------------------
-
-// Add a student session to the list
-function addSessionToList(sessionId, name) {
-  const item = document.createElement('div');
-  item.classList.add('chat-list-item');
-  item.textContent = name + ' (' + sessionId.substring(0,4) + ')';
-  item.onclick = () => selectSession(sessionId);
-  item.dataset.id = sessionId;
-  chatList.appendChild(item);
+// ---------- Helpers ----------
+function fallbackName(sessionId, name) {
+  return name && name.trim() ? name : `Student ${sessionId?.slice(0,4) || ''}`;
 }
 
-// Select a session to view messages
-function selectSession(sessionId) {
-  selectedSession = sessionId;
-  chatMessages.innerHTML = '';
-  chatInput.disabled = false;
-  sendBtn.disabled = false;
-  
-  document.querySelectorAll('.chat-list-item').forEach(i => i.classList.remove('active'));
-  document.querySelector(`.chat-list-item[data-id="${sessionId}"]`)?.classList.add('active');
+function upsertSession(session) {
+  const sid = session.session_id;
+  const name = fallbackName(sid, session.name);
+  const status = session.status || 'queued';
 
-  // Load chat history for this session
-  fetch(`/api/admin/live_chats/${sessionId}`)
-    .then(res => res.json())
-    .then(data => {
-      chatMessages.innerHTML = '';
-      data.messages.forEach(msg => appendMessage(sessionId, msg.sender, msg.message));
-    })
-    .catch(err => console.error('Failed to load chat messages:', err));
+  // store/merge local model
+  const prev = sessionsIndex.get(sid) || {};
+  sessionsIndex.set(sid, { name: name || prev.name, status });
+
+  // dedupe list item by data-id
+  let item = chatList.querySelector(`.chat-list-item[data-id="${sid}"]`);
+  if (!item) {
+    item = document.createElement('div');
+    item.classList.add('chat-list-item');
+    item.dataset.id = sid;
+    item.onclick = () => selectSession(sid);
+    chatList.appendChild(item);
+  }
+  item.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div>${fallbackName(sid, name)} <span style="color:#777">(${sid.slice(0,4)})</span></div>
+      <span style="font-size:.7rem;padding:.1rem .4rem;border-radius:8px;background:${status==='live'?'#d1f7e6':'#fff3cd'};color:${status==='live'?'#0b6848':'#8a6d3b'};">
+        ${status}
+      </span>
+    </div>
+  `;
 }
 
-// Append a message to the chat window
+function clearMessages() {
+  chatMessages.innerHTML = `<p style="color:#999; text-align:center;">Select a chat to start messaging.</p>`;
+}
+
+function removeSession(sessionId) {
+  const item = chatList.querySelector(`.chat-list-item[data-id="${sessionId}"]`);
+  if (item) item.remove();
+  if (selectedSession === sessionId) {
+    selectedSession = null;
+    chatInput.disabled = true; sendBtn.disabled = true;
+    chatMessages.innerHTML = `<p style="color:#999; text-align:center;">Select a chat to start messaging.</p>`;
+  }
+  sessionsIndex.delete(sessionId);
+  joinedSessions.delete(sessionId);
+}
+
+
 function appendMessage(sessionId, sender, message) {
-  if (sessionId !== selectedSession) return; // Only show messages for selected session
+  if (sessionId !== selectedSession) return; // only show for selected session
   const div = document.createElement('div');
   div.classList.add('chat-message', sender === 'admin' ? 'admin' : 'student');
   div.textContent = message;
@@ -260,72 +285,128 @@ function appendMessage(sessionId, sender, message) {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Open/close panel with chat button hide/show
-chatToggle.onclick = () => {
-  chatPanel.classList.add('open');
-  chatToggle.classList.add('hidden'); // hide the button when panel opens
-};
+function enableInput(enabled) {
+  chatInput.disabled = !enabled;
+  sendBtn.disabled   = !enabled;
+}
 
-closeChat.onclick = () => {
-  chatPanel.classList.remove('open');
-  chatToggle.classList.remove('hidden'); // show the button when panel closes
-};
+// ---------- Select a session ----------
+async function selectSession(sessionId) {
+  selectedSession = sessionId;
+  document.querySelectorAll('.chat-list-item').forEach(i => i.classList.remove('active'));
+  document.querySelector(`.chat-list-item[data-id="${sessionId}"]`)?.classList.add('active');
 
+  // reset window
+  chatMessages.innerHTML = '';
+  enableInput(false);
 
-// Send a message from admin
+  // 1) Load chat history (backend: GET /api/chat/{session_id} returns a LIST)
+  try {
+    const res = await fetch(`/api/chat/${sessionId}`);
+    const history = await res.json(); // [{sender, message, created_at}, ...]
+    if (!Array.isArray(history)) throw new Error('Bad history payload');
+    history.forEach(msg => appendMessage(sessionId, msg.sender, msg.message));
+  } catch (err) {
+    console.error('Failed to load chat messages:', err);
+  }
+
+  // 2) JOIN the session once per admin per session
+  if (!joinedSessions.has(sessionId)) {
+    ws?.send(JSON.stringify({ type: 'join', session_id: sessionId }));
+    // wait for "joined" event to enable input
+  } else {
+    enableInput(true);
+  }
+}
+
+// ---------- Send a message ----------
 sendBtn.onclick = () => {
   const msg = chatInput.value.trim();
   if (!msg || !selectedSession) return;
-  
+
+  if (!joinedSessions.has(selectedSession)) {
+    // safety: do not allow sending before joined
+    return alert('Join the session first.');
+  }
+
   ws.send(JSON.stringify({ type: 'message', session_id: selectedSession, message: msg }));
   appendMessage(selectedSession, 'admin', msg);
   chatInput.value = '';
 };
 
-// ------------------- Load Existing Sessions -------------------
-
+// ---------- Load existing sessions on page load ----------
 async function loadExistingSessions() {
   try {
-    const res = await fetch('/api/admin/live_chats'); // Backend endpoint
-    const sessions = await res.json(); // [{ session_id, name, messages: [{ sender, message }] }]
-    
-    sessions.forEach((session, idx) => {
-      addSessionToList(session.session_id, session.name);
-      
-      // Auto-select the first session
-      if (idx === 0) selectSession(session.session_id);
+    const res = await fetch('/api/admin/live_chats'); // returns [{session_id, status, name?}]
+    const sessions = await res.json();
+    sessions.forEach((s, idx) => {
+      upsertSession(s);
+      if (idx === 0) selectSession(s.session_id);
     });
   } catch (err) {
     console.error('Failed to load sessions:', err);
   }
 }
 
-// ------------------- WebSocket Connection -------------------
-
+// ---------- Admin WebSocket ----------
 function connectWebSocket() {
-  ws = new WebSocket(`ws://${window.location.host}/ws/admin`);
+  ws = new WebSocket(`${location.origin.replace('http', 'ws')}/ws/admin`);
+
+  ws.onopen = () => console.log("Connected to live chat WebSocket.");
+  ws.onclose = () => console.log("Disconnected from live chat WebSocket.");
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
     if (data.type === 'new_session') {
-      addSessionToList(data.session_id, data.name);
-      if (!selectedSession) selectSession(data.session_id); // auto-select first
-    } else if (data.type === 'message') {
-      appendMessage(data.session_id, data.sender, data.message);
+      // session (queued) appears to admins
+      upsertSession({ session_id: data.session_id, status: data.status || 'queued', name: data.name });
+      if (!selectedSession) selectSession(data.session_id);
+      return;
     }
-  };
 
-  ws.onopen = () => console.log("Connected to live chat WebSocket.");
-  ws.onclose = () => console.log("Disconnected from live chat WebSocket.");
+    if (data.type === 'queued_ping') {
+      // student typed while queued — keep as lightweight activity marker
+      return;
+    }
+
+    if (data.type === 'joined') {
+      // this admin successfully joined a session → enable input
+      if (data.session_id) {
+        joinedSessions.add(data.session_id);
+        upsertSession({ session_id: data.session_id, status: 'live' });
+        if (selectedSession === data.session_id) enableInput(true);
+      }
+      return;
+    }
+
+    if (data.type === 'error') {
+      console.warn('WS error:', data.reason);
+      return;
+    }
+
+    if (data.type === 'message') {
+      // Only messages for selected session are appended by appendMessage()
+      appendMessage(data.session_id, data.sender, data.message);
+      return;
+    }
+
+    if (data.type === 'session_removed') {
+      removeSession(data.session_id);
+      return;
+    }
+
+  };
 }
 
-// ------------------- Initialize -------------------
+// ---------- Init ----------
 window.onload = async () => {
-  await loadExistingSessions(); // Load sessions and messages
-  connectWebSocket();           // Start WebSocket for live updates
+  clearMessages();
+  await loadExistingSessions();
+  connectWebSocket();
 };
 </script>
+
 
 </body>
 </html>
