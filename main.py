@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory="templates")  # folder for HTML templates
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key="5ab64f2fa5c97972a2ed0583f07d1d478c6887f6bc9cdbae2b42b25c1ff716c5",
+    secret_key=os.getenv("SECRET_KEY"),
     same_site="lax",   # or "none" if using HTTPS
     https_only=False
 )
