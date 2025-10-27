@@ -379,6 +379,121 @@
     transition: opacity 0.3s;
   }
 
+  /* Ticket Details Styles */
+  .ticket-details {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+  }
+  .ticket-details div {
+    margin-bottom: 0.5rem;
+  }
+  .ticket-details .label {
+    font-weight: 500;
+    color: #333;
+  }
+  .ticket-details .value {
+    margin-left: 0.5rem;
+    color: #555;
+  }
+
+  /* Cancel Ticket Button */
+  .cancel-ticket-btn {
+    background: #ff4d4d;
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .cancel-ticket-btn:hover {
+    background: #ff3333;
+  }
+
+  /* Card Styles */
+  .ticket-card, .appt-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Make modal content scrollable */
+  #tickets-modal .modal-content {
+    max-height: 80vh; /* Limit height to 80% of the viewport */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+
+  /* Meta and Actions Layout */
+  .ticket-meta, .appt-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .ticket-actions, .appt-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Header Styles */
+  .ticket-header, .appt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Make appointments modal content scrollable */
+  #appts-modal .modal-content {
+    max-height: 80vh; /* Limit height to 80% of the viewport */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+
+  /* Profile dropdown styles */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+#profile-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.profile-dropdown {
+  position: relative;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 1000;
+}
+.dropdown-content a {
+  display: block;
+  padding: 0.8rem 1rem;
+  text-decoration: none;
+  color: #333;
+  transition: background 0.3s;
+}
+.dropdown-content a:hover {
+  background: #f1f1f1;
+}
+.dropdown-content.show {
+  display: block;
+}
 </style>
 </head>
 <body>
@@ -386,17 +501,23 @@
 <!-- Navbar -->
 <nav>
   <div class="nav-left">
-    <img src="{{ url_for('static', path='assets/images/logo.png') }}"
-          alt="SmartAssist Logo"
-          class="logo">
     <h1>SmartAssist</h1>
   </div>
   <div class="nav-links">
-    <a href="#">Home</a>
-    <a href="#">Tickets</a>
-    <a href="#">Appointments</a>
-    <a href="#">Feedback</a>
-    <a href="login">Logout</a>
+    <a href="classes">Classes</a>
+    <a href="knowledge_base">Knowledge Base</a>
+    <a href="departments">Departments</a>
+    <a href="analytics">Analytics</a>
+  </div>
+  <div class="nav-right">
+    <span id="welcome-message">Welcome, User</span>
+    <div class="profile-dropdown">
+      <i class="fa-solid fa-user-circle" id="profile-icon"></i>
+      <div class="dropdown-content" id="profile-dropdown">
+        <a href="edit_profile">Edit Profile</a>
+        <a href="login">Logout</a>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -419,16 +540,16 @@
 
     <!-- Quick Stats -->
     <div class="stats">
-      <div class="stat">
+      <div id="open-tickets-widget" class="stat" style="cursor:pointer;">
         <div>
-          <div class="number">3</div>
+          <div id="open-tickets-count" class="number">0</div>
           <div class="label">Open Tickets</div>
         </div>
         <i class="fa-solid fa-ticket"></i>
       </div>
-      <div class="stat">
+      <div id="upcoming-appts-widget" class="stat" style="cursor:pointer;">
         <div>
-          <div class="number">2</div>
+          <div id="upcoming-appts-count" class="number">0</div>
           <div class="label">Upcoming Appointments</div>
         </div>
         <i class="fa-solid fa-calendar-check"></i>
@@ -562,123 +683,482 @@
   </div>
 </div>
 
+<!-- ================= LIST OPEN TICKETS MODAL ================= -->
+<div id="tickets-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-tickets-modal">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Open Tickets</h2>
+    <div id="tickets-list">
+      <!-- Tickets will be dynamically injected here -->
+      <div class="card" style="margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;">
+        <strong>Subject: Sample Ticket</strong>
+        <div>Category: Technical • Priority: <span style="color: red;">High</span></div>
+        <div>Status: <span style="color: orange;">In Progress</span></div>
+        <div>Date Created: 2025-10-20</div>
+        <div>Last Updated: 2025-10-21 by Staff A</div>
+        <div>Assigned Staff: Staff A</div>
+        <hr>
+        <div>Description:</div>
+        <p>This is a sample ticket description.</p>
+        <hr>
+        <div>Attachment: <a href="#">Download</a></div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel Ticket</button>
+        </div>
+      </div>
+
+      <!-- Open Tickets Example -->
+      <div class="card" style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Subject:</strong> Cannot access library portal</div>
+        <div><strong>Category:</strong> Technical • <strong>Priority:</strong> <span style="color: red;">High</span></div>
+        <div><strong>Status:</strong> <span style="color: orange;">In Progress</span></div>
+        <div><strong>Created:</strong> 2025-10-20</div>
+        <div><strong>Last Updated:</strong> 2025-10-21 by Staff A</div>
+        <div><strong>Assigned Staff:</strong> Staff A</div>
+        <hr>
+        <div><strong>Description:</strong></div>
+        <p>When I try to log in, I get an error message: "Access denied".</p>
+        <hr>
+        <div><strong>Attachment:</strong> <a href="#">Download</a></div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel Ticket</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= UPCOMING APPOINTMENTS MODAL ================= -->
+<div id="appts-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-appts-modal">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Upcoming Appointments</h2>
+    <div id="appts-list">
+      <!-- Appointments will be injected here by JS -->
+      <div class="card" style="margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;">
+        <strong>Type: Academic Advising</strong>
+        <div>Date & Time: 2025-10-25 10:00 AM</div>
+        <div>Status: <span style="color: green;">Confirmed (In 3 days)</span></div>
+        <div>Location/Mode: In-Person (Room 101)</div>
+        <p>Notes: Bring all relevant documents.</p>
+        <button style="background: red; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Cancel Appointment</button>
+        <button style="background: orange; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+      </div>
+
+      <!-- Confirmed Appointment Example -->
+      <div class="card" style="border: 2px solid green; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Type:</strong> Academic Advising</div>
+        <div><strong>Date & Time:</strong> 2025-10-25 • 10:00 AM</div>
+        <div><strong>Status:</strong> <span style="color: green;">Confirmed (In 3 days)</span></div>
+        <div><strong>Location / Mode:</strong> Room 203, Admin Bldg</div>
+        <div><strong>Notes:</strong> Bring your course plan</div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+          <button style="background: orange; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+        </div>
+      </div>
+
+      <!-- Pending Appointment Example -->
+      <div class="card" style="border: 2px solid yellow; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Type:</strong> Career Guidance</div>
+        <div><strong>Date & Time:</strong> 2025-10-27 • 2:00 PM</div>
+        <div><strong>Status:</strong> <span style="color: orange;">Confirmation Pending</span></div>
+        <div><strong>Location / Mode:</strong> To be assigned</div>
+        <div><strong>Notes:</strong> Optional prep info</div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-  // Raise Ticket Modal Logic
-  const modal = document.getElementById('ticket-modal');
-  const closeBtn = document.getElementById('close-ticket-btn');
-  const cancelBtn = document.getElementById('cancel-ticket-btn');
-  const ticketForm = document.getElementById('ticket-form');
-  const feedback = document.getElementById('ticket-feedback');
+  // Utility to get status color
+function getStatusColor(status) {
+  switch(status?.toLowerCase()) {
+    case 'open': return 'blue';
+    case 'in progress': return 'orange';
+    case 'closed': return 'green';
+    case 'cancelled': return 'red';
+    default: return 'gray';
+  }
+}
 
-  const raiseTicketCard = document.getElementById('raise-ticket-card');
-  const raiseTicketSidebar = document.getElementById('raise-ticket-sidebar');
+// Utility to get priority color
+function getPriorityColor(priority) {
+  switch(priority?.toLowerCase()) {
+    case 'low': return 'green';
+    case 'medium': return 'orange';
+    case 'high': return 'red';
+    case 'urgent': return 'darkred';
+    default: return 'gray';
+  }
+}
 
-  // Open modal
-  if (raiseTicketCard) {
-      raiseTicketCard.addEventListener('click', (e) => {
-        e.preventDefault();
-        modal.classList.add('show');
-        feedback.classList.add('hidden');
-        ticketForm.reset();
-      });
-    }
+// Render tickets dynamically
+function renderTickets(tickets) {
+  if (!tickets || tickets.length === 0) {
+    ticketsList.innerHTML = '<p>No open tickets.</p>';
+    return;
+  }
 
-  // Close modal
-  [closeBtn, cancelBtn].forEach(btn => btn.addEventListener('click', () => {
-    modal.classList.remove('show');
-    ticketForm.reset();
-    feedback.classList.add('hidden');
-  }));
+  ticketsList.innerHTML = tickets.map(t => `
+    <div class="ticket-card card">
+      <div class="ticket-header">
+        <strong>Subject:</strong> ${t.subject || 'No Subject'}
+        <span class="ticket-status" style="color: ${getStatusColor(t.status)};">${t.status || 'Unknown'}</span>
+      </div>
+      <div class="ticket-meta">
+        <div>Category: ${t.category || 'N/A'} • Priority: <span style="color: ${getPriorityColor(t.priority)};">${t.priority || 'N/A'}</span></div>
+        <div>Created: ${t.date_created || 'N/A'} • Last Updated: ${t.last_updated || 'N/A'} by ${t.assigned_staff || 'Not Assigned'}</div>
+        <div>Assigned Staff: ${t.assigned_staff || 'Not Assigned'}</div>
+      </div>
+      <div class="ticket-description">
+        <strong>Description:</strong> ${t.description || 'No description'}
+      </div>
+      <div class="ticket-attachment">
+        <strong>Attachment:</strong> ${t.attachment_id ? `<a href="/api/attachment/${t.attachment_id}">Download</a>` : 'None'}
+      </div>
+      <div class="ticket-actions">
+        <button class="cancel-ticket-btn" data-id="${t._id}">Cancel Ticket</button>
+      </div>
+    </div>
+  `).join('');
 
-  // Close on outside click
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.remove('show');
-      ticketForm.reset();
-      feedback.classList.add('hidden');
-    }
+  // Attach cancel button events after rendering
+  document.querySelectorAll('.cancel-ticket-btn').forEach(btn => {
+    btn.addEventListener('click', () => cancelTicket(btn.dataset.id));
   });
+}
 
-  // Submit form (AJAX placeholder)
-  ticketForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    feedback.classList.remove('hidden');
-    feedback.textContent = 'Submitting ticket...';
+// Fetch tickets
+async function fetchTickets() {
+  ticketsList.innerHTML = 'Loading...';
+  try {
+    const res = await fetch('/api/tickets?status=open');
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    const data = await res.json();
+    renderTickets(data.tickets || []);
+  } catch (e) {
+    console.error(e);
+    ticketsList.innerHTML = '<p>Error loading tickets.</p>';
+  }
+}
 
-    const formData = new FormData(ticketForm);
-    try {
-      const res = await fetch('/raise_ticket', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        feedback.textContent = 'Ticket submitted successfully!';
-        ticketForm.reset();
-        setTimeout(() => modal.classList.remove('show'), 1500);
-      } else {
-        feedback.textContent = 'Failed to submit ticket. Please try again.';
-      }
-    } catch (err) {
-      feedback.textContent = 'Error connecting to server.';
+// Cancel ticket function (example AJAX)
+async function cancelTicket(ticketId) {
+  if (!ticketId) return;
+  if (!confirm('Are you sure you want to cancel this ticket?')) return;
+
+  try {
+    const res = await fetch(`/api/tickets/cancel/${ticketId}`, { method: 'POST' });
+    if (!res.ok) {
+      alert('Failed to cancel ticket. Please try again.');
+      return;
     }
-  });
+    const data = await res.json();
+    if (data.success) {
+      alert('Ticket cancelled successfully!');
+      fetchTickets(); // Refresh the list
+      updateCounts(); // Refresh count widget
+    } else {
+      alert(data.message || 'Failed to cancel ticket.');
+    }
+  } catch (e) {
+    console.error('Error cancelling ticket:', e);
+    alert('Error connecting to server.');
+  }
+}
 
-  // Book Appointment Modal Logic
-  const appointmentModal = document.getElementById('appointment-modal');
-  const closeAppointmentBtn = document.getElementById('close-appointment-btn');
-  const cancelAppointmentBtn = document.getElementById('cancel-appointment-btn');
-  const appointmentForm = document.getElementById('appointment-form');
-  const appointmentFeedback = document.getElementById('appointment-feedback');
+// Raise Ticket Modal Logic
+const modal = document.getElementById('ticket-modal');
+const closeBtn = document.getElementById('close-ticket-btn');
+const cancelBtn = document.getElementById('cancel-ticket-btn');
+const ticketForm = document.getElementById('ticket-form');
+const feedback = document.getElementById('ticket-feedback');
 
-  const bookAppointmentCard = document.getElementById('book-appointment-card');
-  const bookAppointmentSidebar = document.getElementById('book-appointment-sidebar');
+const raiseTicketCard = document.getElementById('raise-ticket-card');
+const raiseTicketSidebar = document.getElementById('raise-ticket-sidebar');
 
-  // Open modal
-  if (bookAppointmentCard) {
-    bookAppointmentCard.addEventListener('click', (e) => {
+// Open modal
+if (raiseTicketCard) {
+    raiseTicketCard.addEventListener('click', (e) => {
       e.preventDefault();
-      appointmentModal.classList.add('show');
-      appointmentFeedback.classList.add('hidden');
-      appointmentForm.reset();
+      modal.classList.add('show');
+      feedback.classList.add('hidden');
+      ticketForm.reset();
     });
   }
 
-  // Close modal
-  [closeAppointmentBtn, cancelAppointmentBtn].forEach(btn => btn.addEventListener('click', () => {
+// Close modal
+[closeBtn, cancelBtn].forEach(btn => btn.addEventListener('click', () => {
+  modal.classList.remove('show');
+  ticketForm.reset();
+  feedback.classList.add('hidden');
+}));
+
+// Close on outside click
+window.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    modal.classList.remove('show');
+    ticketForm.reset();
+    feedback.classList.add('hidden');
+  }
+});
+
+// Submit form (AJAX placeholder)
+ticketForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  feedback.classList.remove('hidden');
+  feedback.textContent = 'Submitting ticket...';
+
+  const formData = new FormData(ticketForm);
+  try {
+    const res = await fetch('/raise_ticket', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      feedback.textContent = 'Ticket submitted successfully!';
+      ticketForm.reset();
+      // refresh counts and tickets list
+      updateCounts();
+      setTimeout(() => modal.classList.remove('show'), 1500);
+    } else {
+      feedback.textContent = 'Failed to submit ticket. Please try again.';
+    }
+  } catch (err) {
+    feedback.textContent = 'Error connecting to server.';
+  }
+});
+
+// Book Appointment Modal Logic
+const appointmentModal = document.getElementById('appointment-modal');
+const closeAppointmentBtn = document.getElementById('close-appointment-btn');
+const cancelAppointmentBtn = document.getElementById('cancel-appointment-btn');
+const appointmentForm = document.getElementById('appointment-form');
+const appointmentFeedback = document.getElementById('appointment-feedback');
+
+const bookAppointmentCard = document.getElementById('book-appointment-card');
+const bookAppointmentSidebar = document.getElementById('book-appointment-sidebar');
+
+// Open modal
+if (bookAppointmentCard) {
+  bookAppointmentCard.addEventListener('click', (e) => {
+    e.preventDefault();
+    appointmentModal.classList.add('show');
+    appointmentFeedback.classList.add('hidden');
+    appointmentForm.reset();
+  });
+}
+
+// Close modal
+[closeAppointmentBtn, cancelAppointmentBtn].forEach(btn => btn.addEventListener('click', () => {
+  appointmentModal.classList.remove('show');
+  appointmentForm.reset();
+  appointmentFeedback.classList.add('hidden');
+}));
+
+// Close on outside click
+window.addEventListener('click', (e) => {
+  if (e.target === appointmentModal) {
     appointmentModal.classList.remove('show');
     appointmentForm.reset();
     appointmentFeedback.classList.add('hidden');
-  }));
+  }
+});
 
-  // Close on outside click
-  window.addEventListener('click', (e) => {
-    if (e.target === appointmentModal) {
-      appointmentModal.classList.remove('show');
+// Submit form (AJAX placeholder)
+appointmentForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  appointmentFeedback.classList.remove('hidden');
+  appointmentFeedback.textContent = 'Booking appointment...';
+
+  const formData = new FormData(appointmentForm);
+  try {
+    const res = await fetch('/book_appointment', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      appointmentFeedback.textContent = 'Appointment booked successfully!';
       appointmentForm.reset();
-      appointmentFeedback.classList.add('hidden');
+      updateCounts();
+      setTimeout(() => appointmentModal.classList.remove('show'), 1500);
+    } else {
+      appointmentFeedback.textContent = 'Failed to book appointment. Please try again.';
     }
-  });
+  } catch (err) {
+    appointmentFeedback.textContent = 'Error connecting to server.';
+  }
+});
 
-  // Submit form (AJAX placeholder)
-  appointmentForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    appointmentFeedback.classList.remove('hidden');
-    appointmentFeedback.textContent = 'Booking appointment...';
+// New: Open Tickets & Upcoming Appointments modals
+const ticketsModal = document.getElementById('tickets-modal');
+const apptsModal = document.getElementById('appts-modal');
+const ticketsList = document.getElementById('tickets-list');
+const apptsList = document.getElementById('appts-list');
 
-    const formData = new FormData(appointmentForm);
-    try {
-      const res = await fetch('/book_appointment', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        appointmentFeedback.textContent = 'Appointment booked successfully!';
-        appointmentForm.reset();
-        setTimeout(() => appointmentModal.classList.remove('show'), 1500);
-      } else {
-        appointmentFeedback.textContent = 'Failed to book appointment. Please try again.';
+// Select widgets by id
+const openTicketsById = document.getElementById('open-tickets-widget');
+const upcomingById = document.getElementById('upcoming-appts-widget');
+
+function renderTickets(items){
+  if(!items || items.length === 0){
+    ticketsList.innerHTML = '<p>No open tickets.</p>';
+    return;
+  }
+  ticketsList.innerHTML = items.map(t => `
+    <div class="ticket-card card">
+      <div class="ticket-header">
+        <strong>Subject:</strong> ${t.subject}
+        <span class="ticket-status" style="color: ${getStatusColor(t.status)};">${t.status}</span>
+      </div>
+      <div class="ticket-meta">
+        <div>Category: ${t.category} • Priority: <span style="color: ${getPriorityColor(t.priority)};">${t.priority}</span></div>
+        <div>Created: ${t.date_created} • Last Updated: ${t.last_updated} by ${t.assigned_staff || 'Not Assigned Yet'}</div>
+        <div>Assigned Staff: ${t.assigned_staff || 'Not Assigned Yet'}</div>
+      </div>
+      <div class="ticket-description">
+        <strong>Description:</strong> ${t.description}
+      </div>
+      <div class="ticket-attachment"><strong>Attachment:</strong> ${t.attachment_id ? `<a href="/api/attachment/${t.attachment_id}">Download</a>` : 'None'}</div>
+      <div class="ticket-actions">
+        <button class="cancel-ticket-btn" onclick="cancelTicket('${t._id}')">Cancel Ticket</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAppts(items){
+  if(!items || items.length === 0){
+    apptsList.innerHTML = '<p>No upcoming appointments.</p>';
+    return;
+  }
+  apptsList.innerHTML = items.map(a => `
+    <div class="appt-card card">
+      <div class="appt-header">
+        <strong>Type:</strong> ${a.type}
+        <span class="appt-status" style="color: ${a.status === 'Confirmed' ? 'green' : 'orange'};">${a.status} ${a.countdown || ''}</span>
+      </div>
+      <div class="appt-meta">
+        <div>Date & Time: ${a.date} • ${a.time}</div>
+        <div>Location / Mode: ${a.location_mode || 'To be assigned'}</div>
+      </div>
+      <div class="appt-notes"><strong>Notes:</strong> ${a.notes || 'None'}</div>
+      <div class="appt-actions">
+        <button class="cancel-appt-btn" onclick="cancelAppointment('${a._id}')">Cancel</button>
+        ${a.status === 'Confirmed' ? `<button class="reschedule-appt-btn" onclick="rescheduleAppointment('${a._id}')">Reschedule</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function fetchTickets(){
+  ticketsList.innerHTML = 'Loading...';
+  try{
+    const res = await fetch('/api/tickets?status=open');
+    if (!res.ok) {
+      console.error('Failed to fetch tickets:', res.status, res.statusText);
+      ticketsList.innerHTML = '<p>Error loading tickets. Please try again later.</p>';
+      return;
+    }
+    const data = await res.json();
+    console.log('Tickets API response:', data);
+    renderTickets(data.tickets || []);
+  }catch(e){
+    console.error('Error in fetchTickets:', e);
+    ticketsList.innerHTML = '<p>Error loading tickets. Please check your connection.</p>';
+  }
+}
+
+async function fetchAppts(){
+  apptsList.innerHTML = 'Loading...';
+  try{
+    const res = await fetch('/api/appointments?upcoming=true');
+    const data = await res.json();
+    renderAppts(data.appointments || []);
+  }catch(e){ apptsList.innerHTML = '<p>Error loading appointments.</p>'; }
+}
+
+// Update counts in stats widgets
+async function updateCounts(){
+  try{
+    const t = await fetch('/api/tickets?status=open');
+    const tdata = await t.json();
+    document.getElementById('open-tickets-count').textContent = tdata.count || 0;
+
+    const a = await fetch('/api/appointments?upcoming=true');
+    const adata = await a.json();
+    document.getElementById('upcoming-appts-count').textContent = adata.count || 0;
+  }catch(e){
+    console.error('Failed to update counts', e);
+  }
+}
+
+// initial counts
+updateCounts();
+
+// wire up openers
+if(openTicketsById){
+  openTicketsById.addEventListener('click', () => { ticketsModal.classList.add('show'); fetchTickets(); });
+}
+if(upcomingById){
+  upcomingById.addEventListener('click', () => { apptsModal.classList.add('show'); fetchAppts(); });
+}
+
+// close buttons
+const closeTicketsBtn = document.getElementById('close-tickets-modal');
+const closeApptsBtn = document.getElementById('close-appts-modal');
+if (closeTicketsBtn && typeof ticketsModal !== 'undefined') {
+  closeTicketsBtn.addEventListener('click', () => ticketsModal.classList.remove('show'));
+}
+if (closeApptsBtn && typeof apptsModal !== 'undefined') {
+  closeApptsBtn.addEventListener('click', () => apptsModal.classList.remove('show'));
+}
+
+// close on outside click
+window.addEventListener('click', (e) => {
+  if(e.target === ticketsModal) ticketsModal.classList.remove('show');
+  if(e.target === apptsModal) apptsModal.classList.remove('show');
+});
+
+// Dynamic welcome message
+window.onload = async () => {
+  try {
+    const res = await fetch('/api/user'); // Backend endpoint to fetch user info
+    if (res.ok) {
+      const user = await res.json();
+
+      // Update the main welcome message
+      const welcomeHeading = document.querySelector('.text-2xl.font-semibold.text-gray-800');
+      if (welcomeHeading) {
+        welcomeHeading.textContent = `Welcome, ${user.full_name || 'Student'} 👋`;
       }
-    } catch (err) {
-      appointmentFeedback.textContent = 'Error connecting to server.';
-    }
-  });
 
+      // Update the profile dropdown welcome message
+      const welcomeMessage = document.getElementById('welcome-message');
+      if (welcomeMessage) {
+        welcomeMessage.textContent = `Welcome, ${user.full_name || 'User'}`;
+      }
+    } else {
+      console.error(`Failed to fetch user info. Status: ${res.status}`);
+    }
+  } catch (err) {
+    console.error('Failed to fetch user info:', err);
+  }
+};
+
+// Profile dropdown toggle
+const profileIcon = document.getElementById('profile-icon');
+const profileDropdown = document.getElementById('profile-dropdown');
+profileIcon.onclick = () => {
+  profileDropdown.classList.toggle('show');
+};
+
+// Close dropdown on outside click
+window.addEventListener('click', (e) => {
+  if (!profileDropdown.contains(e.target) && e.target !== profileIcon) {
+    profileDropdown.classList.remove('show');
+  }
+});
 </script>
 
 </body>

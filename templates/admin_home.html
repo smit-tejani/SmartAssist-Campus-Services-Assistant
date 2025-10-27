@@ -129,6 +129,74 @@
     display: none;
   }
 
+  /* Tickets & Appointments */
+  /* ------------------- */
+  /* Section */
+  .tickets-appointments { margin-top:2rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; }
+
+  /* Cards */
+  .ticket-card, .appointment-card {
+    background:#fff; border-radius:16px; padding:1.5rem; box-shadow:0 6px 20px rgba(0,0,0,0.05);
+    transition:0.4s; cursor:pointer; display:flex; flex-direction:column; justify-content:center;
+  }
+  .ticket-card:hover, .appointment-card:hover { transform:translateY(-8px); }
+  .ticket-card i, .appointment-card i { font-size:2rem; color:#0067A5; margin-bottom:1rem; }
+
+  /* Tables */
+  table {
+    width:100%; margin-top:1rem; border-collapse: collapse;
+  }
+  th, td {
+    padding:0.8rem; text-align:left; border-bottom:1px solid #eee;
+  }
+  th {
+    background:#f1f1f1; color:#333;
+  }
+  tr:hover {
+    background:#f9f9f9;
+  }
+
+  /* Modal */
+  #ticket-modal {
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:2000;
+  }
+  #ticket-modal > div {
+    background:#fff; border-radius:12px; padding:2rem; width:500px; max-width:90%; max-height:90%; overflow-y:auto; position:relative;
+  }
+  #close-ticket-modal {
+    position:absolute; top:1rem; right:1rem; cursor:pointer; font-size:1.2rem;
+  }
+  #ticket-subject {
+    margin:0 0 1rem 0;
+    font-size:1.3rem; font-weight:500;
+  }
+  #ticket-status, #ticket-assign {
+    width:100%; padding:0.6rem; border:1px solid #ccc;
+    border-radius:6px; margin-top:0.5rem;
+  }
+  #update-ticket {
+    background:#00A99D; color:white; padding:0.6rem 1.2rem; border:none; border-radius:6px;
+    cursor:pointer; transition:0.3s; margin-top:1rem;
+  }
+  #update-ticket:hover {
+    background:#009688;
+  }
+
+  .ticket-item, .appointment-item {
+    background:#fdfdfd;
+    box-shadow:0 3px 10px rgba(0,0,0,0.05);
+    transition:0.3s;
+  }
+  .ticket-item:hover, .appointment-item:hover {
+    transform:translateY(-3px);
+  }
+  .ticket-item button, .appointment-item button {
+    background:#0067A5; color:#fff; border:none; padding:0.4rem 0.8rem; border-radius:6px; cursor:pointer;
+  }
+  .ticket-item button:hover, .appointment-item button:hover {
+    background:#00A99D;
+  }
 </style>
 </head>
 <body>
@@ -159,19 +227,102 @@
     </div>
 
     <div class="stats">
-      <div class="stat"><div><div class="number">120</div><div class="label">Knowledge Articles</div></div><i class="fa-solid fa-book"></i></div>
-      <div class="stat"><div><div class="number">15</div><div class="label">Departments</div></div><i class="fa-solid fa-building-columns"></i></div>
-      <div class="stat"><div><div class="number">50</div><div class="label">Active Users</div></div><i class="fa-solid fa-user-gear"></i></div>
-      <div class="stat"><div><div class="number">30</div><div class="label">Upcoming Appointments</div></div><i class="fa-solid fa-calendar-check"></i></div>
+      <div class="stat"><div><div class="number">0</div><div class="label">Knowledge Articles</div></div><i class="fa-solid fa-book"></i></div>
+      <div class="stat"><div><div class="number">0</div><div class="label">Departments</div></div><i class="fa-solid fa-building-columns"></i></div>
+      <div class="stat"><div><div class="number">0</div><div class="label">Active Users</div></div><i class="fa-solid fa-user-gear"></i></div>
+      <div class="stat"><div><div class="number">0</div><div class="label">Upcoming Appointments</div></div><i class="fa-solid fa-calendar-check"></i></div>
     </div>
 
     <div class="grid">
-      <div class="card"><i class="fa-solid fa-book"></i><h3>Knowledge Base</h3><p>Add, edit, or remove FAQ articles and guides.</p></div>
+      <a href="/knowledge_base" style="text-decoration: none; color: inherit;">
+        <div class="card">
+          <i class="fa-solid fa-book"></i>
+          <h3>Knowledge Base</h3>
+          <p>Add, edit, or remove FAQ articles and guides.</p>
+        </div>
+      </a>
       <div class="card"><i class="fa-solid fa-building-columns"></i><h3>Departments</h3><p>Update professor info, office locations, and departmental details.</p></div>
       <div class="card"><i class="fa-solid fa-chart-line"></i><h3>Analytics</h3><p>View reports on tickets, requests, and knowledge base usage.</p></div>
       <div class="card"><i class="fa-solid fa-user-gear"></i><h3>User Management</h3><p>Manage students, staff, and admin access and permissions.</p></div>
       <div class="card"><i class="fa-solid fa-calendar-check"></i><h3>Appointments</h3><p>View and manage scheduled appointments across departments.</p></div>
     </div>
+
+    <!-- Tickets & Appointments Section -->
+    <div class="grid" style="margin-top:2rem;">
+
+      <!-- Tickets Card -->
+      <div class="card" style="flex:2; min-width:400px;">
+        <i class="fa-solid fa-ticket"></i>
+        <h3>Open Tickets</h3>
+        <p>View, assign, and manage student-raised tickets.</p>
+
+        <table style="width:100%; margin-top:1rem; border-collapse: collapse;">
+          <thead>
+            <tr style="background:#00A99D; color:white;">
+              <th style="padding:0.5rem; text-align:left;">ID</th>
+              <th style="padding:0.5rem; text-align:left;">Student</th>
+              <th style="padding:0.5rem; text-align:left;">Subject</th>
+              <th style="padding:0.5rem; text-align:left;">Status</th>
+              <th style="padding:0.5rem; text-align:left;">Assign</th>
+            </tr>
+          </thead>
+          <tbody id="tickets-table">
+            <!-- Tickets dynamically populated here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Appointments Card -->
+      <div class="card" style="flex:2; min-width:400px;">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h3>Upcoming Appointments</h3>
+        <p>View and manage all scheduled appointments.</p>
+
+        <table style="width:100%; margin-top:1rem; border-collapse: collapse;">
+          <thead>
+            <tr style="background:#0067A5; color:white;">
+              <th style="padding:0.5rem; text-align:left;">ID</th>
+              <th style="padding:0.5rem; text-align:left;">Student</th>
+              <th style="padding:0.5rem; text-align:left;">Department</th>
+              <th style="padding:0.5rem; text-align:left;">Date & Time</th>
+              <th style="padding:0.5rem; text-align:left;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="appointments-table">
+            <!-- Appointments dynamically populated here -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- Ticket Details Modal -->
+    <div id="ticket-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000;">
+      <div style="background:#fff; border-radius:12px; padding:2rem; width:500px; max-width:90%; max-height:90%; overflow-y:auto; position:relative;">
+        <span id="close-ticket-modal" style="position:absolute; top:1rem; right:1rem; cursor:pointer; font-size:1.2rem;">&times;</span>
+        <h3 id="ticket-subject">Ticket Subject</h3>
+        <p><strong>Student:</strong> <span id="ticket-student"></span></p>
+        <p><strong>Category:</strong> <span id="ticket-category"></span></p>
+        <p><strong>Priority:</strong> <span id="ticket-priority"></span></p>
+        <p><strong>Description:</strong></p>
+        <p id="ticket-description"></p>
+        <p><strong>Status:</strong>
+          <select id="ticket-status">
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </p>
+        <p><strong>Assign Staff:</strong>
+          <select id="ticket-assign">
+            <!-- Staff list populated dynamically -->
+          </select>
+        </p>
+        <button id="update-ticket" style="background:#00A99D; color:white; padding:0.5rem 1rem; border:none; border-radius:6px; cursor:pointer;">Update Ticket</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -213,52 +364,9 @@ const sendBtn = document.getElementById('send-btn');
 
 let ws;
 let selectedSession = null;
+const joinedSessions = new Set();      // sessions this admin has joined
+const sessionsIndex  = new Map();      // session_id -> {name,status}
 
-// Open/close panel
-chatToggle.onclick = () => chatPanel.classList.toggle('open');
-closeChat.onclick = () => chatPanel.classList.remove('open');
-
-// ------------------- Helper Functions -------------------
-
-// Add a student session to the list
-function addSessionToList(sessionId, name) {
-  const item = document.createElement('div');
-  item.classList.add('chat-list-item');
-  item.textContent = name + ' (' + sessionId.substring(0,4) + ')';
-  item.onclick = () => selectSession(sessionId);
-  item.dataset.id = sessionId;
-  chatList.appendChild(item);
-}
-
-// Select a session to view messages
-function selectSession(sessionId) {
-  selectedSession = sessionId;
-  chatMessages.innerHTML = '';
-  chatInput.disabled = false;
-  sendBtn.disabled = false;
-  
-  document.querySelectorAll('.chat-list-item').forEach(i => i.classList.remove('active'));
-  document.querySelector(`.chat-list-item[data-id="${sessionId}"]`)?.classList.add('active');
-
-  // Load chat history for this session
-  fetch(`/api/admin/live_chats/${sessionId}`)
-    .then(res => res.json())
-    .then(data => {
-      chatMessages.innerHTML = '';
-      data.messages.forEach(msg => appendMessage(sessionId, msg.sender, msg.message));
-    })
-    .catch(err => console.error('Failed to load chat messages:', err));
-}
-
-// Append a message to the chat window
-function appendMessage(sessionId, sender, message) {
-  if (sessionId !== selectedSession) return; // Only show messages for selected session
-  const div = document.createElement('div');
-  div.classList.add('chat-message', sender === 'admin' ? 'admin' : 'student');
-  div.textContent = message;
-  chatMessages.appendChild(div);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
 
 // Open/close panel with chat button hide/show
 chatToggle.onclick = () => {
@@ -271,60 +379,336 @@ closeChat.onclick = () => {
   chatToggle.classList.remove('hidden'); // show the button when panel closes
 };
 
+// ------------------- Helper Functions -------------------
+function fallbackName(sessionId, name) {
+  return name && name.trim() ? name : `Student ${sessionId?.slice(0,4) || ''}`;
+}
 
-// Send a message from admin
+function upsertSession(session) {
+  const sid = session.session_id;
+  const name = fallbackName(sid, session.name);
+  const status = session.status || 'queued';
+
+  // store/merge local model
+  const prev = sessionsIndex.get(sid) || {};
+  sessionsIndex.set(sid, { name: name || prev.name, status });
+
+  // dedupe list item by data-id
+  let item = chatList.querySelector(`.chat-list-item[data-id="${sid}"]`);
+  if (!item) {
+    item = document.createElement('div');
+    item.classList.add('chat-list-item');
+    item.dataset.id = sid;
+    item.onclick = () => selectSession(sid);
+    chatList.appendChild(item);
+  }
+  item.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div>${fallbackName(sid, name)} <span style="color:#777">(${sid.slice(0,4)})</span></div>
+      <span style="font-size:.7rem;padding:.1rem .4rem;border-radius:8px;background:${status==='live'?'#d1f7e6':'#fff3cd'};color:${status==='live'?'#0b6848':'#8a6d3b'};">
+        ${status}
+      </span>
+    </div>
+  `;
+}
+
+function clearMessages() {
+  chatMessages.innerHTML = `<p style="color:#999; text-align:center;">Select a chat to start messaging.</p>`;
+}
+
+function removeSession(sessionId) {
+  const item = chatList.querySelector(`.chat-list-item[data-id="${sessionId}"]`);
+  if (item) item.remove();
+  if (selectedSession === sessionId) {
+    selectedSession = null;
+    chatInput.disabled = true; sendBtn.disabled = true;
+    chatMessages.innerHTML = `<p style="color:#999; text-align:center;">Select a chat to start messaging.</p>`;
+  }
+  sessionsIndex.delete(sessionId);
+  joinedSessions.delete(sessionId);
+}
+
+
+
+function enableInput(enabled) {
+  chatInput.disabled = !enabled;
+  sendBtn.disabled   = !enabled;
+}
+
+// ---------- Select a session ----------
+async function selectSession(sessionId) {
+  selectedSession = sessionId;
+  document.querySelectorAll('.chat-list-item').forEach(i => i.classList.remove('active'));
+  document.querySelector(`.chat-list-item[data-id="${sessionId}"]`)?.classList.add('active');
+
+  // reset window
+  chatMessages.innerHTML = '';
+  enableInput(false);
+
+  // 1) Load chat history (backend: GET /api/chat/{session_id} returns a LIST)
+  try {
+    const res = await fetch(`/api/chat/${sessionId}`);
+    const history = await res.json(); // [{sender, message, created_at}, ...]
+    if (!Array.isArray(history)) throw new Error('Bad history payload');
+    history.forEach(msg => appendMessage(sessionId, msg.sender, msg.message));
+  } catch (err) {
+    console.error('Failed to load chat messages:', err);
+  }
+
+  // 2) JOIN the session once per admin per session
+  if (!joinedSessions.has(sessionId)) {
+    ws?.send(JSON.stringify({ type: 'join', session_id: sessionId }));
+    // wait for "joined" event to enable input
+  } else {
+    enableInput(true);
+  }
+}
+
+// ---------- Load existing sessions on page load ----------
+// Append a message to the chat window
+function appendMessage(sessionId, sender, message) {
+  if (sessionId !== selectedSession) return; // only show for selected session
+  const div = document.createElement('div');
+  div.classList.add('chat-message', sender === 'admin' ? 'admin' : 'student');
+  div.textContent = message;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// ---------- Send a message ----------
 sendBtn.onclick = () => {
   const msg = chatInput.value.trim();
   if (!msg || !selectedSession) return;
-  
+
+  if (!joinedSessions.has(selectedSession)) {
+    // safety: do not allow sending before joined
+    return alert('Join the session first.');
+  }
+
   ws.send(JSON.stringify({ type: 'message', session_id: selectedSession, message: msg }));
   appendMessage(selectedSession, 'admin', msg);
   chatInput.value = '';
 };
 
-// ------------------- Load Existing Sessions -------------------
-
+// ---------- Load existing sessions on page load ----------
 async function loadExistingSessions() {
   try {
-    const res = await fetch('/api/admin/live_chats'); // Backend endpoint
-    const sessions = await res.json(); // [{ session_id, name, messages: [{ sender, message }] }]
-    
-    sessions.forEach((session, idx) => {
-      addSessionToList(session.session_id, session.name);
-      
-      // Auto-select the first session
-      if (idx === 0) selectSession(session.session_id);
+    const res = await fetch('/api/admin/live_chats'); // returns [{session_id, status, name?}]
+    const sessions = await res.json();
+    sessions.forEach((s, idx) => {
+      upsertSession(s);
+      if (idx === 0) selectSession(s.session_id);
     });
   } catch (err) {
     console.error('Failed to load sessions:', err);
   }
 }
 
-// ------------------- WebSocket Connection -------------------
-
+// ---------- Admin WebSocket ----------
 function connectWebSocket() {
-  ws = new WebSocket(`ws://${window.location.host}/ws/admin`);
+  ws = new WebSocket(`${location.origin.replace('http', 'ws')}/ws/admin`);
+
+  ws.onopen = () => console.log("Connected to live chat WebSocket.");
+  ws.onclose = () => console.log("Disconnected from live chat WebSocket.");
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
     if (data.type === 'new_session') {
-      addSessionToList(data.session_id, data.name);
-      if (!selectedSession) selectSession(data.session_id); // auto-select first
-    } else if (data.type === 'message') {
-      appendMessage(data.session_id, data.sender, data.message);
+      // session (queued) appears to admins
+      upsertSession({ session_id: data.session_id, status: data.status || 'queued', name: data.name });
+      if (!selectedSession) selectSession(data.session_id);
+      return;
     }
-  };
 
-  ws.onopen = () => console.log("Connected to live chat WebSocket.");
-  ws.onclose = () => console.log("Disconnected from live chat WebSocket.");
+    if (data.type === 'queued_ping') {
+      // student typed while queued — keep as lightweight activity marker
+      return;
+    }
+
+    if (data.type === 'joined') {
+      // this admin successfully joined a session → enable input
+      if (data.session_id) {
+        joinedSessions.add(data.session_id);
+        upsertSession({ session_id: data.session_id, status: 'live' });
+        if (selectedSession === data.session_id) enableInput(true);
+      }
+      return;
+    }
+
+    if (data.type === 'error') {
+      console.warn('WS error:', data.reason);
+      return;
+    }
+
+    if (data.type === 'message') {
+      // Only messages for selected session are appended by appendMessage()
+      appendMessage(data.session_id, data.sender, data.message);
+      return;
+    }
+
+    if (data.type === 'session_removed') {
+      removeSession(data.session_id);
+      return;
+    }
+
+  };
 }
 
 // ------------------- Initialize -------------------
 window.onload = async () => {
   await loadExistingSessions(); // Load sessions and messages
+  clearMessages();
   connectWebSocket();           // Start WebSocket for live updates
+  loadTickets();               // Load tickets for admin
+  loadAppointments();           // Load appointments for admin
 };
+
+// ------------------- Tickets & Appointments -------------------
+// Load tickets from server
+async function loadTickets() {
+  try {
+    console.log('Fetching tickets from backend...');
+    const res = await fetch('/api/tickets'); // Ensure this endpoint matches your backend
+    if (!res.ok) {
+      console.error(`Failed to fetch tickets. Status: ${res.status}, Message: ${res.statusText}`);
+      return;
+    }
+    const data = await res.json();
+    console.log('Tickets fetched:', data);
+
+    const tickets = data.tickets || []; // Extract tickets array from response
+    const ticketsTable = document.getElementById('tickets-table');
+    ticketsTable.innerHTML = '';
+
+    tickets.forEach(ticket => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${ticket.id}</td>
+        <td>${ticket.student_name}</td>
+        <td>${ticket.subject}</td>
+        <td>${ticket.status}</td>
+        <td>
+          <button class="assign-btn" style="margin-right:0.5rem;">Assign</button>
+          <button class="update-status-btn">Update</button>
+        </td>
+      `;
+
+      // Assign Staff click
+      row.querySelector('.assign-btn').onclick = () => openTicketModal(ticket);
+      row.querySelector('.update-status-btn').onclick = () => openTicketModal(ticket);
+
+      ticketsTable.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Error fetching tickets:', err);
+  }
+}
+
+// Load appointments from server
+async function loadAppointments() {
+  try {
+    console.log('Fetching appointments from backend...');
+    const res = await fetch('/api/appointments'); // Ensure this endpoint matches your backend
+    if (!res.ok) {
+      console.error(`Failed to fetch appointments. Status: ${res.status}, Message: ${res.statusText}`);
+      return;
+    }
+    const data = await res.json();
+    console.log('Appointments fetched:', data);
+
+    const appointments = data.appointments || []; // Extract appointments array from response
+    const appointmentsTable = document.getElementById('appointments-table');
+    appointmentsTable.innerHTML = '';
+    
+    appointments.forEach(app => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${app.id}</td>
+        <td>${app.student_name}</td>
+        <td>${app.department}</td>
+        <td>${app.date} ${app.time}</td>
+        <td>${app.status}</td>
+      `;
+
+      appointmentsTable.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Error fetching appointments:', err);
+  }
+}
+
+// Ticket modal functions
+const ticketModal = document.getElementById('ticket-modal');
+const closeTicketModal = document.getElementById('close-ticket-modal');
+closeTicketModal.onclick = () => ticketModal.style.display = 'none';
+
+function openTicketModal(ticket) {
+  ticketModal.style.display = 'flex';
+  document.getElementById('ticket-subject').textContent = ticket.subject;
+  document.getElementById('ticket-student').textContent = ticket.student_name;
+  document.getElementById('ticket-category').textContent = ticket.category;
+  document.getElementById('ticket-priority').textContent = ticket.priority;
+  document.getElementById('ticket-description').textContent = ticket.description;
+  document.getElementById('ticket-status').value = ticket.status;
+
+  const assignSelect = document.getElementById('ticket-assign');
+  assignSelect.innerHTML = '';
+  ticket.staff_list.forEach(staff => {
+    const option = document.createElement('option');
+    option.value = staff;
+    option.textContent = staff;
+    if(ticket.assigned_staff === staff) option.selected = true;
+    assignSelect.appendChild(option);
+  });
+
+  document.getElementById('update-ticket').onclick = async () => {
+    const updatedStatus = document.getElementById('ticket-status').value;
+    const assignedStaff = document.getElementById('ticket-assign').value;
+
+    try {
+      await fetch(`/api/tickets/${ticket.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: updatedStatus, assigned_staff: assignedStaff })
+      });
+      ticketModal.style.display = 'none';
+      loadTickets(); // refresh table
+    } catch (err) {
+      console.error('Failed to update ticket:', err);
+    }
+  }
+}
+
+// Initialize
+window.onload = () => {
+  loadTickets();
+  loadAppointments();
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('DOM fully loaded and parsed. Fetching stats...');
+
+  try {
+    const res = await fetch('/api/stats');
+    if (res.ok) {
+      const stats = await res.json();
+      console.log('Stats fetched successfully:', stats);
+
+      const knowledgeArticlesStat = document.querySelector('.stat .number');
+      if (knowledgeArticlesStat) {
+        knowledgeArticlesStat.textContent = stats.knowledge_articles || 0;
+        console.log('Knowledge articles count updated in UI:', stats.knowledge_articles);
+      } else {
+        console.error('Knowledge articles stat element not found in the DOM.');
+      }
+    } else {
+      console.error(`Failed to fetch stats. Status: ${res.status}`);
+    }
+  } catch (err) {
+    console.error('Error fetching stats:', err);
+  }
+});
 </script>
 
 </body>
