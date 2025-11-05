@@ -4,6 +4,7 @@ aiosignal==1.4.0
 annotated-types==0.7.0
 anyio==4.11.0
 attrs==25.4.0
+authlib
 beautifulsoup4==4.14.2
 bs4==0.0.2
 certifi==2025.10.5
@@ -74,3 +75,5 @@ uvloop==0.21.0
 watchfiles==1.1.0
 websockets==15.0.1
 yarl==1.22.0
+itsdangerous
+starlette>=0.23.0

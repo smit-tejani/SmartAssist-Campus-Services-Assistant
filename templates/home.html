@@ -166,8 +166,15 @@
   <!-- Navbar -->
   <nav>
     <div class="nav-left">
-      <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo" class="logo">
-      <h1>SmartAssist</h1>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <img src="{{ url_for('static', path='assets/images/logo.png') }}"
+          alt="SmartAssist Logo"
+          style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+        <div>
+          <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
+          <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">TAMUCC Campus Assistant</p>
+        </div>
+      </div>
     </div>
     <div class="nav-links">
       <a href="#about">About</a>
