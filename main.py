@@ -705,7 +705,7 @@ async def post_register(
     users_collection.insert_one({
         "full_name": full_name,
         "email": email,
-        "password": password,       # TODO: hash this
+        "password": password,       #TODO: hash this
         "role": role
     })
     return templates.TemplateResponse(
