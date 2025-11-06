@@ -59,11 +59,14 @@ db = client.smartassist
 users_collection = db.users
 live_chat_collection = db.live_chat
 live_chat_sessions = db.live_chat_sessions
+kb_collection        = db.knowledge_base   # <-- use the collection from your screenshot
 fs = gridfs.GridFS(db)
 
 # Ensure a text index exists for follow-ups (safe to call once)
 try:
-    db.articles.create_index([("title","text"), ("content","text"), ("category","text")])
+    kb_collection.create_index(
+        [("title", "text"), ("content", "text"), ("category", "text")]
+    )
 except Exception:
     pass
 
@@ -127,23 +130,41 @@ def _wants_human(text: str) -> bool:
 def _mongo_text_search(query: str, limit: int = 8) -> List[Dict]:
     if not (query and query.strip()):
         return []
-    cur = (db.articles.find(
+    cur = (
+        kb_collection.find(
             {"$text": {"$search": query}},
-            {"title": 1, "category": 1, "url": 1, "score": {"$meta": "textScore"}}
-          )
-          .sort([("score", {"$meta": "textScore"})])
-          .limit(limit))
+            {
+                "title": 1,
+                "category": 1,
+                "url": 1,
+                "score": {"$meta": "textScore"},
+            },
+        )
+        .sort([("score", {"$meta": "textScore"})])
+        .limit(limit)
+    )
     return list(cur)
 
+
 def _should_offer_live_chat(user_q: str, answer_text: str, hits: int) -> bool:
+    # If they explicitly ask for a human, always escalate
     if _wants_human(user_q):
         return True
+
     low_conf = [
-        "i'm not sure", "no information", "could not find", "not available",
-        "i don't have", "unable to find"
+        "i'm not sure",
+        "no information",
+        "could not find",
+        "not available",
+        "i don't have",
+        "unable to find",
     ]
     a = (answer_text or "").lower()
-    return hits == 0 or any(p in a for p in low_conf)
+
+    # Only escalate when the answer itself looks uncertain
+    return any(p in a for p in low_conf)
+    # (optional stricter version if you want: return hits == 0 and any(p in a for p in low_conf))
+
 
 import re
 

@@ -373,8 +373,25 @@
       }
 
       // Check if user wants to create a ticket
-      const ticketKeywords = ['raise ticket', 'create ticket', 'submit ticket', 'report issue', 'file complaint', 'having issue', 'facing issue', 'problem with'];
-      const isTicketRequest = ticketKeywords.some(keyword => text.toLowerCase().includes(keyword));
+    const ticketKeywords = [
+    'raise ticket',
+    'raise a ticket',
+    'create ticket',
+    'create a ticket',
+    'open ticket',
+    'open a ticket',
+    'support ticket',
+    'help ticket',
+    'issue ticket',
+    'student issue',
+    'report issue',
+    'log complaint',
+    'file complaint',
+    'having issue',
+    'facing issue',
+    'problem with'
+  ];    
+    const isTicketRequest = ticketKeywords.some(keyword => text.toLowerCase().includes(keyword));
       
       if (isTicketRequest) {
         await handleTicketCreation(text);
