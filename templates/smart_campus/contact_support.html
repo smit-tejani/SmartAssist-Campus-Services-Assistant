@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact & Support | SmartAssist</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+  body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
+
+  /* Navbar */
+  nav {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1rem 2rem; 
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color:#fff; 
+    position:sticky; 
+    top:0; 
+    z-index:1000;
+    box-shadow:0 4px 20px rgba(0,0,0,0.15);
+  }
+  
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .nav-left h1 { 
+    font-size:1.5rem; 
+    font-weight:600; 
+    margin: 0;
+  }
+  
+  .nav-left p {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+  
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .nav-right a { 
+    color:#fff; 
+    text-decoration:none; 
+    font-weight:500; 
+    transition:0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .nav-right a:hover { 
+    color:#f0f0f0;
+    transform: translateY(-2px);
+  }
+  
+  .back-btn {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: 0.3s;
+  }
+  
+  .back-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(0) !important;
+  }
+
+  /* Container */
+  .content { 
+    padding:2rem; 
+    max-width:1400px; 
+    margin:auto; 
+  }
+
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color:#fff; 
+    padding:3rem 2.5rem; 
+    border-radius:20px;
+    text-align: center;
+    box-shadow:0 10px 40px rgba(0,103,165,0.3);
+    margin-bottom: 2rem;
+  }
+  
+  .hero h1 { 
+    font-size:2.5rem; 
+    margin-bottom:0.5rem;
+    font-weight: 700;
+  }
+  
+  .hero p { 
+    font-size:1.1rem; 
+    opacity:0.95;
+  }
+
+  /* Search Bar */
+  .search-container {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+  }
+  
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #f7fafc;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    transition: 0.3s;
+  }
+  
+  .search-box:focus-within {
+    border-color: #0067A5;
+    box-shadow: 0 0 0 3px rgba(0,103,165,0.1);
+  }
+  
+  .search-box i {
+    color: #718096;
+    font-size: 1.2rem;
+  }
+  
+  .search-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    outline: none;
+    color: #2d3748;
+  }
+  
+  .search-box input::placeholder {
+    color: #a0aec0;
+  }
+
+  /* Emergency Banner */
+  .emergency-banner {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 4px 20px rgba(229,62,62,0.3);
+  }
+  
+  .emergency-banner i {
+    font-size: 2.5rem;
+  }
+  
+  .emergency-banner h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .emergency-banner p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+  }
+
+  /* Contact Categories */
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .category-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: 0.3s;
+  }
+  
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,103,165,0.15);
+  }
+  
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  .category-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #fff;
+  }
+  
+  .category-header h3 {
+    font-size: 1.3rem;
+    color: #2d3748;
+    font-weight: 600;
+  }
+  
+  .contact-item {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f7fafc;
+    border-radius: 10px;
+    transition: 0.3s;
+  }
+  
+  .contact-item:hover {
+    background: #edf2f7;
+  }
+  
+  .contact-item h4 {
+    color: #2d3748;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .contact-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+  
+  .contact-detail i {
+    color: #0067A5;
+    width: 20px;
+  }
+  
+  .contact-detail a {
+    color: #0067A5;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+  
+  .contact-detail a:hover {
+    color: #00A99D;
+    text-decoration: underline;
+  }
+
+  /* Quick Links */
+  .quick-links {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+  }
+  
+  .quick-links h3 {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .quick-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .quick-link-btn {
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #2d3748;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: 0.3s;
+    border: 2px solid transparent;
+  }
+  
+  .quick-link-btn:hover {
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,103,165,0.3);
+  }
+  
+  .quick-link-btn i {
+    font-size: 1.3rem;
+  }
+
+  /* Chatbot Button */
+  .chatbot-btn {
+    position:fixed; 
+    bottom:30px; 
+    right:30px; 
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color:#fff;
+    width:65px; 
+    height:65px; 
+    border-radius:50%; 
+    border:none;
+    font-size:1.8rem; 
+    cursor:pointer; 
+    box-shadow:0 8px 25px rgba(0,103,165,0.4);
+    transition:0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .chatbot-btn:hover { 
+    transform: scale(1.1);
+    box-shadow:0 10px 30px rgba(0,103,165,0.5);
+  }
+
+  @media(max-width:768px){
+    .categories-grid { 
+      grid-template-columns: 1fr; 
+    }
+    .hero h1 { 
+      font-size: 1.8rem; 
+    }
+    .hero p { 
+      font-size: 0.95rem; 
+    }
+    .content { 
+      padding: 1rem; 
+    }
+    .emergency-banner {
+      flex-direction: column;
+      text-align: center;
+    }
+    .quick-links-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <div class="nav-left">
+    <img src="{{ url_for('static', path='assets/images/logo.png') }}"
+      alt="SmartAssist Logo"
+      style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+    <div>
+      <h1>SmartAssist</h1>
+      <p>TAMUCC Campus Assistant</p>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="/guest_home" class="back-btn">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back to Home
+    </a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="content">
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1><i class="fa-solid fa-headset"></i> Contact & Support</h1>
+    <p>Find the help you need. Contact information for university departments, services, and support.</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Search for departments, services, or contacts..." onkeyup="filterContacts()">
+    </div>
+  </div>
+
+  <!-- Emergency Banner -->
+  <div class="emergency-banner">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <div>
+      <h3>Emergency Contact</h3>
+      <p><strong>Campus Police:</strong> <a href="tel:3618254444" style="color:#fff; text-decoration:underline;">(361) 825-4444</a> | <strong>Emergency:</strong> 911</p>
+    </div>
+  </div>
+
+  <!-- Contact Categories -->
+  <div class="categories-grid">
+    
+    <!-- Academic Support -->
+    <div class="category-card" data-category="academic">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h3>Academic Support</h3>
+      </div>
+      
+      <div class="contact-item">
+        <h4>Admissions Office</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252624">(361) 825-2624</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:admissions@tamucc.edu">admissions@tamucc.edu</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Ward Hall, Room 136</span>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Registrar's Office</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252177">(361) 825-2177</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:registrar@tamucc.edu">registrar@tamucc.edu</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-clock"></i>
+          <span>Mon-Fri: 8:00 AM - 5:00 PM</span>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Academic Advising</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252715">(361) 825-2715</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:advising@tamucc.edu">advising@tamucc.edu</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Services -->
+    <div class="category-card" data-category="student">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <h3>Student Services</h3>
+      </div>
+      
+      <div class="contact-item">
+        <h4>Financial Aid Office</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252338">(361) 825-2338</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:finaid@tamucc.edu">finaid@tamucc.edu</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Driftwood Building</span>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Housing & Residence Life</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252633">(361) 825-2633</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:housing@tamucc.edu">housing@tamucc.edu</a>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Career Services</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252626">(361) 825-2626</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:career@tamucc.edu">career@tamucc.edu</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Technical Support -->
+    <div class="category-card" data-category="technical">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fa-solid fa-laptop-code"></i>
+        </div>
+        <h3>IT & Technical Support</h3>
+      </div>
+      
+      <div class="contact-item">
+        <h4>IT Help Desk</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252692">(361) 825-2692</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:helpdesk@tamucc.edu">helpdesk@tamucc.edu</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-clock"></i>
+          <span>24/7 Support Available</span>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Library Services</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252740">(361) 825-2740</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:library@tamucc.edu">library@tamucc.edu</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-globe"></i>
+          <a href="https://library.tamucc.edu" target="_blank">library.tamucc.edu</a>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Blackboard Support</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252692">(361) 825-2692</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-globe"></i>
+          <a href="https://tamucc.blackboard.com" target="_blank">Blackboard Portal</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health & Wellness -->
+    <div class="category-card" data-category="health">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <h3>Health & Wellness</h3>
+      </div>
+      
+      <div class="contact-item">
+        <h4>Student Health Center</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252601">(361) 825-2601</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Momentum Campus</span>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-clock"></i>
+          <span>Mon-Fri: 8:00 AM - 5:00 PM</span>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Counseling Services</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252703">(361) 825-2703</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:counseling@tamucc.edu">counseling@tamucc.edu</a>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Disability Services</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252604">(361) 825-2604</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:disability.services@tamucc.edu">disability.services@tamucc.edu</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Administrative Offices -->
+    <div class="category-card" data-category="administrative">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fa-solid fa-building"></i>
+        </div>
+        <h3>Administrative Offices</h3>
+      </div>
+      
+      <div class="contact-item">
+        <h4>Bursar / Business Office</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252030">(361) 825-2030</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:bursar@tamucc.edu">bursar@tamucc.edu</a>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Parking Services</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252588">(361) 825-2588</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:parking@tamucc.edu">parking@tamucc.edu</a>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Human Resources</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252626">(361) 825-2626</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:hr@tamucc.edu">hr@tamucc.edu</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- International & Special Services -->
+    <div class="category-card" data-category="international">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fa-solid fa-globe"></i>
+        </div>
+        <h3>International & Special Services</h3>
+      </div>
+      
+      <div class="contact-item">
+        <h4>International Student Services</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252177">(361) 825-2177</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:international@tamucc.edu">international@tamucc.edu</a>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Veterans Services</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252654">(361) 825-2654</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:veterans@tamucc.edu">veterans@tamucc.edu</a>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <h4>Title IX Office</h4>
+        <div class="contact-detail">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:3618252701">(361) 825-2701</a>
+        </div>
+        <div class="contact-detail">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:titleix@tamucc.edu">titleix@tamucc.edu</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick Links -->
+  <div class="quick-links">
+    <h3><i class="fa-solid fa-link"></i> Quick Links</h3>
+    <div class="quick-links-grid">
+      <a href="/chat" class="quick-link-btn">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI Chatbot</span>
+      </a>
+      <a href="https://campusmap.tamucc.edu/?id=1758#!ct/41227,45184,45185,42919,41218,41221,43145,43188,43193,43340,43341,43389,43391?s/:" target="_blank" class="quick-link-btn">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Campus Map</span>
+      </a>
+      <a href="https://www.tamucc.edu" target="_blank" class="quick-link-btn">
+        <i class="fa-solid fa-house"></i>
+        <span>TAMUCC Website</span>
+      </a>
+      <a href="https://tamucc.blackboard.com" target="_blank" class="quick-link-btn">
+        <i class="fa-solid fa-chalkboard"></i>
+        <span>Blackboard</span>
+      </a>
+      <a href="https://library.tamucc.edu" target="_blank" class="quick-link-btn">
+        <i class="fa-solid fa-book"></i>
+        <span>Library</span>
+      </a>
+      <a href="/login" class="quick-link-btn">
+        <i class="fa-solid fa-user"></i>
+        <span>Student Portal</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- General University Info -->
+  <div class="quick-links">
+    <h3><i class="fa-solid fa-info-circle"></i> General Information</h3>
+    <div class="contact-item">
+      <h4>Texas A&M University - Corpus Christi</h4>
+      <div class="contact-detail">
+        <i class="fa-solid fa-phone"></i>
+        <a href="tel:3618252000">(361) 825-2000</a> (Main)
+      </div>
+      <div class="contact-detail">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>6300 Ocean Drive, Corpus Christi, TX 78412</span>
+      </div>
+      <div class="contact-detail">
+        <i class="fa-solid fa-envelope"></i>
+        <a href="mailto:info@tamucc.edu">info@tamucc.edu</a>
+      </div>
+      <div class="contact-detail">
+        <i class="fa-solid fa-globe"></i>
+        <a href="https://www.tamucc.edu" target="_blank">www.tamucc.edu</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chatbot Button -->
+<button class="chatbot-btn" onclick="window.location.href='/chat'">
+  <i class="fa-solid fa-comments"></i>
+</button>
+
+<script>
+// Search functionality
+function filterContacts() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const categoryCards = document.querySelectorAll('.category-card');
+  
+  categoryCards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    if (text.includes(searchTerm)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+
+</body>
+</html>

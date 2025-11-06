@@ -1,0 +1,3086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAssist | Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<style>
+  /* ==================== RESET & BASE ==================== */
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+  }
+  
+  body { 
+    background: #f5f7fa;
+    color: #2d3748;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ==================== NAVBAR ==================== */
+  nav { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 1rem 2.5rem; 
+    background: #0067A5; 
+    color: #fff; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  nav h1 { 
+    font-size: 1.4rem; 
+    font-weight: 600; 
+    color: #ffffff;
+  }
+  
+  nav .nav-links a { 
+    color: #ffffff; 
+    text-decoration: none; 
+    margin-left: 1.5rem; 
+    font-weight: 500; 
+    transition: color 0.2s;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+  }
+  
+  nav .nav-links a:hover { 
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* ==================== CONTAINER & LAYOUT ==================== */
+  .container { 
+    display: flex; 
+    min-height: calc(100vh - 70px);
+  }
+  
+  .sidebar { 
+    display: none; /* Hide sidebar for cleaner look */
+  }
+  
+  .content { 
+    flex: 1; 
+    padding: 2.5rem 3rem; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ==================== HERO SECTION ==================== */
+  .hero { 
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color: #ffffff; 
+    padding: 3rem 2.5rem; 
+    border-radius: 16px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    margin-bottom: 1rem;
+  }
+  
+  .hero h2 { 
+    font-size: 2rem; 
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .hero p { 
+    font-size: 1.05rem; 
+    opacity: 0.95;
+    max-width: 600px;
+  }
+  
+  .hero img { 
+    width: 180px; 
+    max-width: 100%;
+    opacity: 0.9;
+  }
+
+  /* ==================== STATS WIDGETS ==================== */
+  .stats { 
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .stat {
+    background: #ffffff;
+    padding: 1.5rem 1.75rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .stat:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 103, 165, 0.15);
+    border-color: #0067A5;
+  }
+  
+  .stat .number { 
+    font-size: 2rem; 
+    font-weight: 700; 
+    color: #0067A5;
+    line-height: 1;
+  }
+  
+  .stat .label { 
+    font-size: 0.875rem; 
+    color: #718096;
+    font-weight: 500;
+    margin-top: 0.25rem;
+  }
+  
+  .stat i {
+    font-size: 2.5rem;
+    color: #0067A5;
+    opacity: 0.15;
+  }
+
+  /* ==================== CARDS GRID ==================== */
+  .grid {
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 1.5rem;
+  }
+  
+  .card {
+    background: #ffffff;
+    border-radius: 12px; 
+    padding: 2rem 1.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex; 
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 24px rgba(0, 103, 165, 0.12);
+    border-color: #0067A5;
+  }
+  
+  .card i { 
+    font-size: 2.5rem; 
+    color: #0067A5;
+    margin-bottom: 1rem;
+  }
+  
+  .card h3 { 
+    font-size: 1.125rem; 
+    margin-bottom: 0.5rem; 
+    color: #2d3748;
+    font-weight: 600;
+  }
+  
+  .card p { 
+    font-size: 0.9rem; 
+    color: #718096;
+    line-height: 1.5;
+  }
+
+  /* ==================== CHATBOT BUTTON ==================== */
+  .chatbot-btn {
+    position: fixed; 
+    bottom: 30px; 
+    right: 30px; 
+    background: #0067A5; 
+    color: #fff;
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%; 
+    border: none;
+    font-size: 1.75rem; 
+    cursor: pointer; 
+    box-shadow: 0 4px 12px rgba(0, 103, 165, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1200;
+  }
+  
+  .chatbot-btn:hover { 
+    background: #00A99D;
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 169, 157, 0.4);
+  }
+  
+  .chatbot-btn.hidden {
+    display: none;
+  }
+
+  /* ==================== TABLES ==================== */
+  table {
+    width: 100%; 
+    margin-top: 1rem; 
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+  
+  th, td {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  th {
+    background: #0067A5;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  tr:hover {
+    background: #f7fafc;
+  }
+  
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .assign-btn {
+    background: #0067A5;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+  }
+  
+  .assign-btn:hover {
+    background: #00A99D;
+  }
+
+  /* ==================== LIVE CHAT PANEL ==================== */
+  .chat-panel {
+    position: fixed; 
+    top: 0; 
+    right: -750px; 
+    width: 750px; 
+    height: 100%;
+    background: #ffffff; 
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+    display: flex; 
+    flex-direction: column; 
+    transition: right 0.3s ease;
+    z-index: 1100;
+    border-left: 2px solid #e2e8f0;
+  }
+  
+  .chat-panel.open { 
+    right: 0; 
+  }
+
+  .chat-header {
+    background: #0067A5;
+    color: #fff; 
+    padding: 1.5rem; 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .chat-header h3 { 
+    margin: 0; 
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+  
+  .close-chat { 
+    cursor: pointer; 
+    font-size: 1.4rem;
+    transition: all 0.2s;
+    opacity: 0.9;
+    padding: 0.25rem;
+  }
+  
+  .close-chat:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  .chat-body { 
+    flex: 1; 
+    display: flex; 
+    min-height: 0;
+  }
+  
+  .chat-list {
+    width: 42%; 
+    border-right: 2px solid #e2e8f0; 
+    overflow-y: auto;
+    background: #f8fafc;
+    min-width: 320px;
+  }
+  
+  .chat-list-item {
+    padding: 1.5rem 1.25rem; 
+    border-bottom: 1px solid #e2e8f0; 
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  
+  .chat-list-item:hover {
+    background: #f1f5f9;
+  }
+  
+  .chat-list-item.active {
+    background: #e0f2fe;
+    border-left: 4px solid #0067A5;
+    padding-left: calc(1.25rem - 4px);
+  }
+  
+  .chat-list-item span {
+    font-size: 0.85rem; 
+    color: #64748b;
+  }
+
+  .chat-window {
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+    min-height: 0;
+    background: #ffffff;
+  }
+  
+  .chat-messages { 
+    flex: 1; 
+    padding: 1.5rem; 
+    overflow-y: auto; 
+    scroll-behavior: smooth; 
+    min-height: 0;
+    background: #fafbfc;
+  }
+  
+  .chat-messages::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+  }
+  
+  .chat-messages::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  
+  .chat-message {
+    padding: 0.875rem 1.25rem; 
+    border-radius: 16px; 
+    max-width: 75%;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+    margin-bottom: 0;
+  }
+  
+  .chat-message.admin { 
+    background: #0067A5;
+    color: #fff; 
+    margin-left: auto;
+    border-radius: 16px 16px 4px 16px;
+    box-shadow: 0 2px 8px rgba(0, 103, 165, 0.2);
+  }
+  
+  .chat-message.student { 
+    background: #ffffff; 
+    color: #1e293b;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px 16px 16px 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .chat-input-area {
+    display: flex; 
+    gap: 0.75rem;
+    padding: 1.25rem; 
+    border-top: 2px solid #e2e8f0;
+    background: #ffffff;
+  }
+  
+  .chat-input-area input {
+    flex: 1; 
+    padding: 0.875rem 1.25rem; 
+    border: 2px solid #e2e8f0;
+    border-radius: 12px; 
+    outline: none;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    background: #f8fafc;
+  }
+  
+  .chat-input-area input:focus {
+    border-color: #0067A5;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 103, 165, 0.1);
+  }
+  
+  .chat-input-area button {
+    background: #0067A5; 
+    color: #fff;
+    border: none; 
+    border-radius: 10px; 
+    width: 44px;
+    height: 44px;
+    cursor: pointer; 
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .chat-input-area button:hover:not(:disabled) {
+    background: #005a8f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 103, 165, 0.3);
+  }
+  
+  .chat-input-area button:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+  }
+
+  /* Chat Badge */
+  .chat-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e53e3e;
+    color: white;
+    border-radius: 50%;
+    padding: 3px 7px;
+    font-size: 11px;
+    font-weight: 600;
+    display: none;
+    z-index: 1;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(229, 62, 62, 0.4);
+  }
+
+  /* ==================== MODALS ==================== */
+  #ticket-modal,
+  #departments-modal,
+  #user-management-modal {
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 2000;
+    overflow-y: auto;
+  }
+  
+  #ticket-modal > div,
+  #departments-modal > div,
+  #user-management-modal > div {
+    background: #fff; 
+    border-radius: 16px; 
+    padding: 2.5rem; 
+    width: 90%; 
+    max-width: 600px; 
+    max-height: 90%; 
+    overflow-y: auto; 
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    margin: 2rem auto;
+  }
+  
+  #departments-modal > div,
+  #user-management-modal > div {
+    max-width: 1400px;
+  }
+  
+  #close-ticket-modal,
+  #close-departments-modal,
+  #close-user-modal {
+    position: absolute; 
+    top: 1.5rem; 
+    right: 1.5rem; 
+    cursor: pointer; 
+    font-size: 1.5rem;
+    color: #718096;
+    transition: all 0.2s;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  #close-ticket-modal:hover,
+  #close-departments-modal:hover,
+  #close-user-modal:hover {
+    background: #f7fafc;
+    color: #2d3748;
+  }
+  
+  #ticket-subject {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.4rem; 
+    font-weight: 600;
+    color: #2d3748;
+  }
+  
+  #ticket-modal p {
+    margin-bottom: 1rem;
+    color: #4a5568;
+    font-size: 0.95rem;
+  }
+  
+  #ticket-modal p strong {
+    color: #2d3748;
+    font-weight: 600;
+  }
+  
+  #ticket-status, 
+  #ticket-assign {
+    width: 100%; 
+    padding: 0.75rem 1rem; 
+    border: 1px solid #e2e8f0;
+    border-radius: 8px; 
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+  }
+  
+  #ticket-status:focus,
+  #ticket-assign:focus {
+    border-color: #0067A5;
+    box-shadow: 0 0 0 3px rgba(0, 103, 165, 0.1);
+  }
+  
+  #update-ticket {
+    background: #0067A5; 
+    color: white; 
+    padding: 0.75rem 1.5rem; 
+    border: none; 
+    border-radius: 8px;
+    cursor: pointer; 
+    transition: all 0.3s; 
+    margin-top: 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  
+  #update-ticket:hover {
+    background: #00A99D;
+  }
+
+  /* Department Cards in Modal */
+  #departments-grid > div {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+    border-left: 4px solid #0067A5;
+  }
+  
+  #departments-grid > div:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 103, 165, 0.15);
+  }
+  
+  #departments-grid h3 {
+    color: #0067A5;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  /* ==================== RESPONSIVE STYLES ==================== */
+  @media (max-width: 968px) {
+    nav {
+      padding: 1rem 1.5rem;
+    }
+
+    .content {
+      padding: 1.5rem 1.25rem;
+      max-width: 100%;
+    }
+
+    .hero {
+      flex-direction: column;
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .hero h2 {
+      font-size: 1.75rem;
+    }
+
+    .hero p {
+      max-width: 100%;
+    }
+
+    .hero img {
+      width: 140px;
+      margin-top: 1rem;
+    }
+
+    .stats {
+      grid-template-columns: 1fr;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      min-width: auto !important;
+      flex: none !important;
+    }
+
+    /* Force table to be responsive */
+    table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100% !important;
+    }
+
+    thead, tbody, tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    th, td {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.85rem;
+      min-width: 100px;
+    }
+
+    .chat-panel {
+      width: 100%;
+      right: -100%;
+    }
+
+    #departments-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    nav h1 {
+      font-size: 1.2rem;
+    }
+
+    .hero h2 {
+      font-size: 1.5rem;
+    }
+
+    .hero p {
+      font-size: 0.95rem;
+    }
+
+    .stat .number {
+      font-size: 1.5rem;
+    }
+
+    .stat .label {
+      font-size: 0.8rem;
+    }
+
+    .card {
+      padding: 1.5rem 1rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+    }
+
+    .card i {
+      font-size: 2rem;
+    }
+
+    /* Mobile table styles */
+    table {
+      font-size: 0.75rem;
+    }
+
+    th, td {
+      padding: 0.5rem 0.25rem;
+      font-size: 0.75rem;
+      min-width: 80px;
+    }
+
+    th {
+      font-size: 0.7rem;
+    }
+
+    .assign-btn {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .chatbot-btn {
+      width: 55px;
+      height: 55px;
+      font-size: 1.5rem;
+      bottom: 20px;
+      right: 20px;
+    }
+  }
+
+  .logout-btn {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: 0.3s;
+  }
+  
+  .logout-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(0) !important;
+  }
+
+  /* ==================== TABS ==================== */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    margin-top: 2rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  .tab {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #718096;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .tab.active {
+    color: #0067A5;
+    border-bottom-color: #0067A5;
+  }
+  
+  .tab:hover {
+    color: #0067A5;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+
+  /* ==================== NOTIFICATION BELL ==================== */
+  .notification-bell {
+    position: relative;
+    margin-right: 1.5rem;
+    display: inline-block;
+  }
+
+  .notification-bell-icon {
+    font-size: 1.5rem;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .notification-bell-icon:hover {
+    color: #00A99D;
+    transform: scale(1.1);
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e53e3e;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
+    border: 2px solid #0067A5;
+  }
+
+  .notification-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1001;
+    width: 380px;
+    max-height: 500px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .notification-dropdown.show {
+    display: block;
+  }
+
+  .notification-header {
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mark-all-read {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .mark-all-read:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .notification-item {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .notification-item:hover {
+    background: #f7fafc;
+  }
+
+  .notification-item.unread {
+    background: #ebf8ff;
+    border-left: 4px solid #0067A5;
+  }
+
+  .notification-item.unread:hover {
+    background: #bee3f8;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+  }
+
+  .notification-message {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+  }
+
+  .notification-time {
+    font-size: 0.75rem;
+    color: #a0aec0;
+  }
+
+  .notification-priority-high {
+    border-left-color: #e53e3e !important;
+  }
+
+  .notification-priority-urgent {
+    border-left-color: #dd6b20 !important;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .notification-empty {
+    padding: 2rem;
+    text-align: center;
+    color: #a0aec0;
+  }
+
+  .notification-empty i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .notification-footer {
+    padding: 0.75rem 1.25rem;
+    background: #f7fafc;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .notification-footer a {
+    color: #0067A5;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .notification-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .delete-notification {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: #a0aec0;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .delete-notification:hover {
+    background: #e53e3e;
+    color: #ffffff;
+  }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <img src="{{ url_for('static', path='assets/images/logo.png') }}"
+      alt="SmartAssist Logo"
+      style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
+      <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">TAMUCC Campus Assistant</p>
+    </div>
+  </div>
+  <div class="nav-links">
+    <!-- Notification Bell -->
+    <div class="notification-bell">
+      <i class="fa-solid fa-bell notification-bell-icon" id="notification-icon"></i>
+      <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+      
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="notification-header">
+          <span>Notifications</span>
+          <span class="mark-all-read" onclick="markAllAsRead()">Mark all read</span>
+        </div>
+        <div class="notification-list" id="notification-list">
+          <div class="notification-empty">
+            <i class="fa-solid fa-bell-slash"></i>
+            <p>No notifications</p>
+          </div>
+        </div>
+        <div class="notification-footer">
+          <a href="#" onclick="showAllNotifications(); return false;">View All Notifications</a>
+        </div>
+      </div>
+    </div>
+    
+    <a href="/logout" class="logout-btn">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      Logout
+    </a>
+  </div>
+</nav>
+
+<!-- Main Layout -->
+<div class="container">
+
+  <div class="content">
+    <div class="hero">
+      <div>
+        <h2>Welcome, Admin 👋</h2>
+        <p>Manage knowledge base, departments, users, and view analytics at a glance.</p>
+      </div>
+      <img src="https://img.icons8.com/ios/200/ffffff/admin-settings-male.png" alt="Admin Illustration">
+    </div>
+
+    <!-- Appointment Reminders -->
+    <div id="appointment-reminders" style="margin-bottom: 1.5rem;">
+      <!-- Reminders will be dynamically populated here -->
+    </div>
+
+        <div class="stats">
+      <div class="stat"><div><div class="number" id="knowledge-stat">0</div><div class="label">Knowledge Articles</div></div><i class="fa-solid fa-book"></i></div>
+      <div class="stat"><div><div class="number" id="departments-stat">0</div><div class="label">Departments</div></div><i class="fa-solid fa-building-columns"></i></div>
+      <div class="stat"><div><div class="number" id="users-stat">0</div><div class="label">Total Users</div></div><i class="fa-solid fa-user-gear"></i></div>
+    </div>
+
+    <div class="grid">
+      <div class="card" onclick="window.location.href='/knowledge_base'" style="cursor: pointer;">
+        <i class="fa-solid fa-book"></i>
+        <h3>Knowledge Base</h3>
+        <p>Add new FAQ articles and guides to help students.</p>
+      </div>
+      <div class="card" onclick="showDepartmentsSection()">
+        <i class="fa-solid fa-building-columns"></i>
+        <h3>Departments</h3>
+        <p>All TAMUCC departments and services.</p>
+      </div>
+      <div class="card" onclick="showUserManagement()">
+        <i class="fa-solid fa-user-gear"></i>
+        <h3>User Management</h3>
+        <p>Manage students, staff, and admin access and permissions.</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('tickets')">
+        <i class="fa-solid fa-ticket"></i> Tickets
+      </button>
+      <button class="tab" onclick="showTab('appointments')">
+        <i class="fa-solid fa-calendar"></i> Appointments
+      </button>
+      <button class="tab" onclick="showTab('events')">
+        <i class="fa-solid fa-calendar-star"></i> Events
+      </button>
+    </div>
+
+    <!-- Tickets & Appointments Section -->
+    <div id="ticketsTab" class="tab-content active">
+      <!-- Tickets Card -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <i class="fa-solid fa-ticket"></i>
+        <h3>Open Tickets</h3>
+        <p>View, assign, and manage student-raised tickets.</p>
+
+        <div style="overflow-x: auto; margin-top: 1rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Subject</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-table">
+              <!-- Tickets dynamically populated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="appointmentsTab" class="tab-content">
+      <!-- Pending Appointments Card -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h3>Pending Appointments</h3>
+        <p>Review and confirm student appointment requests.</p>
+
+        <div style="overflow-x: auto; margin-top: 1rem; -webkit-overflow-scrolling: touch;">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Subject</th>
+                <th>Department</th>
+                <th>Date</th>
+                <th>Time Slot</th>
+                <th>Meeting Mode</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="appointments-table">
+              <!-- Appointments dynamically populated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Tab -->
+    <div id="eventsTab" class="tab-content">
+      <div class="card" style="grid-column: 1 / -1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <i class="fa-solid fa-calendar-star"></i>
+            <h3 style="display: inline; margin-left: 0.5rem;">Event Management</h3>
+            <p style="margin-top: 0.5rem;">Create and manage campus events with priority-based notifications</p>
+          </div>
+          <button onclick="openEventModal()" style="background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%); color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.875rem; display: flex; align-items: center; gap: 0.4rem; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+            <i class="fa-solid fa-plus" style="font-size: 1rem; color: #fff;"></i> Create Event
+          </button>
+        </div>
+
+        <div style="overflow-x: auto; margin-top: 1rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Event Title</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Priority</th>
+                <th>Target Audience</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="events-table">
+              <!-- Events dynamically populated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    <!-- Event Modal (Create/Edit) -->
+    <div id="event-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; padding:1rem;">
+      <div style="background:#fff; border-radius:16px; width:600px; max-width:95%; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.3); padding:2rem;">
+        <span id="close-event-modal" style="position:absolute; top:1.5rem; right:1.5rem; cursor:pointer; font-size:1.5rem; color:#718096; transition:color 0.2s;" onmouseover="this.style.color='#0067A5'" onmouseout="this.style.color='#718096'">&times;</span>
+        
+        <h3 style="color:#0067A5; margin:0 0 1.5rem 0; font-size:1.5rem; font-weight:600;">
+          <i class="fa-solid fa-calendar-plus"></i> <span id="event-modal-title">Create New Event</span>
+        </h3>
+        
+        <form id="event-form" style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Event Title *</label>
+            <input type="text" id="event-title" required style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem;">
+          </div>
+          
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Description *</label>
+            <textarea id="event-description" required rows="4" style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem; resize:vertical;"></textarea>
+          </div>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div>
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Event Date *</label>
+              <input type="date" id="event-date" required style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem;">
+            </div>
+            
+            <div>
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Event Time</label>
+              <input type="time" id="event-time" style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem;">
+            </div>
+          </div>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div>
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Priority</label>
+              <select id="event-priority" style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem;">
+                <option value="low">Low</option>
+                <option value="normal" selected>Normal</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+            
+            <div>
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Category</label>
+              <select id="event-category" style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem;">
+                <option value="general" selected>General</option>
+                <option value="academic">Academic</option>
+                <option value="administrative">Administrative</option>
+                <option value="social">Social</option>
+              </select>
+            </div>
+          </div>
+          
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Target Audience</label>
+            <select id="event-target" style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem;">
+              <option value="all" selected>All Users</option>
+              <option value="students">Students Only</option>
+              <option value="staff">Staff Only</option>
+            </select>
+          </div>
+          
+          <div style="display:flex; gap:1rem; justify-content:flex-end; margin-top:1rem;">
+            <button type="button" onclick="closeEventModal()" style="background:#e2e8f0; color:#2d3748; padding:0.75rem 1.5rem; border:none; border-radius:8px; cursor:pointer; font-weight:500;">
+              Cancel
+            </button>
+            <button type="submit" style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); color:white; padding:0.75rem 1.5rem; border:none; border-radius:8px; cursor:pointer; font-weight:500;">
+              <i class="fa-solid fa-save"></i> Save Event
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Ticket Details Modal -->
+    <div id="ticket-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000;">
+      <div style="background:#fff; border-radius:12px; padding:2rem; width:500px; max-width:90%; max-height:90%; overflow-y:auto; position:relative;">
+        <span id="close-ticket-modal" style="position:absolute; top:1rem; right:1rem; cursor:pointer; font-size:1.2rem;">&times;</span>
+        <h3 id="ticket-subject">Ticket Subject</h3>
+        <p><strong>Student:</strong> <span id="ticket-student"></span></p>
+        <p><strong>Category:</strong> <span id="ticket-category"></span></p>
+        <p><strong>Priority:</strong> <span id="ticket-priority"></span></p>
+        <p><strong>Description:</strong></p>
+        <p id="ticket-description"></p>
+        <p><strong>Status:</strong>
+          <select id="ticket-status">
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </p>
+        <p><strong>Assign Staff:</strong>
+          <select id="ticket-assign">
+            <!-- Staff list populated dynamically -->
+          </select>
+        </p>
+        <button id="update-ticket" style="background:#00A99D; color:white; padding:0.5rem 1rem; border:none; border-radius:6px; cursor:pointer;">Update Ticket</button>
+      </div>
+    </div>
+
+    <!-- Appointment Details Modal -->
+    <div id="appointment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; padding:1rem;">
+      <div style="background:#fff; border-radius:16px; width:900px; max-width:95%; max-height:90vh; overflow:hidden; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.3); display:flex; flex-direction:column;">
+        <span id="close-appointment-modal" style="position:absolute; top:1.5rem; right:1.5rem; cursor:pointer; font-size:1.5rem; z-index:10; color:#718096; transition:color 0.2s;" onmouseover="this.style.color='#0067A5'" onmouseout="this.style.color='#718096'">&times;</span>
+        
+        <!-- Modal Header -->
+        <div style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); padding:2rem; color:#fff; flex-shrink:0;">
+          <h3 style="margin:0; font-size:1.5rem; font-weight:600;">
+            <i class="fa-solid fa-calendar-check"></i> Review Appointment Request
+          </h3>
+          <p style="margin:0.5rem 0 0 0; opacity:0.9; font-size:0.95rem;">Review the student's request and modify details before confirming</p>
+        </div>
+        
+        <!-- Two Column Layout (Scrollable) -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; overflow-y:auto; flex:1;">
+          
+          <!-- Left Column - Student Request Info (Read-only) -->
+          <div style="padding:2rem; background:#f7fafc; border-right:1px solid #e2e8f0;">
+            <h4 style="color:#0067A5; margin:0 0 1.5rem 0; font-size:1.1rem; font-weight:600; display:flex; align-items:center; gap:0.5rem;">
+              <i class="fa-solid fa-user-circle"></i> Student Information
+            </h4>
+            
+            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+              <div>
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Student Name</label>
+                <div id="appt-student" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; font-weight:500;"></div>
+              </div>
+              
+              <div>
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Subject</label>
+                <div id="appt-subject" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; font-weight:500;"></div>
+              </div>
+              
+              <div>
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Department</label>
+                <div id="appt-department" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; font-weight:500;"></div>
+              </div>
+              
+              <div>
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Student Notes</label>
+                <div id="appt-notes" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; min-height:80px; max-height:120px; overflow-y:auto; white-space:pre-wrap;"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Column - Admin Modifiable Fields -->
+          <div style="padding:2rem; background:#fff;">
+            <h4 style="color:#00A99D; margin:0 0 1.5rem 0; font-size:1.1rem; font-weight:600; display:flex; align-items:center; gap:0.5rem;">
+              <i class="fa-solid fa-pen-to-square"></i> Schedule Details
+            </h4>
+            
+            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+              <div>
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                  <i class="fa-solid fa-calendar"></i> Date
+                </label>
+                <input type="date" id="appt-date" style="padding:0.75rem; border:2px solid #cbd5e0; border-radius:8px; width:100%; font-size:1rem; transition:border-color 0.2s;" onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#cbd5e0'">
+              </div>
+              
+              <div>
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                  <i class="fa-solid fa-clock"></i> Time Slot
+                </label>
+                <select id="appt-time-slot" style="padding:0.75rem; border:2px solid #cbd5e0; border-radius:8px; width:100%; font-size:1rem; transition:border-color 0.2s; background:#fff;" onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#cbd5e0'">
+                  <option value="9:00 AM - 10:00 AM">9:00 AM - 10:00 AM</option>
+                  <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                  <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+                  <option value="12:00 PM - 1:00 PM">12:00 PM - 1:00 PM</option>
+                  <option value="1:00 PM - 2:00 PM">1:00 PM - 2:00 PM</option>
+                  <option value="2:00 PM - 3:00 PM">2:00 PM - 3:00 PM</option>
+                  <option value="3:00 PM - 4:00 PM">3:00 PM - 4:00 PM</option>
+                  <option value="4:00 PM - 5:00 PM">4:00 PM - 5:00 PM</option>
+                </select>
+              </div>
+              
+              <div>
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                  <i class="fa-solid fa-video"></i> Meeting Mode
+                </label>
+                <select id="appt-meeting-mode" style="padding:0.75rem; border:2px solid #cbd5e0; border-radius:8px; width:100%; font-size:1rem; transition:border-color 0.2s; background:#fff;" onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#cbd5e0'">
+                  <option value="In-Person">In-Person</option>
+                  <option value="Virtual">Virtual (Zoom/Teams)</option>
+                  <option value="No Preference">No Preference</option>
+                </select>
+              </div>
+              
+              <div>
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                  <i class="fa-solid fa-location-dot"></i> Location / Meeting Link
+                </label>
+                <input type="text" id="appt-location" placeholder="e.g., Room 205 or Zoom link" style="padding:0.75rem; border:2px solid #cbd5e0; border-radius:8px; width:100%; font-size:1rem; transition:border-color 0.2s;" onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#cbd5e0'">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Modal Footer (Fixed at bottom) -->
+        <div style="padding:1.5rem 2rem; background:#f7fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:1rem; flex-shrink:0;">
+          <button onclick="document.getElementById('appointment-modal').style.display='none'" style="background:#fff; color:#718096; padding:0.75rem 1.5rem; border:2px solid #e2e8f0; border-radius:8px; cursor:pointer; font-weight:600; transition:all 0.2s;" onmouseover="this.style.borderColor='#0067A5'; this.style.color='#0067A5'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.color='#718096'">
+            Cancel
+          </button>
+          <button id="confirm-appointment" style="background:linear-gradient(135deg, #00A99D 0%, #48bb78 100%); color:white; padding:0.75rem 2rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; box-shadow:0 4px 12px rgba(0,169,157,0.3); transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,169,157,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,169,157,0.3)'">
+            <i class="fa-solid fa-check-circle"></i> Confirm Appointment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Appointment Details Modal -->
+    <div id="view-appointment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; padding:1rem;">
+      <div style="background:#fff; border-radius:16px; width:600px; max-width:95%; max-height:90vh; overflow:hidden; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.3); display:flex; flex-direction:column;">
+        <span id="close-view-appointment-modal" style="position:absolute; top:1.5rem; right:1.5rem; cursor:pointer; font-size:1.5rem; z-index:10; color:#718096; transition:color 0.2s;" onmouseover="this.style.color='#0067A5'" onmouseout="this.style.color='#718096'">&times;</span>
+        
+        <!-- Modal Header -->
+        <div style="background:linear-gradient(135deg, #00A99D 0%, #0067A5 100%); padding:2rem; color:#fff; flex-shrink:0;">
+          <h3 style="margin:0; font-size:1.5rem; font-weight:600;">
+            <i class="fa-solid fa-calendar-check"></i> Appointment Details
+          </h3>
+          <p style="margin:0.5rem 0 0 0; opacity:0.9; font-size:0.95rem;">Confirmed appointment information</p>
+        </div>
+        
+        <!-- Content (Scrollable) -->
+        <div style="padding:2rem; overflow-y:auto; flex:1;">
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div style="background:#f7fafc; padding:1rem; border-left:4px solid #0067A5; border-radius:8px;">
+              <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                <i class="fa-solid fa-user"></i> Student Name
+              </label>
+              <div id="view-student" style="font-size:1.1rem; color:#2d3748; font-weight:600;"></div>
+            </div>
+            
+            <div style="background:#f7fafc; padding:1rem; border-left:4px solid #00A99D; border-radius:8px;">
+              <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                <i class="fa-solid fa-message"></i> Subject
+              </label>
+              <div id="view-subject" style="font-size:1rem; color:#2d3748; font-weight:500;"></div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <div style="background:#f7fafc; padding:1rem; border-radius:8px;">
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                  <i class="fa-solid fa-building"></i> Department
+                </label>
+                <div id="view-department" style="font-size:1rem; color:#2d3748; font-weight:500;"></div>
+              </div>
+              
+              <div style="background:#f7fafc; padding:1rem; border-radius:8px;">
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                  <i class="fa-solid fa-calendar"></i> Date
+                </label>
+                <div id="view-date" style="font-size:1rem; color:#2d3748; font-weight:500;"></div>
+              </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <div style="background:#f7fafc; padding:1rem; border-radius:8px;">
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                  <i class="fa-solid fa-clock"></i> Time Slot
+                </label>
+                <div id="view-time-slot" style="font-size:1rem; color:#2d3748; font-weight:500;"></div>
+              </div>
+              
+              <div style="background:#f7fafc; padding:1rem; border-radius:8px;">
+                <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                  <i class="fa-solid fa-video"></i> Meeting Mode
+                </label>
+                <div id="view-meeting-mode" style="font-size:1rem; color:#2d3748; font-weight:500;"></div>
+              </div>
+            </div>
+            
+            <div style="background:#f7fafc; padding:1rem; border-left:4px solid #48bb78; border-radius:8px;">
+              <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                <i class="fa-solid fa-location-dot"></i> Location/Link
+              </label>
+              <div id="view-location" style="font-size:1rem; color:#2d3748; font-weight:500; word-break:break-word;"></div>
+            </div>
+            
+            <div style="background:#f7fafc; padding:1rem; border-radius:8px;">
+              <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+                <i class="fa-solid fa-note-sticky"></i> Notes
+              </label>
+              <div id="view-notes" style="font-size:0.95rem; color:#2d3748; white-space:pre-wrap;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div style="padding:1.5rem 2rem; background:#f7fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; flex-shrink:0;">
+          <button onclick="document.getElementById('view-appointment-modal').style.display='none'" style="background:#0067A5; color:white; padding:0.75rem 1.5rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:all 0.2s;" onmouseover="this.style.background='#005a8f'" onmouseout="this.style.background='#0067A5'">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Departments Modal -->
+    <div id="departments-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; overflow-y:auto;">
+      <div style="background:#fff; border-radius:16px; padding:2rem; width:90%; max-width:1200px; max-height:90%; overflow-y:auto; position:relative; margin:2rem;">
+        <span id="close-departments-modal" style="position:absolute; top:1rem; right:1rem; cursor:pointer; font-size:1.5rem; color:#666;">&times;</span>
+        <h2 style="color:#0067A5; margin-bottom:1.5rem;"><i class="fa-solid fa-building-columns"></i> TAMUCC Departments</h2>
+        
+        <div id="departments-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(350px, 1fr)); gap:1.5rem;">
+          <!-- Departments will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div id="user-management-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; overflow-y:auto;">
+      <div style="background:#fff; border-radius:16px; padding:2rem; width:90%; max-width:1400px; max-height:90%; overflow-y:auto; position:relative; margin:2rem;">
+        <span id="close-user-modal" style="position:absolute; top:1rem; right:1rem; cursor:pointer; font-size:1.5rem; color:#666;">&times;</span>
+        <h2 style="color:#0067A5; margin-bottom:1.5rem;"><i class="fa-solid fa-user-gear"></i> User Management - Students</h2>
+        
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background:#0067A5; color:white;">
+              <th style="padding:0.8rem; text-align:left;">Full Name</th>
+              <th style="padding:0.8rem; text-align:left;">Email</th>
+              <th style="padding:0.8rem; text-align:left;">Phone Number</th>
+              <th style="padding:0.8rem; text-align:left;">Date of Birth</th>
+              <th style="padding:0.8rem; text-align:left;">Address</th>
+            </tr>
+          </thead>
+          <tbody id="students-table">
+            <!-- Students will be populated here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Chat Button -->
+<button class="chatbot-btn" id="chat-toggle"><i class="fa-solid fa-comments"></i></button>
+
+<!-- Live Chat Panel -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <h3>Live Chat Requests</h3>
+    <i class="fa-solid fa-xmark close-chat" id="close-chat"></i>
+  </div>
+
+  <div class="chat-body">
+    <div class="chat-list" id="chat-list">
+      <!-- Dynamic student list -->
+    </div>
+
+    <div class="chat-window">
+      <div class="chat-messages" id="chat-messages">
+        <p style="color:#999; text-align:center;">Select a chat to start messaging.</p>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Type your message..." disabled>
+        <button id="send-btn" disabled><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================================================================================
+//                              NOTIFICATION SYSTEM
+// ======================================================================================
+
+// Fetch and display notifications
+async function loadNotifications() {
+  try {
+    const response = await fetch('/api/notifications?limit=10');
+    if (!response.ok) throw new Error('Failed to fetch notifications');
+    
+    const notifications = await response.json();
+    const notificationList = document.getElementById('notification-list');
+    const notificationCount = document.getElementById('notification-count');
+    
+    if (notifications.length === 0) {
+      notificationList.innerHTML = `
+        <div class="notification-empty">
+          <i class="fa-solid fa-bell-slash"></i>
+          <p>No notifications</p>
+        </div>
+      `;
+      notificationCount.style.display = 'none';
+      return;
+    }
+    
+    // Count unread
+    const unreadCount = notifications.filter(n => n.status === 'unread').length;
+    if (unreadCount > 0) {
+      notificationCount.textContent = unreadCount > 99 ? '99+' : unreadCount;
+      notificationCount.style.display = 'block';
+    } else {
+      notificationCount.style.display = 'none';
+    }
+    
+    // Render notifications
+    notificationList.innerHTML = notifications.map(notif => `
+      <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''} ${notif.priority === 'high' ? 'notification-priority-high' : ''} ${notif.priority === 'urgent' ? 'notification-priority-urgent' : ''}"
+           onclick="markAsRead('${notif._id}', '${notif.link || '#'}')">
+        <div class="notification-title">${notif.title || 'Notification'}</div>
+        <div class="notification-message">${notif.message || ''}</div>
+        <div class="notification-time">${formatNotificationTime(notif.created_at)}</div>
+        <button class="delete-notification" onclick="deleteNotification(event, '${notif._id}')">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+    `).join('');
+    
+  } catch (error) {
+    console.error('Error loading notifications:', error);
+  }
+}
+
+// Format notification time
+function formatNotificationTime(timestamp) {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  return date.toLocaleDateString();
+}
+
+// Mark notification as read
+async function markAsRead(notificationId, link) {
+  try {
+    await fetch(`/api/notifications/${notificationId}/read`, {
+      method: 'PUT'
+    });
+    
+    await loadNotifications();
+    
+    if (link && link !== '#') {
+      window.location.href = link;
+    }
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+  }
+}
+
+// Delete notification
+async function deleteNotification(event, notificationId) {
+  event.stopPropagation();
+  
+  try {
+    await fetch(`/api/notifications/${notificationId}`, {
+      method: 'DELETE'
+    });
+    
+    await loadNotifications();
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+  }
+}
+
+// Mark all as read
+async function markAllAsRead() {
+  try {
+    const response = await fetch('/api/notifications/mark-all-read', {
+      method: 'PUT'
+    });
+    
+    if (!response.ok) throw new Error('Failed to mark all as read');
+    
+    const result = await response.json();
+    console.log(`Marked ${result.count} notifications as read`);
+    
+    await loadNotifications();
+  } catch (error) {
+    console.error('Error marking all as read:', error);
+  }
+}
+
+// Show all notifications
+function showAllNotifications() {
+  alert('View All Notifications feature coming soon!');
+}
+
+// Toggle notification dropdown
+const notificationIcon = document.getElementById('notification-icon');
+const notificationDropdown = document.getElementById('notification-dropdown');
+
+notificationIcon.addEventListener('click', (e) => {
+  e.stopPropagation();
+  notificationDropdown.classList.toggle('show');
+  
+  if (notificationDropdown.classList.contains('show')) {
+    loadNotifications();
+  }
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (!notificationDropdown.contains(e.target) && e.target !== notificationIcon) {
+    notificationDropdown.classList.remove('show');
+  }
+});
+
+// Poll for new notifications every 30 seconds
+setInterval(async () => {
+  const response = await fetch('/api/notifications/unread/count');
+  if (response.ok) {
+    const data = await response.json();
+    const notificationCount = document.getElementById('notification-count');
+    if (data.count > 0) {
+      notificationCount.textContent = data.count > 99 ? '99+' : data.count;
+      notificationCount.style.display = 'block';
+    } else {
+      notificationCount.style.display = 'none';
+    }
+  }
+}, 30000);
+
+// Initial load
+loadNotifications();
+
+// ======================================================================================
+//                              EXISTING ADMIN CODE
+// ======================================================================================
+
+const chatToggle = document.getElementById('chat-toggle');
+const chatPanel = document.getElementById('chat-panel');
+const closeChat = document.getElementById('close-chat');
+const chatList = document.getElementById('chat-list');
+const chatMessages = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
+const chatBadge = document.createElement('span');
+chatBadge.className = 'chat-badge';
+chatBadge.style.cssText = 'position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; display: none;';
+chatToggle.appendChild(chatBadge);
+
+
+let queueCount = 0;
+let ws;
+let selectedSession = null;
+const joinedSessions = new Set();      // sessions this admin has joined
+const sessionsIndex  = new Map();      // session_id -> {name,status}
+
+
+// Open/close panel with chat button hide/show
+chatToggle.onclick = () => {
+  chatPanel.classList.add('open');
+  chatToggle.classList.add('hidden'); // hide the button when panel opens
+};
+
+closeChat.onclick = () => {
+  chatPanel.classList.remove('open');
+  chatToggle.classList.remove('hidden'); // show the button when panel closes
+};
+
+function updateBadge(count) {
+  if (count > 0) {
+    chatBadge.textContent = count;
+    chatBadge.style.display = 'inline';
+  } else {
+    chatBadge.style.display = 'none';
+  }
+}
+
+function showToast(message) {
+  Toastify({
+    text: message,
+    duration: 3000,
+    close: true,
+    gravity: 'top',
+    position: 'right',
+    backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+  }).showToast();
+}
+
+function connectWebSocket() {
+  ws = new WebSocket(`${location.origin.replace('http', 'ws')}/ws/admin`);
+
+  ws.onopen = () => console.log("Connected to admin WebSocket.");
+  ws.onclose = () => console.log("Disconnected from admin WebSocket.");
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+    if (data.type === 'new_session') {
+      queueCount += 1;
+      updateBadge(queueCount);
+      showToast(`New live chat request: ${data.student_name || data.name || 'Student'} (#${data.session_id.slice(0, 4)})`);
+      upsertSession({ 
+        session_id: data.session_id, 
+        status: data.status || 'queued', 
+        student_name: data.student_name || data.name,
+        student_email: data.student_email
+      });
+    }
+
+    if (data.type === 'queued_ping') {
+      const session = sessionsIndex.get(data.session_id);
+      if (session) {
+        session.queue_position = data.queue_position;
+        upsertSession(session);
+      }
+    }
+
+    if (data.type === 'session_removed') {
+      queueCount = Math.max(0, queueCount - 1);
+      updateBadge(queueCount);
+      removeSession(data.session_id);
+    }
+  };
+}
+
+connectWebSocket();
+</script>
+
+<script>
+// Tab switching function
+function showTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  event.target.closest('.tab').classList.add('active');
+  
+  // Update tab content
+  document.getElementById('ticketsTab').classList.remove('active');
+  document.getElementById('appointmentsTab').classList.remove('active');
+  document.getElementById('eventsTab').classList.remove('active');
+  
+  if (tabName === 'tickets') {
+    document.getElementById('ticketsTab').classList.add('active');
+  } else if (tabName === 'appointments') {
+    document.getElementById('appointmentsTab').classList.add('active');
+  } else if (tabName === 'events') {
+    document.getElementById('eventsTab').classList.add('active');
+    loadEvents(); // Load events when tab is shown
+  }
+}
+
+window.onload = async () => {
+  console.log("Window loaded. Initializing admin dashboard...");
+
+  // Load live chat sessions
+  await loadExistingSessions(); // Load sessions and messages
+  clearMessages();
+  connectWebSocket();           // Start WebSocket for live updates
+  // Load tickets and appointments
+  loadTickets();               // Load tickets for admin
+  loadAppointments();          // Load pending appointments for admin
+  loadUpcomingAppointments();  // Load upcoming appointments for admin
+  loadAppointmentReminders();  // Load appointment reminders at the top
+
+  // Fetch stats
+  try {
+    const res = await fetch('/api/stats');
+    if (res.ok) {
+      const stats = await res.json();
+      console.log('Stats fetched successfully:', stats);
+
+      document.getElementById('knowledge-stat').textContent = stats.knowledge_articles || 0;
+      document.getElementById('departments-stat').textContent = stats.departments || 0;
+      document.getElementById('users-stat').textContent = stats.total_users || 0;
+    } else {
+      console.error(`Failed to fetch stats. Status: ${res.status}`);
+    }
+  } catch (err) {
+    console.error('Error fetching stats:', err);
+  }
+};
+
+// ------------------- Helper Functions -------------------
+function upsertSession(session) {
+  const sid = session.session_id;
+  const studentName = session.student_name || session.name || `Student ${sid?.slice(0, 4) || ''}`;
+  const studentEmail = session.student_email || '';
+  const status = session.status || 'queued';
+
+  console.log(`[DEBUG] Upserting session: ${sid}, Name: ${studentName}, Email: ${studentEmail}, Status: ${status}`);
+
+  // Store/merge local model
+  const prev = sessionsIndex.get(sid) || {};
+  sessionsIndex.set(sid, { 
+    name: studentName || prev.name, 
+    email: studentEmail || prev.email,
+    status 
+  });
+
+  // Dedupe list item by data-id
+  let item = chatList.querySelector(`.chat-list-item[data-id="${sid}"]`);
+  if (!item) {
+    item = document.createElement('div');
+    item.classList.add('chat-list-item');
+    item.dataset.id = sid;
+    item.onclick = () => selectSession(sid);
+    chatList.appendChild(item);
+  }
+
+  // Status badge colors
+  const statusColors = {
+    'queued': { bg: '#fef3c7', text: '#92400e', dot: '#f59e0b' },
+    'live': { bg: '#d1fae5', text: '#065f46', dot: '#10b981' },
+    'closed': { bg: '#e5e7eb', text: '#374151', dot: '#6b7280' }
+  };
+  const statusStyle = statusColors[status] || statusColors['queued'];
+
+  item.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:0.75rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+        <div style="flex:1;">
+          <div style="font-weight:600;color:#1e293b;font-size:1rem;margin-bottom:0.25rem;word-break:break-word;">
+            ${studentName}
+          </div>
+          ${studentEmail ? `
+            <div style="font-size:0.8rem;color:#64748b;word-break:break-all;">
+              ${studentEmail}
+            </div>
+          ` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
+          <span style="width:8px;height:8px;border-radius:50%;background:${statusStyle.dot};"></span>
+          <span style="font-size:0.7rem;color:${statusStyle.text};font-weight:600;text-transform:uppercase;letter-spacing:0.3px;white-space:nowrap;">
+            ${status}
+          </span>
+        </div>
+      </div>
+      <div style="font-size:0.7rem;color:#94a3b8;font-family:monospace;">
+        ID: ${sid.slice(0, 12)}...
+      </div>
+    </div>
+  `;
+
+  console.log(`[DEBUG] Chat list updated for session: ${sid}`);
+}
+
+function clearMessages() {
+  chatMessages.innerHTML = `<p style="color:#999; text-align:center;">Select a chat to start messaging.</p>`;
+}
+
+function removeSession(sessionId) {
+  const item = chatList.querySelector(`.chat-list-item[data-id="${sessionId}"]`);
+  if (item) item.remove();
+  if (selectedSession === sessionId) {
+    selectedSession = null;
+    chatInput.disabled = true; sendBtn.disabled = true;
+    chatMessages.innerHTML = `<p style="color:#999; text-align:center;">Select a chat to start messaging.</p>`;
+  }
+  sessionsIndex.delete(sessionId);
+  joinedSessions.delete(sessionId);
+}
+
+
+
+function enableInput(enabled) {
+  chatInput.disabled = !enabled;
+  sendBtn.disabled   = !enabled;
+}
+
+// ---------- Select a session ----------
+async function selectSession(sessionId) {
+  selectedSession = sessionId;
+  document.querySelectorAll('.chat-list-item').forEach(i => i.classList.remove('active'));
+  document.querySelector(`.chat-list-item[data-id="${sessionId}"]`)?.classList.add('active');
+
+  // Start with a clean chat window for fresh conversation
+  chatMessages.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:2rem; font-size:0.9rem;">Starting live chat session...</p>';
+  enableInput(false);
+
+  // JOIN the session once per admin per session
+  if (!joinedSessions.has(sessionId)) {
+    console.log("Sending join request for session:", sessionId);
+    ws?.send(JSON.stringify({ type: 'join', session_id: sessionId }));
+    // wait for "joined" event to enable input
+  } else {
+    // Already joined - clear message and enable input
+    chatMessages.innerHTML = '';
+    enableInput(true);
+  }
+}
+
+// ---------- Load existing sessions on page load ----------
+// Append a message to the chat window
+function appendMessage(sessionId, sender, message) {
+  if (sessionId !== selectedSession) return; // only show for selected session
+  
+  const messageContainer = document.createElement('div');
+  messageContainer.style.cssText = `
+    margin-bottom: 1rem; 
+    display: flex; 
+    flex-direction: column;
+    align-items: ${sender === 'admin' ? 'flex-end' : 'flex-start'};
+    max-width: 100%;
+  `;
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('chat-message', sender === 'admin' ? 'admin' : 'student');
+  messageDiv.textContent = message;
+  
+  const timestamp = document.createElement('div');
+  timestamp.style.cssText = `
+    font-size: 0.7rem;
+    color: ${sender === 'admin' ? '#64748b' : '#94a3b8'};
+    margin-top: 0.35rem;
+    padding: 0 0.5rem;
+    font-style: italic;
+  `;
+  timestamp.textContent = new Date().toLocaleString();
+  
+  messageContainer.appendChild(messageDiv);
+  messageContainer.appendChild(timestamp);
+  
+  chatMessages.appendChild(messageContainer);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// ---------- Send a message ----------
+function sendMessage() {
+  const msg = chatInput.value.trim();
+  if (!msg || !selectedSession) return;
+
+  if (!joinedSessions.has(selectedSession)) {
+    // safety: do not allow sending before joined
+    return alert('Join the session first.');
+  }
+
+  ws.send(JSON.stringify({ type: 'message', session_id: selectedSession, message: msg }));
+  appendMessage(selectedSession, 'admin', msg);
+  chatInput.value = '';
+  chatInput.focus();
+}
+
+sendBtn.onclick = sendMessage;
+
+// Add Enter key support for sending messages
+chatInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// ---------- Load existing sessions on page load ----------
+async function loadExistingSessions() {
+  try {
+    const res = await fetch('/api/admin/live_chats'); // returns [{session_id, status, name?}]
+    const sessions = await res.json();
+    sessions.forEach((s) => {
+      upsertSession(s);
+    });
+    // Don't auto-select any session - let admin choose which chat to join
+  } catch (err) {
+    console.error('Failed to load sessions:', err);
+  }
+}
+
+// ---------- Admin WebSocket ----------
+function connectWebSocket() {
+  ws = new WebSocket(`${location.origin.replace('http', 'ws')}/ws/admin`);
+
+  ws.onopen = () => console.log("Connected to live chat WebSocket.");
+  ws.onclose = () => console.log("Disconnected from live chat WebSocket.");
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+    if (data.type === 'new_session') {
+      // session (queued) appears to admins
+      upsertSession({ 
+        session_id: data.session_id, 
+        status: data.status || 'queued', 
+        student_name: data.student_name || data.name,
+        student_email: data.student_email
+      });
+      // Don't auto-select - let admin choose which chat to join
+      showToast(`New live chat request: ${data.student_name || data.name || 'Student'} (#${data.session_id.slice(0, 4)})`);
+      return;
+    }
+
+    if (data.type === 'queued_ping') {
+      // student typed while queued — keep as lightweight activity marker
+      return;
+    }
+
+    if (data.type === 'joined') {
+      // this admin successfully joined a session → enable input
+      if (data.session_id) {
+        joinedSessions.add(data.session_id);
+        // Update status to live while preserving student information
+        const existingSession = sessionsIndex.get(data.session_id) || {};
+        upsertSession({ 
+          session_id: data.session_id, 
+          status: 'live',
+          student_name: data.student_name || existingSession.name,
+          student_email: data.student_email || existingSession.email
+        });
+        if (selectedSession === data.session_id) {
+          // Clear the "Starting..." message and enable input
+          chatMessages.innerHTML = '';
+          enableInput(true);
+        }
+      }
+      return;
+    }
+
+    if (data.type === 'error') {
+      console.warn('WS error:', data.reason);
+      return;
+    }
+
+    if (data.type === 'message') {
+      // Only messages for selected session are appended by appendMessage()
+      appendMessage(data.session_id, data.sender, data.message);
+      return;
+    }
+
+    if (data.type === 'session_removed') {
+      removeSession(data.session_id);
+      return;
+    }
+
+  };
+}
+
+// ------------------- Tickets & Appointments -------------------
+// Load tickets from server
+async function loadTickets() {
+  try {
+    console.log('Fetching tickets from backend...');
+    const res = await fetch('/api/tickets'); // Ensure this endpoint matches your backend
+    if (!res.ok) {
+      console.error(`Failed to fetch tickets. Status: ${res.status}, Message: ${res.statusText}`);
+      return;
+    }
+    const data = await res.json();
+    console.log('Tickets fetched:', data);
+
+    // Filter out Resolved and Cancelled tickets
+    const tickets = (data.tickets || []).filter(ticket => 
+      ticket.status !== 'Resolved' && 
+      ticket.status !== 'Cancelled' &&
+      ticket.status !== 'resolved' && 
+      ticket.status !== 'cancelled'
+    );
+    const ticketsTable = document.getElementById('tickets-table');
+    ticketsTable.innerHTML = '';
+
+    // Fetch staff list once
+    const staffRes = await fetch('/api/staff');
+    const staffData = await staffRes.json();
+    const staffList = Array.isArray(staffData) ? staffData : [];
+
+    tickets.forEach(ticket => {
+      const row = document.createElement('tr');
+      const isAssigned = ticket.assigned_staff && ticket.assigned_staff !== 'Not Assigned Yet';
+      const buttonText = isAssigned ? 'Assigned' : 'Assign';
+      const buttonStyle = isAssigned 
+        ? 'background:#ffffff; color:#0067A5; border:1px solid #0067A5; cursor:not-allowed; opacity:0.7;' 
+        : 'background:#0067A5; color:white; border:1px solid #0067A5; cursor:pointer;';
+      const disabledAttr = isAssigned ? 'disabled' : '';
+      
+      row.innerHTML = `
+        <td>${ticket.student_name}</td>
+        <td>${ticket.subject}</td>
+        <td>${ticket.priority || 'N/A'}</td>
+        <td>${ticket.status}</td>
+        <td>
+          <button class="assign-btn" style="${buttonStyle} padding:0.4rem 0.8rem; border-radius:6px;" ${disabledAttr}>${buttonText}</button>
+        </td>
+      `;
+
+      // Assign Staff click - only if not assigned
+      const assignBtn = row.querySelector('.assign-btn');
+      if (!isAssigned) {
+        assignBtn.onclick = () => openTicketModal(ticket, staffList);
+      }
+
+      ticketsTable.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Error fetching tickets:', err);
+  }
+}
+
+// Load appointments from server
+async function loadAppointments() {
+  try {
+    console.log('Fetching appointments from backend...');
+    const res = await fetch('/api/appointments?admin=true'); // Get all appointments for admin
+    if (!res.ok) {
+      console.error(`Failed to fetch appointments. Status: ${res.status}, Message: ${res.statusText}`);
+      return;
+    }
+    const data = await res.json();
+    console.log('Appointments fetched:', data);
+
+    const appointments = data.appointments || []; // Extract appointments array from response
+    const appointmentsTable = document.getElementById('appointments-table');
+    appointmentsTable.innerHTML = '';
+    
+    // Filter to show only Pending appointments with Admin department (exclude Cancelled)
+    const pendingAppointments = appointments.filter(app => 
+      app.status === 'Pending' && 
+      app.department === 'Admin' &&
+      app.status !== 'Cancelled' &&
+      app.status !== 'cancelled'
+    );
+    
+    if (pendingAppointments.length === 0) {
+      appointmentsTable.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#718096; padding:1.5rem;">No pending appointments</td></tr>';
+      return;
+    }
+    
+    pendingAppointments.forEach(app => {
+      const row = document.createElement('tr');
+      const statusColor = app.status === 'Confirmed' ? '#48bb78' : 
+                         app.status === 'Pending' ? '#ed8936' : '#718096';
+      
+      row.innerHTML = `
+        <td>${app.student_name || 'N/A'}</td>
+        <td>${app.subject || 'N/A'}</td>
+        <td>${app.department || 'N/A'}</td>
+        <td>${app.date || 'N/A'}</td>
+        <td>${app.time_slot || 'N/A'}</td>
+        <td>${app.meeting_mode || 'N/A'}</td>
+        <td><span style="color:${statusColor}; font-weight:600;">${app.status}</span></td>
+        <td>
+          <button class="modify-appt-btn" style="background:#0067A5; color:white; padding:0.4rem 0.8rem; border:none; border-radius:6px; cursor:pointer; margin-right:0.5rem;">
+            <i class="fa-solid fa-edit"></i> Modify
+          </button>
+        </td>
+      `;
+
+      // Modify appointment click
+      row.querySelector('.modify-appt-btn').onclick = () => openAppointmentModal(app);
+
+      appointmentsTable.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Error fetching appointments:', err);
+  }
+}
+
+// Load upcoming (confirmed) appointments from server
+async function loadUpcomingAppointments() {
+  try {
+    console.log('Fetching upcoming appointments from backend...');
+    const res = await fetch('/api/appointments?admin=true'); // Get all appointments for admin
+    if (!res.ok) {
+      console.error(`Failed to fetch upcoming appointments. Status: ${res.status}, Message: ${res.statusText}`);
+      return;
+    }
+    const data = await res.json();
+    console.log('Upcoming Appointments fetched:', data);
+
+    const appointments = data.appointments || [];
+    const upcomingTable = document.getElementById('upcoming-appointments-table');
+    upcomingTable.innerHTML = '';
+    
+    // Get today's date for filtering
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Filter to show only Confirmed appointments with Admin department and date >= today (exclude Cancelled)
+    const upcomingAppointments = appointments.filter(app => {
+      if (app.status !== 'Confirmed' || app.department !== 'Admin') return false;
+      if (app.status === 'Cancelled' || app.status === 'cancelled') return false;
+      
+      // Parse appointment date
+      const appDate = new Date(app.date);
+      appDate.setHours(0, 0, 0, 0);
+      
+      return appDate >= today;
+    });
+    
+    // Sort by date ascending (soonest first)
+    upcomingAppointments.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    if (upcomingAppointments.length === 0) {
+      upcomingTable.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#718096; padding:1.5rem;">No upcoming appointments</td></tr>';
+      return;
+    }
+    
+    upcomingAppointments.forEach(app => {
+      const row = document.createElement('tr');
+      
+      // Format date nicely
+      const appDate = new Date(app.date);
+      const formattedDate = appDate.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+      });
+      
+      row.innerHTML = `
+        <td>${app.student_name || 'N/A'}</td>
+        <td>${app.subject || 'N/A'}</td>
+        <td>${app.department || 'N/A'}</td>
+        <td>${formattedDate}</td>
+        <td>${app.time_slot || 'N/A'}</td>
+        <td>${app.meeting_mode || 'N/A'}</td>
+        <td>${app.location_mode || 'N/A'}</td>
+        <td>
+          <button class="view-appt-btn" style="background:#00A99D; color:white; padding:0.4rem 0.8rem; border:none; border-radius:6px; cursor:pointer;">
+            <i class="fa-solid fa-eye"></i> View
+          </button>
+        </td>
+      `;
+
+      // View appointment details click
+      row.querySelector('.view-appt-btn').onclick = () => viewAppointmentDetails(app);
+
+      upcomingTable.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Error fetching upcoming appointments:', err);
+  }
+}
+
+// Load appointment reminders (shows next upcoming appointment)
+async function loadAppointmentReminders() {
+  try {
+    const res = await fetch('/api/appointments?admin=true');
+    if (!res.ok) return;
+    
+    const data = await res.json();
+    const appointments = data.appointments || [];
+    
+    const reminderContainer = document.getElementById('appointment-reminders');
+    reminderContainer.innerHTML = '';
+    
+    // Get today's date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Filter confirmed Admin appointments with date >= today (exclude Cancelled)
+    const upcomingAppointments = appointments.filter(app => {
+      if (app.status !== 'Confirmed' || app.department !== 'Admin') return false;
+      if (app.status === 'Cancelled' || app.status === 'cancelled') return false;
+      const appDate = new Date(app.date);
+      appDate.setHours(0, 0, 0, 0);
+      return appDate >= today;
+    });
+    
+    // Sort by date ascending and get the nearest one
+    upcomingAppointments.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    if (upcomingAppointments.length === 0) {
+      // No upcoming appointments - show a friendly message
+      reminderContainer.innerHTML = `
+        <div style="background:linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); padding:1rem 1.5rem; border-radius:12px; border-left:4px solid #cbd5e0; display:flex; align-items:center; gap:1rem;">
+          <i class="fa-solid fa-calendar-check" style="font-size:1.5rem; color:#a0aec0;"></i>
+          <div style="color:#718096; font-size:0.95rem;">
+            No upcoming appointments scheduled
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    // Show reminders for upcoming appointments (max 3)
+    const remindersToShow = upcomingAppointments.slice(0, 3);
+    
+    remindersToShow.forEach(app => {
+      const appDate = new Date(app.date);
+      appDate.setHours(0, 0, 0, 0);
+      
+      // Calculate days difference
+      const diffTime = appDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      // Determine message and styling based on days left
+      let message, bgGradient, borderColor, iconColor, icon;
+      
+      if (diffDays === 0) {
+        message = `Today with <strong>${app.student_name}</strong>`;
+        bgGradient = 'linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%)';
+        borderColor = '#fc8181';
+        iconColor = '#e53e3e';
+        icon = 'fa-bell';
+      } else if (diffDays === 1) {
+        message = `Tomorrow with <strong>${app.student_name}</strong>`;
+        bgGradient = 'linear-gradient(135deg, #fffaf0 0%, #feebc8 100%)';
+        borderColor = '#f6ad55';
+        iconColor = '#dd6b20';
+        icon = 'fa-clock';
+      } else if (diffDays <= 7) {
+        message = `In ${diffDays} days with <strong>${app.student_name}</strong>`;
+        bgGradient = 'linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%)';
+        borderColor = '#4fd1c5';
+        iconColor = '#319795';
+        icon = 'fa-calendar-day';
+      } else {
+        message = `In ${diffDays} days with <strong>${app.student_name}</strong>`;
+        bgGradient = 'linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%)';
+        borderColor = '#63b3ed';
+        iconColor = '#3182ce';
+        icon = 'fa-calendar';
+      }
+      
+      // Get meeting mode display
+      const meetingMode = app.meeting_mode === 'In-Person' ? 'in person' : 'virtual';
+      const meetingIcon = app.meeting_mode === 'In-Person' ? 'fa-user-group' : 'fa-video';
+      
+      // Format time
+      const timeSlot = app.time_slot || 'Time TBD';
+      
+      const reminderCard = document.createElement('div');
+      reminderCard.style.cssText = `
+        background:${bgGradient};
+        padding:1rem 1.5rem;
+        border-radius:12px;
+        border-left:4px solid ${borderColor};
+        display:flex;
+        align-items:center;
+        gap:1rem;
+        margin-bottom:0.75rem;
+        box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        transition:all 0.2s;
+      `;
+      
+      reminderCard.onmouseover = () => {
+        reminderCard.style.transform = 'translateY(-2px)';
+        reminderCard.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)';
+      };
+      
+      reminderCard.onmouseout = () => {
+        reminderCard.style.transform = 'translateY(0)';
+        reminderCard.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+      };
+      
+      reminderCard.innerHTML = `
+        <i class="fa-solid ${icon}" style="font-size:1.8rem; color:${iconColor};"></i>
+        <div style="flex:1;">
+          <div style="color:#2d3748; font-size:1rem; font-weight:600; margin-bottom:0.25rem;">
+            <i class="fa-solid fa-calendar-check" style="color:${iconColor}; font-size:0.9rem;"></i>
+            Appointment ${message}
+          </div>
+          <div style="color:#4a5568; font-size:0.875rem; display:flex; gap:1rem; flex-wrap:wrap;">
+            <span><i class="fa-solid ${meetingIcon}" style="color:${iconColor};"></i> ${meetingMode}</span>
+            <span><i class="fa-solid fa-clock" style="color:${iconColor};"></i> ${timeSlot}</span>
+            <span><i class="fa-solid fa-note-sticky" style="color:${iconColor};"></i> ${app.subject}</span>
+          </div>
+        </div>
+        <button onclick="viewAppointmentDetails(${JSON.stringify(app).replace(/"/g, '&quot;')})" 
+                style="background:white; color:${iconColor}; border:2px solid ${borderColor}; padding:0.5rem 1rem; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.875rem; transition:all 0.2s; white-space:nowrap;"
+                onmouseover="this.style.background='${iconColor}'; this.style.color='white'"
+                onmouseout="this.style.background='white'; this.style.color='${iconColor}'">
+          <i class="fa-solid fa-eye"></i> View
+        </button>
+      `;
+      
+      reminderContainer.appendChild(reminderCard);
+    });
+    
+  } catch (err) {
+    console.error('Error loading appointment reminders:', err);
+  }
+}
+
+// Ticket modal functions
+const ticketModal = document.getElementById('ticket-modal');
+const closeTicketModal = document.getElementById('close-ticket-modal');
+closeTicketModal.onclick = () => ticketModal.style.display = 'none';
+
+function openTicketModal(ticket, staffList) {
+  ticketModal.style.display = 'flex';
+  document.getElementById('ticket-subject').textContent = ticket.subject;
+  document.getElementById('ticket-student').textContent = ticket.student_name;
+  document.getElementById('ticket-category').textContent = ticket.category;
+  document.getElementById('ticket-priority').textContent = ticket.priority;
+  document.getElementById('ticket-description').textContent = ticket.description;
+  document.getElementById('ticket-status').value = ticket.status;
+
+  const assignSelect = document.getElementById('ticket-assign');
+  assignSelect.innerHTML = '<option value="">-- Select Staff --</option>';
+  
+  staffList.forEach(staff => {
+    const option = document.createElement('option');
+    option.value = staff.email;
+    option.textContent = `${staff.full_name} - ${staff.department}`;
+    if(ticket.assigned_staff === staff.email) option.selected = true;
+    assignSelect.appendChild(option);
+  });
+
+  document.getElementById('update-ticket').onclick = async () => {
+    const updatedStatus = document.getElementById('ticket-status').value;
+    const assignedStaff = document.getElementById('ticket-assign').value;
+
+    try {
+      await fetch(`/api/tickets/${ticket._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: updatedStatus, assigned_staff: assignedStaff })
+      });
+      ticketModal.style.display = 'none';
+      loadTickets(); // refresh table
+    } catch (err) {
+      console.error('Failed to update ticket:', err);
+    }
+  }
+}
+
+// Appointment modal functions
+const appointmentModal = document.getElementById('appointment-modal');
+const closeAppointmentModal = document.getElementById('close-appointment-modal');
+closeAppointmentModal.onclick = () => appointmentModal.style.display = 'none';
+
+let currentAppointmentId = null;
+
+function openAppointmentModal(appointment) {
+  currentAppointmentId = appointment._id;
+  appointmentModal.style.display = 'flex';
+  
+  document.getElementById('appt-student').textContent = appointment.student_name || 'N/A';
+  document.getElementById('appt-subject').textContent = appointment.subject || 'N/A';
+  document.getElementById('appt-department').textContent = appointment.department || 'N/A';
+  
+  // Set notes (now a div, not textarea)
+  document.getElementById('appt-notes').textContent = appointment.notes || 'No additional notes provided';
+  
+  document.getElementById('appt-date').value = appointment.date || '';
+  
+  // Properly set the time slot value
+  const timeSlotSelect = document.getElementById('appt-time-slot');
+  if (appointment.time_slot) {
+    timeSlotSelect.value = appointment.time_slot;
+  }
+  
+  // Set meeting mode
+  const meetingModeSelect = document.getElementById('appt-meeting-mode');
+  if (appointment.meeting_mode) {
+    meetingModeSelect.value = appointment.meeting_mode;
+  }
+  
+  document.getElementById('appt-location').value = appointment.location_mode || '';
+
+  // Confirm appointment (only action now)
+  const confirmBtn = document.getElementById('confirm-appointment');
+  console.log('Confirm button found:', confirmBtn);
+  
+  if (confirmBtn) {
+    confirmBtn.onclick = async () => {
+      console.log('Confirm button clicked! Current appointment ID:', currentAppointmentId);
+      
+      // First update any changes made to the fields
+      const updatedData = {
+        date: document.getElementById('appt-date').value,
+        time_slot: timeSlotSelect.value,
+        meeting_mode: meetingModeSelect.value,
+        location_mode: document.getElementById('appt-location').value
+      };
+
+      console.log('Updated data:', updatedData);
+
+      try {
+        // Update the appointment first
+        console.log('Updating appointment...');
+        const updateRes = await fetch(`/api/appointments/${currentAppointmentId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedData)
+        });
+        console.log('Update response:', updateRes.status);
+
+        // Then confirm it
+        console.log('Confirming appointment...');
+        const res = await fetch(`/api/appointments/${currentAppointmentId}/confirm`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        console.log('Confirm response:', res.status);
+        
+        if (res.ok) {
+          Toastify({
+            text: "Appointment confirmed successfully!",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: { background: "#48bb78" }
+          }).showToast();
+          appointmentModal.style.display = 'none';
+          loadAppointments(); // refresh pending appointments table
+          loadUpcomingAppointments(); // refresh upcoming appointments table
+          loadAppointmentReminders(); // refresh appointment reminders
+        } else {
+          const errorData = await res.json();
+          console.error('Confirm failed with data:', errorData);
+          throw new Error('Failed to confirm appointment');
+        }
+      } catch (err) {
+        console.error('Failed to confirm appointment:', err);
+        Toastify({
+          text: "Failed to confirm appointment",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          style: { background: "#f56565" }
+        }).showToast();
+      }
+    };
+  } else {
+    console.error('Confirm button not found!');
+  }
+}
+
+// View appointment details function
+function viewAppointmentDetails(appointment) {
+  const viewModal = document.getElementById('view-appointment-modal');
+  viewModal.style.display = 'flex';
+  
+  // Populate all fields
+  document.getElementById('view-student').textContent = appointment.student_name || 'N/A';
+  document.getElementById('view-subject').textContent = appointment.subject || 'N/A';
+  document.getElementById('view-department').textContent = appointment.department || 'N/A';
+  
+  // Format date nicely
+  if (appointment.date) {
+    const appDate = new Date(appointment.date);
+    const formattedDate = appDate.toLocaleDateString('en-US', { 
+      weekday: 'long',
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+    document.getElementById('view-date').textContent = formattedDate;
+  } else {
+    document.getElementById('view-date').textContent = 'N/A';
+  }
+  
+  document.getElementById('view-time-slot').textContent = appointment.time_slot || 'N/A';
+  document.getElementById('view-meeting-mode').textContent = appointment.meeting_mode || 'N/A';
+  document.getElementById('view-location').textContent = appointment.location_mode || 'N/A';
+  document.getElementById('view-notes').textContent = appointment.notes || 'No additional notes provided';
+}
+
+// Close view appointment modal
+document.getElementById('close-view-appointment-modal').onclick = () => {
+  document.getElementById('view-appointment-modal').style.display = 'none';
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch('/api/user'); // Fetch user details from backend
+      if (res.ok) {
+        const user = await res.json();
+        const fullName = user.full_name || 'Admin'; // Default to 'Admin' if full_name is not available
+        document.querySelector('.hero h2').textContent = `Welcome, ${fullName} 👋`;
+      } else {
+        console.error('Failed to fetch user details:', res.statusText);
+      }
+    } catch (err) {
+      console.error('Error fetching user details:', err);
+    }
+  });
+
+// ==================== DEPARTMENTS MANAGEMENT ====================
+
+// Show departments modal
+async function showDepartmentsSection() {
+  const modal = document.getElementById('departments-modal');
+  modal.style.display = 'flex';
+  await loadDepartments();
+}
+
+// Close departments modal
+document.getElementById('close-departments-modal').onclick = () => {
+  document.getElementById('departments-modal').style.display = 'none';
+};
+
+// Load and display all departments
+async function loadDepartments() {
+  try {
+    const res = await fetch('/api/departments');
+    if (!res.ok) {
+      console.error(`Failed to fetch departments. Status: ${res.status}`);
+      return;
+    }
+    
+    const departments = await res.json();
+    const grid = document.getElementById('departments-grid');
+    grid.innerHTML = '';
+
+    if (departments.length === 0) {
+      grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#999;">No departments found.</p>';
+      return;
+    }
+
+    departments.forEach(dept => {
+      const card = document.createElement('div');
+      card.style.cssText = `
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: 0.3s;
+        border-left: 4px solid #0067A5;
+      `;
+      card.onmouseover = () => card.style.transform = 'translateY(-5px)';
+      card.onmouseout = () => card.style.transform = 'translateY(0)';
+
+      card.innerHTML = `
+        <h3 style="color:#0067A5; margin-bottom:0.5rem; font-size:1.1rem;">
+          <i class="fa-solid fa-building"></i> ${dept.name}
+        </h3>
+        <p style="color:#666; font-size:0.9rem; margin-bottom:1rem;">${dept.description}</p>
+        <div style="display:grid; gap:0.5rem; font-size:0.85rem;">
+          <div><i class="fa-solid fa-location-dot" style="color:#00A99D; width:20px;"></i> <strong>Building:</strong> ${dept.building}</div>
+          <div><i class="fa-solid fa-door-open" style="color:#00A99D; width:20px;"></i> <strong>Office:</strong> ${dept.office_location}</div>
+          <div><i class="fa-solid fa-phone" style="color:#00A99D; width:20px;"></i> <strong>Phone:</strong> ${dept.phone}</div>
+          <div><i class="fa-solid fa-envelope" style="color:#00A99D; width:20px;"></i> <strong>Email:</strong> ${dept.email}</div>
+          <div><i class="fa-solid fa-clock" style="color:#00A99D; width:20px;"></i> <strong>Hours:</strong> ${dept.office_hours}</div>
+        </div>
+        ${dept.services && dept.services.length > 0 ? `
+          <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #eee;">
+            <strong style="color:#0067A5; font-size:0.85rem;">Services:</strong>
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem;">
+              ${dept.services.map(s => `<span style="background:#e8f5ff; color:#0067A5; padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem;">${s}</span>`).join('')}
+            </div>
+          </div>
+        ` : ''}
+      `;
+
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Error loading departments:', err);
+  }
+}
+
+// ==================== USER MANAGEMENT ====================
+
+// Show user management modal
+async function showUserManagement() {
+  const modal = document.getElementById('user-management-modal');
+  modal.style.display = 'flex';
+  await loadStudents();
+}
+
+// Close user management modal
+document.getElementById('close-user-modal').onclick = () => {
+  document.getElementById('user-management-modal').style.display = 'none';
+};
+
+// Load and display all students
+async function loadStudents() {
+  try {
+    const res = await fetch('/api/students');
+    if (!res.ok) {
+      console.error(`Failed to fetch students. Status: ${res.status}`);
+      return;
+    }
+    
+    const students = await res.json();
+    const tableBody = document.getElementById('students-table');
+    tableBody.innerHTML = '';
+
+    if (students.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999; padding:2rem;">No students found.</td></tr>';
+      return;
+    }
+
+    students.forEach(student => {
+      const row = document.createElement('tr');
+      row.style.cssText = 'border-bottom: 1px solid #eee; transition: 0.2s;';
+      row.onmouseover = () => row.style.background = '#f9f9f9';
+      row.onmouseout = () => row.style.background = 'transparent';
+      
+      row.innerHTML = `
+        <td style="padding:0.8rem;">${student.full_name || 'N/A'}</td>
+        <td style="padding:0.8rem;">${student.email || 'N/A'}</td>
+        <td style="padding:0.8rem;">${student.phone_number || 'N/A'}</td>
+        <td style="padding:0.8rem;">${student.date_of_birth || 'N/A'}</td>
+        <td style="padding:0.8rem;">${student.address || 'N/A'}</td>
+      `;
+
+      tableBody.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Error loading students:', err);
+  }
+}
+
+// ======================================================================================
+//                              EVENT MANAGEMENT
+// ======================================================================================
+
+let currentEventId = null;
+
+// Load all events
+async function loadEvents() {
+  try {
+    const response = await fetch('/api/events');
+    if (!response.ok) throw new Error('Failed to fetch events');
+    
+    const events = await response.json();
+    const eventsTable = document.getElementById('events-table');
+    
+    if (events.length === 0) {
+      eventsTable.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#718096; padding:1.5rem;">No events created yet</td></tr>';
+      return;
+    }
+    
+    eventsTable.innerHTML = events.map(event => `
+      <tr style="font-size:0.875rem;">
+        <td style="padding:0.75rem 0.5rem; font-weight:500; color:#2d3748;">${event.title || 'N/A'}</td>
+        <td style="padding:0.75rem 0.5rem; color:#4a5568;">${event.event_date || 'N/A'}</td>
+        <td style="padding:0.75rem 0.5rem; color:#4a5568;">${event.event_time || 'N/A'}</td>
+        <td style="padding:0.75rem 0.5rem;">
+          <span style="padding:0.15rem 0.5rem; border-radius:3px; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; background:${getPriorityBg(event.priority)}; color:${getPriorityColor(event.priority)};">
+            ${event.priority || 'normal'}
+          </span>
+        </td>
+        <td style="padding:0.75rem 0.5rem; color:#4a5568; text-transform:capitalize;">${event.target_audience || 'all'}</td>
+        <td style="padding:0.75rem 0.5rem; color:#4a5568; text-transform:capitalize;">${event.category || 'general'}</td>
+        <td style="padding:0.75rem 0.5rem;">
+          <span style="padding:0.15rem 0.5rem; border-radius:3px; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; background:${getStatusBg(event.status)}; color:${getStatusTextColor(event.status)};">
+            ${event.status || 'active'}
+          </span>
+        </td>
+        <td style="padding:0.75rem 0.5rem;">
+          <div style="display:inline-flex; gap:0.25rem; align-items:center;">
+            ${event.status !== 'completed' ? `
+              <button onclick="editEvent('${event._id}')" title="Edit" style="background:#0067A5; color:#fff; padding:0.35rem 0.5rem; border:none; border-radius:4px; cursor:pointer; font-size:0.75rem; line-height:1; transition:all 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)'">
+                <i class="fa-solid fa-pen" style="font-size:0.85rem; color:#fff;"></i>
+              </button>
+              <button onclick="markEventComplete('${event._id}')" title="Mark Complete" style="background:#48bb78; color:#fff; padding:0.35rem 0.5rem; border:none; border-radius:4px; cursor:pointer; font-size:0.75rem; line-height:1; transition:all 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)'">
+                <i class="fa-solid fa-check" style="font-size:0.85rem; color:#fff;"></i>
+              </button>
+            ` : '<span style="color:#48bb78; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-check-circle"></i> Done</span>'}
+            <button onclick="deleteEvent('${event._id}')" title="Delete" style="background:#e53e3e; color:#fff; padding:0.35rem 0.5rem; border:none; border-radius:4px; cursor:pointer; font-size:0.75rem; line-height:1; transition:all 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)'">
+              <i class="fa-solid fa-trash-alt" style="font-size:0.85rem; color:#fff;"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Error loading events:', error);
+  }
+}
+
+function getPriorityBg(priority) {
+  switch(priority) {
+    case 'low': return '#f0fff4';
+    case 'normal': return '#ebf8ff';
+    case 'high': return '#fed7d7';
+    case 'urgent': return '#feebcb';
+    default: return '#f7fafc';
+  }
+}
+
+function getPriorityColor(priority) {
+  switch(priority) {
+    case 'low': return '#22543d';
+    case 'normal': return '#2c5282';
+    case 'high': return '#742a2a';
+    case 'urgent': return '#7c2d12';
+    default: return '#2d3748';
+  }
+}
+
+function getStatusBg(status) {
+  switch(status) {
+    case 'active': return '#ebf8ff';
+    case 'completed': return '#f0fff4';
+    case 'deleted': return '#fed7d7';
+    default: return '#f7fafc';
+  }
+}
+
+function getStatusTextColor(status) {
+  switch(status) {
+    case 'active': return '#2c5282';
+    case 'completed': return '#22543d';
+    case 'deleted': return '#742a2a';
+    default: return '#2d3748';
+  }
+}
+
+// Open event modal for creating new event
+function openEventModal() {
+  currentEventId = null;
+  document.getElementById('event-modal-title').textContent = 'Create New Event';
+  document.getElementById('event-form').reset();
+  // Set default date to today
+  document.getElementById('event-date').valueAsDate = new Date();
+  document.getElementById('event-modal').style.display = 'flex';
+}
+
+// Close event modal
+function closeEventModal() {
+  document.getElementById('event-modal').style.display = 'none';
+  currentEventId = null;
+}
+
+// Handle event form submission
+document.getElementById('event-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const eventData = {
+    title: document.getElementById('event-title').value,
+    description: document.getElementById('event-description').value,
+    event_date: document.getElementById('event-date').value,
+    event_time: document.getElementById('event-time').value || null,
+    priority: document.getElementById('event-priority').value,
+    category: document.getElementById('event-category').value,
+    target_audience: document.getElementById('event-target').value
+  };
+  
+  try {
+    let response;
+    if (currentEventId) {
+      // Update existing event
+      response = await fetch(`/api/events/${currentEventId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData)
+      });
+    } else {
+      // Create new event
+      response = await fetch('/api/events/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData)
+      });
+    }
+    
+    if (!response.ok) throw new Error('Failed to save event');
+    
+    const result = await response.json();
+    
+    // Show success message
+    Toastify({
+      text: result.message || "Event saved successfully!",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      style: { background: "linear-gradient(135deg, #0067A5 0%, #00A99D 100%)" }
+    }).showToast();
+    
+    // Close modal and reload events
+    closeEventModal();
+    loadEvents();
+    
+  } catch (error) {
+    console.error('Error saving event:', error);
+    
+    // Try to get error details from response
+    let errorMessage = "Error saving event";
+    if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    Toastify({
+      text: errorMessage,
+      duration: 5000,
+      gravity: "top",
+      position: "right",
+      style: { background: "#e53e3e" }
+    }).showToast();
+  }
+});
+
+// Edit event
+async function editEvent(eventId) {
+  try {
+    const response = await fetch('/api/events');
+    if (!response.ok) throw new Error('Failed to fetch events');
+    
+    const events = await response.json();
+    const event = events.find(e => e._id === eventId);
+    
+    if (!event) {
+      alert('Event not found');
+      return;
+    }
+    
+    // Prevent editing if event is completed
+    if (event.status === 'completed') {
+      Toastify({
+        text: "Cannot edit a completed event",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        style: { background: "#f56565" }
+      }).showToast();
+      return;
+    }
+    
+    currentEventId = eventId;
+    document.getElementById('event-modal-title').textContent = 'Edit Event';
+    document.getElementById('event-title').value = event.title || '';
+    document.getElementById('event-description').value = event.description || '';
+    document.getElementById('event-date').value = event.event_date || '';
+    document.getElementById('event-time').value = event.event_time || '';
+    document.getElementById('event-priority').value = event.priority || 'normal';
+    document.getElementById('event-category').value = event.category || 'general';
+    document.getElementById('event-target').value = event.target_audience || 'all';
+    
+    document.getElementById('event-modal').style.display = 'flex';
+  } catch (error) {
+    console.error('Error loading event:', error);
+  }
+}
+
+// Mark event as complete
+async function markEventComplete(eventId) {
+  if (!confirm('Mark this event as complete?')) return;
+  
+  try {
+    const response = await fetch(`/api/events/${eventId}/complete`, {
+      method: 'PUT'
+    });
+    
+    if (!response.ok) throw new Error('Failed to mark event as complete');
+    
+    Toastify({
+      text: "Event marked as complete",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      style: { background: "#48bb78" }
+    }).showToast();
+    
+    loadEvents();
+  } catch (error) {
+    console.error('Error marking event complete:', error);
+  }
+}
+
+// Delete event
+async function deleteEvent(eventId) {
+  if (!confirm('Are you sure you want to delete this event?')) return;
+  
+  try {
+    const response = await fetch(`/api/events/${eventId}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Failed to delete event');
+    
+    Toastify({
+      text: "Event deleted successfully",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      style: { background: "#e53e3e" }
+    }).showToast();
+    
+    loadEvents();
+  } catch (error) {
+    console.error('Error deleting event:', error);
+  }
+}
+
+// Close event modal on X click
+document.getElementById('close-event-modal').addEventListener('click', closeEventModal);
+
+// Close event modal on outside click
+document.getElementById('event-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'event-modal') {
+    closeEventModal();
+  }
+});
+
+</script>
+</body>
+</html>

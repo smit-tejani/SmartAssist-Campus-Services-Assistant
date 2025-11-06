@@ -1,0 +1,3135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAssist | Student Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<style>
+  /* ==================== RESET & BASE ==================== */
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+  }
+  
+  body { 
+    background: #f5f7fa;
+    color: #2d3748;
+    line-height: 1.6;
+  }
+
+  /* ==================== NAVBAR ==================== */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2.5rem;
+    background: #0067A5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  /* Brand section: logo + text */
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  nav h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  nav .logo {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  /* Links section */
+  nav .nav-links a {
+    color: #4a5568;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  nav .nav-links a:hover {
+    color: #ffffff;
+  }
+
+  /* ==================== CONTAINER & LAYOUT ==================== */
+  .container { 
+    display: flex; 
+    min-height: calc(100vh - 70px);
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .sidebar {
+    display: none; /* Hide sidebar for cleaner look */
+  }
+
+  .content { 
+    flex: 1; 
+    padding: 2.5rem 3rem; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 2rem;
+  }
+
+  /* ==================== HERO SECTION ==================== */
+  .hero {
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color: #ffffff; 
+    padding: 3rem 2.5rem; 
+    border-radius: 16px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    margin-bottom: 1rem;
+  }
+
+  .hero h2 { 
+    font-size: 2rem; 
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .hero p { 
+    font-size: 1.05rem; 
+    opacity: 0.95;
+    max-width: 500px;
+  }
+
+  .hero img { 
+    width: 180px; 
+    max-width: 100%;
+    opacity: 0.9;
+  }
+
+  /* ==================== STATS WIDGETS ==================== */
+  .stats { 
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .stat {
+    background: #ffffff;
+    padding: 1.5rem 1.75rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .stat:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 103, 165, 0.15);
+    border-color: #0067A5;
+  }
+
+  .stat .number { 
+    font-size: 2rem; 
+    font-weight: 700; 
+    color: #0067A5;
+    line-height: 1;
+  }
+
+  .stat .label { 
+    font-size: 0.875rem; 
+    color: #718096;
+    font-weight: 500;
+    margin-top: 0.25rem;
+  }
+
+  .stat i {
+    font-size: 2.5rem;
+    color: #0067A5;
+    opacity: 0.15;
+  }
+
+  /* ==================== CARDS GRID ==================== */
+  .grid {
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 12px; 
+    padding: 2rem 1.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex; 
+    flex-direction: column;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 24px rgba(0, 103, 165, 0.12);
+    border-color: #0067A5;
+  }
+
+  .card i { 
+    font-size: 2.5rem; 
+    color: #0067A5;
+    margin-bottom: 1rem;
+  }
+
+  .card h3 { 
+    font-size: 1.125rem; 
+    margin-bottom: 0.5rem; 
+    color: #2d3748;
+    font-weight: 600;
+  }
+
+  .card p { 
+    font-size: 0.9rem; 
+    color: #718096;
+    line-height: 1.5;
+  }
+
+  /* ==================== CHATBOT BUTTON ==================== */
+  .chatbot-btn {
+    position: fixed; 
+    bottom: 30px; 
+    right: 30px; 
+    background: #0067A5;
+    color: #ffffff;
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%; 
+    border: none;
+    font-size: 1.75rem; 
+    cursor: pointer; 
+    box-shadow: 0 4px 12px rgba(0, 103, 165, 0.3);
+    transition: all 0.3s ease;
+    z-index: 999;
+  }
+
+  .chatbot-btn:hover { 
+    background: #00A99D;
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 169, 157, 0.4);
+  }
+
+  /* ==================== MODALS ==================== */
+  #ticket-modal,
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  #ticket-modal.show,
+  .modal.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #ticket-modal .modal-content,
+  .modal .modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+
+  #ticket-modal.show .modal-content,
+  .modal.show .modal-content {
+    transform: scale(1);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    font-size: 1.5rem;
+    color: #718096;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: color 0.2s;
+  }
+
+  .close-btn:hover {
+    color: #2d3748;
+  }
+
+  .modal h2 {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  /* ==================== FORM ELEMENTS ==================== */
+  .modal form input[type="text"],
+  .modal form input[type="date"],
+  .modal form input[type="time"],
+  .modal form select,
+  .modal form textarea,
+  #ticket-form input[type="text"],
+  #ticket-form select,
+  #ticket-form textarea {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+    background: #ffffff;
+    color: #2d3748;
+  }
+
+  .modal form input:focus,
+  .modal form select:focus,
+  .modal form textarea:focus,
+  #ticket-form input:focus,
+  #ticket-form select:focus,
+  #ticket-form textarea:focus {
+    border-color: #0067A5;
+    box-shadow: 0 0 0 3px rgba(0, 103, 165, 0.1);
+  }
+
+  .modal form label,
+  #ticket-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+
+  .modal form > div,
+  #ticket-form > div {
+    margin-bottom: 1.25rem;
+  }
+
+  /* File input styling */
+  .modal form input[type="file"],
+  #ticket-form input[type="file"] {
+    padding: 0.5rem;
+  }
+
+  .modal form input[type="file"]::file-selector-button,
+  #ticket-form input[type="file"]::file-selector-button {
+    background: #f7fafc;
+    color: #4a5568;
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .modal form input[type="file"]::file-selector-button:hover,
+  #ticket-form input[type="file"]::file-selector-button:hover {
+    background: #edf2f7;
+  }
+
+  /* Buttons */
+  .modal form button[type="submit"],
+  #ticket-form button[type="submit"] {
+    background: #0067A5;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+  }
+
+  .modal form button[type="submit"]:hover,
+  #ticket-form button[type="submit"]:hover {
+    background: #00A99D;
+  }
+
+  .modal form button[type="button"],
+  #ticket-form button[type="button"] {
+    background: #ffffff;
+    color: #4a5568;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+  }
+
+  .modal form button[type="button"]:hover,
+  #ticket-form button[type="button"]:hover {
+    background: #f7fafc;
+  }
+
+  .flex {
+    display: flex;
+  }
+
+  .justify-end {
+    justify-content: flex-end;
+  }
+
+  .gap-3 {
+    gap: 0.75rem;
+  }
+
+  /* Feedback messages */
+  .feedback {
+    font-size: 0.9rem;
+    text-align: center;
+    color: #38a169;
+    margin-top: 1rem;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* ==================== TABLES & SECTIONS ==================== */
+  section {
+    margin-top: 1rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+    color: #2d3748;
+    font-weight: 600;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  th, td {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  th {
+    background: #f7fafc;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  tr:hover {
+    background: #f7fafc;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .panel {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  .panel__header {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .select-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  select {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+    background: #ffffff;
+  }
+
+  select:focus {
+    border-color: #0067A5;
+    box-shadow: 0 0 0 3px rgba(0, 103, 165, 0.1);
+  }
+
+  .btn {
+    background: #0067A5;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+  }
+
+  .btn:hover {
+    background: #00A99D;
+  }
+
+  /* ==================== PROFILE & UTILITY ==================== */
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  #welcome-message {
+    font-weight: 500;
+    color: #f9f9f9;
+    font-size: 0.95rem;
+  }
+
+  #profile-icon {
+    font-size: 1.75rem;
+    cursor: pointer;
+    color: #ffffff;
+    transition: color 0.2s;
+  }
+
+  #profile-icon:hover {
+    color: #00A99D;
+  }
+
+  .profile-dropdown {
+    position: relative;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1001;
+    min-width: 180px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .dropdown-content a {
+    display: block;
+    padding: 0.75rem 1.25rem;
+    text-decoration: none;
+    color: #4a5568;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+
+  .dropdown-content a:hover {
+    background: #f7fafc;
+    color: #0067A5;
+  }
+
+  .dropdown-content.show {
+    display: block;
+  }
+
+  /* ==================== NOTIFICATION BELL ==================== */
+  .notification-bell {
+    position: relative;
+    margin-right: 1.5rem;
+  }
+
+  .notification-bell-icon {
+    font-size: 1.5rem;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .notification-bell-icon:hover {
+    color: #00A99D;
+    transform: scale(1.1);
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e53e3e;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
+    border: 2px solid #0067A5;
+  }
+
+  .notification-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1001;
+    width: 380px;
+    max-height: 500px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .notification-dropdown.show {
+    display: block;
+  }
+
+  .notification-header {
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mark-all-read {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .mark-all-read:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .notification-item {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .notification-item:hover {
+    background: #f7fafc;
+  }
+
+  .notification-item.unread {
+    background: #ebf8ff;
+    border-left: 4px solid #0067A5;
+  }
+
+  .notification-item.unread:hover {
+    background: #bee3f8;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+  }
+
+  .notification-message {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+  }
+
+  .notification-time {
+    font-size: 0.75rem;
+    color: #a0aec0;
+  }
+
+  .notification-priority-high {
+    border-left-color: #e53e3e !important;
+  }
+
+  .notification-priority-urgent {
+    border-left-color: #dd6b20 !important;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .notification-empty {
+    padding: 2rem;
+    text-align: center;
+    color: #a0aec0;
+  }
+
+  .notification-empty i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .notification-footer {
+    padding: 0.75rem 1.25rem;
+    background: #f7fafc;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .notification-footer a {
+    color: #0067A5;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .notification-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .delete-notification {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: #a0aec0;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .delete-notification:hover {
+    background: #e53e3e;
+    color: #ffffff;
+  }
+
+  /* Ticket/Appointment Cards */
+  .ticket-card, .appt-card {
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .ticket-header, .appt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .ticket-meta, .appt-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: #718096;
+  }
+
+  .ticket-description, .appt-notes {
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+    color: #4a5568;
+  }
+
+  .ticket-actions, .appt-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .cancel-ticket-btn,
+  .cancel-appt-btn {
+    background: #e53e3e;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+  }
+
+  .cancel-ticket-btn:hover,
+  .cancel-appt-btn:hover {
+    background: #c53030;
+  }
+
+  .reschedule-appt-btn {
+    background: #ed8936;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+  }
+
+  .reschedule-appt-btn:hover {
+    background: #dd6b20;
+  }
+
+  /* ==================== RESPONSIVE STYLES ==================== */
+  @media (max-width: 968px) {
+    nav {
+      padding: 1rem 1.5rem;
+    }
+
+    .container {
+      max-width: 100%;
+      flex-direction: column;
+    }
+
+    .content {
+      padding: 1.5rem 1.25rem;
+      width: 100%;
+    }
+
+    .hero {
+      flex-direction: column;
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .hero h2 {
+      font-size: 1.75rem;
+    }
+
+    .hero p {
+      max-width: 100%;
+    }
+
+    .hero img {
+      width: 140px;
+      margin-top: 1rem;
+    }
+
+    .stats {
+      grid-template-columns: 1fr;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .chatbot-btn {
+      width: 55px;
+      height: 55px;
+      font-size: 1.5rem;
+      bottom: 20px;
+      right: 20px;
+    }
+
+    .modal .modal-content,
+    #ticket-modal .modal-content {
+      max-width: 95%;
+      padding: 1.5rem;
+      margin: 1rem;
+    }
+
+    .select-row {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+
+    #welcome-message {
+      display: none;
+    }
+
+    /* Table responsive */
+    .panel {
+      padding: 1.5rem;
+    }
+
+    table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #courses-table {
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 0.75rem 0.5rem;
+      white-space: nowrap;
+    }
+  }
+
+  @media (max-width: 640px) {
+    nav h1 {
+      font-size: 1.2rem;
+    }
+
+    nav .logo {
+      width: 36px;
+      height: 36px;
+    }
+
+    .hero h2 {
+      font-size: 1.5rem;
+    }
+
+    .hero p {
+      font-size: 0.95rem;
+    }
+
+    .stat .number {
+      font-size: 1.5rem;
+    }
+
+    .stat .label {
+      font-size: 0.8rem;
+    }
+
+    .stat i {
+      font-size: 2rem;
+    }
+
+    .card {
+      padding: 1.5rem 1.25rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+    }
+
+    .card i {
+      font-size: 2rem;
+    }
+
+    table {
+      font-size: 0.8rem;
+    }
+
+    th, td {
+      padding: 0.5rem 0.25rem;
+      font-size: 0.75rem;
+    }
+
+    .ticket-actions, .appt-actions {
+      flex-direction: column;
+    }
+
+    .ticket-actions button,
+    .appt-actions button {
+      width: 100%;
+    }
+
+    .modal h2 {
+      font-size: 1.25rem;
+    }
+
+    .modal form input,
+    .modal form select,
+    .modal form textarea {
+      font-size: 0.9rem;
+      padding: 0.6rem 0.875rem;
+    }
+
+    .modal form button {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    #ticket-form > div,
+    .modal form > div {
+      margin-bottom: 1rem;
+    }
+  }
+
+  /* ==================== TABS ==================== */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  .tab {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #718096;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .tab.active {
+    color: #0067A5;
+    border-bottom-color: #0067A5;
+  }
+  
+  .tab:hover {
+    color: #0067A5;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+</style>
+</head>
+<body><!-- Navbar -->
+<nav>
+  <div class="nav-left">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <img src="{{ url_for('static', path='assets/images/logo.png') }}"
+        alt="SmartAssist Logo"
+        style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+      <div>
+        <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
+        <p style="font-size: 0.7rem; opacity: 0.8; margin: 0;">TAMUCC Campus Assistant</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span id="welcome-message">Welcome, User</span>
+    
+    <!-- Notification Bell -->
+    <div class="notification-bell">
+      <i class="fa-solid fa-bell notification-bell-icon" id="notification-icon"></i>
+      <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+      
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="notification-header">
+          <span>Notifications</span>
+          <span class="mark-all-read" onclick="markAllAsRead()">Mark all read</span>
+        </div>
+        <div class="notification-list" id="notification-list">
+          <div class="notification-empty">
+            <i class="fa-solid fa-bell-slash"></i>
+            <p>No notifications</p>
+          </div>
+        </div>
+        <div class="notification-footer">
+          <a href="#" onclick="showAllNotifications(); return false;">View All Notifications</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="profile-dropdown">
+      <i class="fa-solid fa-user-circle" id="profile-icon"></i>
+      <div class="dropdown-content" id="profile-dropdown">
+        <a href="/edit_profile">Profile</a>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<!-- Sidebar + Content -->
+<div class="container">
+  <!-- Sidebar -->
+  <!-- Main Content -->
+  <div class="content">
+    <!-- Hero Section -->
+    <div class="hero">
+      <div>
+        <h2 style="color: #ffffff;">
+          Welcome, Student 👋
+        </h2>
+        <p>Your campus services dashboard. Access SmartAssist features and track your requests in real-time.</p>
+      </div>
+      <img src="https://img.icons8.com/ios/200/ffffff/student-male.png" alt="Student Illustration">
+    </div>
+
+    <!-- Events Section -->
+    <div id="student-events-section" style="margin-bottom: 1.5rem;">
+      <!-- Events will be dynamically populated here -->
+    </div>
+
+    <!-- Appointment Reminders -->
+    <div id="student-appointment-reminders" style="margin-bottom: 1.5rem;">
+      <!-- Reminders will be dynamically populated here -->
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats">
+      <div id="open-tickets-widget" class="stat" style="cursor:pointer;">
+        <div>
+          <div id="open-tickets-count" class="number">0</div>
+          <div class="label">Open Tickets</div>
+        </div>
+        <i class="fa-solid fa-ticket"></i>
+      </div>
+      <div id="upcoming-appts-widget" class="stat" style="cursor:pointer;">
+        <div>
+          <div id="upcoming-appts-count" class="number">0</div>
+          <div class="label">Upcoming Appointments</div>
+        </div>
+        <i class="fa-solid fa-calendar-check"></i>
+      </div>
+      <div class="stat">
+        <div>
+          <div id="feedback-submitted-count" class="number">0</div>
+          <div class="label">Feedback Submitted</div>
+        </div>
+        <i class="fa-solid fa-star"></i>
+      </div>
+    </div>
+
+    <!-- ================= SELECT TERM SECTION ================= -->
+    <section id="browse-classes" class="panel" aria-labelledby="term-heading">
+      <div class="panel__header">
+        <h2 id="term-heading">Select a Term</h2>
+      </div>
+      <form class="form-row" id="term-form">
+        <label for="term" class="form-label">Select a Term for Class Search</label>
+        <div class="select-row">
+          <select id="term" name="term" required>
+            <option value="" selected>Select a term...</option>
+            <option>Spring 2025</option>
+            <option>Summer I 2025</option>
+            <option>Summer II 2025</option>
+            <option>Fall 2025</option>
+          </select>
+          <button class="btn" type="button" id="fetch-courses">Fetch Courses</button>
+        </div>
+      </form>
+
+      <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table id="courses-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Details</th>
+              <th>Hours</th>
+              <th>CRN</th>
+              <th>Schedule Type</th>
+              <th>Grade Mode</th>
+              <th>Level</th>
+              <th>Part Of Term</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="courses-body">
+            <!-- Courses will be dynamically inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Feature Cards -->
+    <div class="grid">
+      <div class="card" onclick="window.location.href='chat'">
+        <i class="fa-solid fa-comments"></i>
+        <h3>Chatbot / FAQ</h3>
+        <p>Get instant answers to common campus questions anytime, anywhere.</p>
+      </div>
+      <div class="card" id="raise-ticket-card">
+        <i class="fa-solid fa-ticket"></i>
+        <h3>Raise Ticket</h3>
+        <p>Submit and track service requests with real-time updates.</p>
+      </div>
+      <div class="card" id="book-appointment-card">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h3>Book Appointment</h3>
+        <p>Schedule meetings with advisors, professors, or offices conveniently.</p>
+      </div>
+      <div class="card" onclick="openSurveysModal()" style="cursor: pointer;">
+        <i class="fa-solid fa-star"></i>
+        <h3>Feedback / Surveys</h3>
+        <p>Share feedback to help improve campus services.</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('tickets')">
+        <i class="fa-solid fa-ticket"></i> My Tickets
+      </button>
+      <button class="tab" onclick="showTab('appointments')">
+        <i class="fa-solid fa-calendar"></i> My Appointments
+      </button>
+    </div>
+
+    <!-- ================= MY TICKETS TAB ================= -->
+    <div id="ticketsTab" class="tab-content active">
+      <section id="my-tickets">
+        <h2>My Tickets</h2>
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Subject</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Assigned Staff</th>
+              </tr>
+            </thead>
+            <tbody id="ticket-list">
+              <!-- Tickets will be dynamically loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= MY APPOINTMENTS TAB ================= -->
+    <div id="appointmentsTab" class="tab-content">
+      <section id="my-appointments">
+        <h2>My Appointments</h2>
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Department</th>
+                <th>Assigned Staff</th>
+                <th>Date</th>
+                <th>Time Slot</th>
+                <th>Meeting Mode</th>
+                <th>Status</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody id="appointment-list">
+              <!-- Appointments will be dynamically loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Chatbot Button -->
+<button class="chatbot-btn" onclick="window.location.href='chat'"><i class="fa-solid fa-comments"></i></button>
+
+<div id="ticket-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-ticket-btn">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Raise a Ticket</h2>
+    <form id="ticket-form" class="space-y-4">
+      <div>
+        <label>Subject</label>
+        <input type="text" name="subject" placeholder="Enter ticket subject" required>
+      </div>
+      <div>
+        <label>Category</label>
+        <select id="ticket-category-select" name="category" required>
+          <option value="">Select Category</option>
+          <option value="Technical">Technical</option>
+          <option value="Administrative">Administrative</option>
+          <option value="Academic">Academic</option>
+          <option value="Financial Aid">Financial Aid</option>
+          <option value="Registrar">Registrar</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label>Priority</label>
+        <select name="priority" required>
+          <option value="">Select Priority</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+      <div>
+        <label>Preferred Staff (Optional)</label>
+        <select id="ticket-staff-select" name="preferred_staff">
+          <option value="">Select category first or leave blank</option>
+        </select>
+        <small style="color: #718096; font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+          Optional: Choose a staff member you'd prefer to handle this ticket. Admin will consider your preference during assignment.
+        </small>
+      </div>
+      <div>
+        <label>Description</label>
+        <textarea name="description" rows="4" placeholder="Describe your issue" required></textarea>
+      </div>
+      <div>
+        <label>Attachment (optional)</label>
+        <input type="file" name="attachment">
+      </div>
+      <div class="flex justify-end gap-3">
+        <button type="button" id="cancel-ticket-btn">Cancel</button>
+        <button type="submit">Submit</button>
+      </div>
+      <div id="ticket-feedback" class="feedback hidden"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= BOOK APPOINTMENT MODAL ================= -->
+<div id="appointment-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-appointment-btn">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Book an Appointment</h2>
+    <form id="appointment-form" class="space-y-4">
+      <div>
+        <label>Department</label>
+        <select id="department-select" name="department" required>
+          <option value="">Select Department</option>
+          <option value="IT Support">IT Support</option>
+          <option value="Academic Advisors">Academic Advisors</option>
+          <option value="Financial Aid">Financial Aid</option>
+          <option value="Registrar">Registrar</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div>
+        <label>Select Staff Member</label>
+        <select id="staff-select" name="assigned_staff" required disabled>
+          <option value="">First select a department</option>
+        </select>
+      </div>
+      <div>
+        <label>Subject/Purpose</label>
+        <input type="text" name="subject" placeholder="Brief description of your appointment purpose" required>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label>Preferred Date</label>
+          <input type="date" name="date" required min="">
+        </div>
+        <div>
+          <label>Preferred Time</label>
+          <select name="time_slot" required>
+            <option value="">Select Time Slot</option>
+            <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+            <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+            <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+            <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+            <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
+            <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+            <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+            <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Meeting Mode</label>
+        <select name="meeting_mode" required>
+          <option value="">Select Mode</option>
+          <option value="In-Person">In-Person</option>
+          <option value="Virtual (Zoom/Teams)">Virtual (Zoom/Teams)</option>
+          <option value="Phone Call">Phone Call</option>
+          <option value="No Preference">No Preference</option>
+        </select>
+      </div>
+      <div>
+        <label>Additional Notes (Optional)</label>
+        <textarea name="notes" rows="3" placeholder="Any special requirements or additional information"></textarea>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button type="button" id="cancel-appointment-btn">Cancel</button>
+        <button type="submit">Book Appointment</button>
+      </div>
+      <div id="appointment-feedback" class="feedback hidden"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= LIST OPEN TICKETS MODAL ================= -->
+<div id="tickets-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-tickets-modal">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Open Tickets</h2>
+    <div id="tickets-list">
+      <!-- Tickets will be dynamically injected here -->
+      <div class="card" style="margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;">
+        <strong>Subject: Sample Ticket</strong>
+        <div>Category: Technical • Priority: <span style="color: red;">High</span></div>
+        <div>Status: <span style="color: orange;">In Progress</span></div>
+        <div>Date Created: 2025-10-20</div>
+        <div>Last Updated: 2025-10-21 by Staff A</div>
+        <div>Assigned Staff: Staff A</div>
+        <hr>
+        <div>Description:</div>
+        <p>This is a sample ticket description.</p>
+        <hr>
+        <div>Attachment: <a href="#">Download</a></div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel Ticket</button>
+        </div>
+      </div>
+
+      <!-- Open Tickets Example -->
+      <div class="card" style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Subject:</strong> Cannot access library portal</div>
+        <div><strong>Category:</strong> Technical • <strong>Priority:</strong> <span style="color: red;">High</span></div>
+        <div><strong>Status:</strong> <span style="color: orange;">In Progress</span></div>
+        <div><strong>Created:</strong> 2025-10-20</div>
+        <div><strong>Last Updated:</strong> 2025-10-21 by Staff A</div>
+        <div><strong>Assigned Staff:</strong> Staff A</div>
+        <hr>
+        <div><strong>Description:</strong></div>
+        <p>When I try to log in, I get an error message: "Access denied".</p>
+        <hr>
+        <div><strong>Attachment:</strong> <a href="#">Download</a></div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel Ticket</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= UPCOMING APPOINTMENTS MODAL ================= -->
+<div id="appts-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-appts-modal">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Upcoming Appointments</h2>
+    <div id="appts-list">
+      <!-- Appointments will be injected here by JS -->
+      <div class="card" style="margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;">
+        <strong>Type: Academic Advising</strong>
+        <div>Date & Time: 2025-10-25 10:00 AM</div>
+        <div>Status: <span style="color: green;">Confirmed (In 3 days)</span></div>
+        <div>Location/Mode: In-Person (Room 101)</div>
+        <p>Notes: Bring all relevant documents.</p>
+        <button style="background: red; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Cancel Appointment</button>
+        <button style="background: orange; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+      </div>
+
+      <!-- Confirmed Appointment Example -->
+      <div class="card" style="border: 2px solid green; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Type:</strong> Academic Advising</div>
+        <div><strong>Date & Time:</strong> 2025-10-25 • 10:00 AM</div>
+        <div><strong>Status:</strong> <span style="color: green;">Confirmed (In 3 days)</span></div>
+        <div><strong>Location / Mode:</strong> Room 203, Admin Bldg</div>
+        <div><strong>Notes:</strong> Bring your course plan</div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+          <button style="background: orange; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+        </div>
+      </div>
+
+      <!-- Pending Appointment Example -->
+      <div class="card" style="border: 2px solid yellow; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Type:</strong> Career Guidance</div>
+        <div><strong>Date & Time:</strong> 2025-10-27 • 2:00 PM</div>
+        <div><strong>Status:</strong> <span style="color: orange;">Confirmation Pending</span></div>
+        <div><strong>Location / Mode:</strong> To be assigned</div>
+        <div><strong>Notes:</strong> Optional prep info</div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SURVEYS MODAL ================= -->
+<div id="surveys-modal" class="modal">
+  <div class="modal-content" style="max-width: 900px;">
+    <span class="close-btn" onclick="closeSurveysModal()">&times;</span>
+    <h2 style="color:#0067A5; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
+      <i class="fa-solid fa-clipboard-list"></i> Available Surveys
+    </h2>
+    
+    <div id="surveys-list" style="display:grid; gap:1rem;">
+      <!-- Surveys will be dynamically loaded here -->
+      <div style="text-align:center; padding:2rem; color:#718096;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
+        <p style="margin-top:1rem;">Loading surveys...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TAKE SURVEY MODAL ================= -->
+<div id="take-survey-modal" class="modal">
+  <div class="modal-content" style="max-width: 700px;">
+    <span class="close-btn" onclick="closeTakeSurveyModal()">&times;</span>
+    
+    <div id="survey-header" style="margin-bottom:1.5rem;">
+      <h2 id="survey-title" style="color:#0067A5; margin-bottom:0.5rem;"></h2>
+      <p id="survey-description" style="color:#4a5568; margin-bottom:1rem;"></p>
+      <div id="survey-progress" style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden; margin-bottom:1rem;">
+        <div id="progress-bar" style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); height:100%; width:0%; transition:width 0.3s;"></div>
+      </div>
+      <p id="progress-text" style="color:#718096; font-size:0.875rem;"></p>
+    </div>
+    
+    <form id="survey-form">
+      <div id="survey-questions">
+        <!-- Questions will be dynamically loaded here -->
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; margin-top:2rem; padding-top:1.5rem; border-top:2px solid #e2e8f0;">
+        <button type="button" id="prev-question-btn" style="background:#718096; color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; display:none;">
+          <i class="fa-solid fa-arrow-left"></i> Previous
+        </button>
+        <div style="flex:1;"></div>
+        <button type="button" id="next-question-btn" style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500;">
+          Next <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button type="submit" id="submit-survey-btn" style="background:#48bb78; color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; display:none;">
+          <i class="fa-solid fa-check"></i> Submit Survey
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<input type="hidden" id="student-email" value="tamucc1@tamucc.edu"> <!-- Dynamically set student email -->
+
+<script>
+  // ======================================================================================
+  //                              NOTIFICATION SYSTEM
+  // ======================================================================================
+  
+  let currentUserEmail = '';
+  
+  // Fetch and display notifications
+  async function loadNotifications() {
+    try {
+      const response = await fetch('/api/notifications?limit=10');
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      
+      const notifications = await response.json();
+      const notificationList = document.getElementById('notification-list');
+      const notificationCount = document.getElementById('notification-count');
+      
+      if (notifications.length === 0) {
+        notificationList.innerHTML = `
+          <div class="notification-empty">
+            <i class="fa-solid fa-bell-slash"></i>
+            <p>No notifications</p>
+          </div>
+        `;
+        notificationCount.style.display = 'none';
+        return;
+      }
+      
+      // Count unread
+      const unreadCount = notifications.filter(n => n.status === 'unread').length;
+      if (unreadCount > 0) {
+        notificationCount.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        notificationCount.style.display = 'block';
+      } else {
+        notificationCount.style.display = 'none';
+      }
+      
+      // Render notifications
+      notificationList.innerHTML = notifications.map(notif => `
+        <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''} ${notif.priority === 'high' ? 'notification-priority-high' : ''} ${notif.priority === 'urgent' ? 'notification-priority-urgent' : ''}"
+             onclick="markAsRead('${notif._id}', '${notif.link || '#'}')">
+          <div class="notification-title">${notif.title || 'Notification'}</div>
+          <div class="notification-message">${notif.message || ''}</div>
+          <div class="notification-time">${formatNotificationTime(notif.created_at)}</div>
+          <button class="delete-notification" onclick="deleteNotification(event, '${notif._id}')">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+      `).join('');
+      
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+      document.getElementById('notification-list').innerHTML = `
+        <div class="notification-empty">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <p>Error loading notifications</p>
+        </div>
+      `;
+    }
+  }
+  
+  // Format notification time
+  function formatNotificationTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
+  }
+  
+  // Mark notification as read
+  async function markAsRead(notificationId, link) {
+    try {
+      await fetch(`/api/notifications/${notificationId}/read`, {
+        method: 'PUT'
+      });
+      
+      // Reload notifications
+      await loadNotifications();
+      
+      // Navigate to link if provided
+      if (link && link !== '#') {
+        window.location.href = link;
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  }
+  
+  // Delete notification
+  async function deleteNotification(event, notificationId) {
+    event.stopPropagation(); // Prevent marking as read
+    
+    try {
+      await fetch(`/api/notifications/${notificationId}`, {
+        method: 'DELETE'
+      });
+      
+      // Reload notifications
+      await loadNotifications();
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  }
+  
+  // Mark all as read
+  async function markAllAsRead() {
+    try {
+      const response = await fetch('/api/notifications/mark-all-read', {
+        method: 'PUT'
+      });
+      
+      if (!response.ok) throw new Error('Failed to mark all as read');
+      
+      const result = await response.json();
+      console.log(`Marked ${result.count} notifications as read`);
+      
+      // Reload notifications
+      await loadNotifications();
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+    }
+  }
+  
+  // Show all notifications (placeholder for future page)
+  function showAllNotifications() {
+    alert('View All Notifications feature coming soon!');
+    // TODO: Navigate to dedicated notifications page
+  }
+  
+  // Toggle notification dropdown
+  const notificationIcon = document.getElementById('notification-icon');
+  const notificationDropdown = document.getElementById('notification-dropdown');
+  
+  notificationIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle('show');
+    // Close profile dropdown if open
+    document.getElementById('profile-dropdown').classList.remove('show');
+    
+    // Load notifications when opening
+    if (notificationDropdown.classList.contains('show')) {
+      loadNotifications();
+    }
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!notificationDropdown.contains(e.target) && e.target !== notificationIcon) {
+      notificationDropdown.classList.remove('show');
+    }
+  });
+  
+  // Poll for new notifications every 30 seconds
+  setInterval(async () => {
+    const response = await fetch('/api/notifications/unread/count');
+    if (response.ok) {
+      const data = await response.json();
+      const notificationCount = document.getElementById('notification-count');
+      if (data.count > 0) {
+        notificationCount.textContent = data.count > 99 ? '99+' : data.count;
+        notificationCount.style.display = 'block';
+      } else {
+        notificationCount.style.display = 'none';
+      }
+    }
+  }, 30000); // 30 seconds
+  
+  // Initial load
+  loadNotifications();
+  
+  // ======================================================================================
+  //                              EXISTING CODE
+  // ======================================================================================
+  
+  // Utility to get status color
+function getStatusColor(status) {
+  switch(status?.toLowerCase()) {
+    case 'open': return 'blue';
+    case 'in progress': return 'orange';
+    case 'closed': return 'green';
+    case 'cancelled': return 'red';
+    default: return 'gray';
+  }
+}
+
+// Utility to get priority color
+function getPriorityColor(priority) {
+  switch(priority?.toLowerCase()) {
+    case 'low': return 'green';
+    case 'medium': return 'orange';
+    case 'high': return 'red';
+    case 'urgent': return 'darkred';
+    default: return 'gray';
+  }
+}
+
+// Fetch tickets
+async function fetchTickets() {
+  ticketsList.innerHTML = 'Loading...';
+  try {
+    // Get current user's email
+    const userRes = await fetch('/api/user');
+    if (!userRes.ok) throw new Error('Failed to fetch user information');
+    const user = await userRes.json();
+    const studentEmail = user.email;
+    
+    // Fetch tickets for this student only
+    const res = await fetch(`/api/tickets?status=open&student_email=${encodeURIComponent(studentEmail)}`);
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    const data = await res.json();
+    renderTickets(data.tickets || []);
+  } catch (e) {
+    console.error(e);
+    ticketsList.innerHTML = '<p>Error loading tickets.</p>';
+  }
+}
+
+// Cancel ticket function (example AJAX)
+async function cancelTicket(ticketId) {
+  if (!ticketId) return;
+  if (!confirm('Are you sure you want to cancel this ticket?')) return;
+
+  try {
+    const res = await fetch(`/api/tickets/cancel/${ticketId}`, { method: 'POST' });
+    if (!res.ok) {
+      alert('Failed to cancel ticket. Please try again.');
+      return;
+    }
+    const data = await res.json();
+    if (data.success) {
+      alert('Ticket cancelled successfully!');
+      fetchTickets(); // Refresh the list
+      updateCounts(); // Refresh count widget
+    } else {
+      alert(data.message || 'Failed to cancel ticket.');
+    }
+  } catch (e) {
+    console.error('Error cancelling ticket:', e);
+    alert('Error connecting to server.');
+  }
+}
+
+// Cancel appointment
+async function cancelAppointment(appointmentId) {
+  if (!appointmentId) return;
+  if (!confirm('Are you sure you want to cancel this appointment?')) return;
+
+  try {
+    const res = await fetch(`/api/appointments/cancel/${appointmentId}`, { method: 'POST' });
+    if (!res.ok) {
+      alert('Failed to cancel appointment. Please try again.');
+      return;
+    }
+    const data = await res.json();
+    if (data.success) {
+      alert('Appointment cancelled successfully!');
+      fetchAppts(); // Refresh the appointments list
+      loadStudentAppointmentReminders(); // Refresh appointment reminders
+      updateCounts(); // Refresh count widget
+    } else {
+      alert(data.message || 'Failed to cancel appointment.');
+    }
+  } catch (e) {
+    console.error('Error cancelling appointment:', e);
+    alert('Error connecting to server.');
+  }
+}
+
+// Raise Ticket Modal Logic
+const modal = document.getElementById('ticket-modal');
+const closeBtn = document.getElementById('close-ticket-btn');
+const cancelBtn = document.getElementById('cancel-ticket-btn');
+const ticketForm = document.getElementById('ticket-form');
+const feedback = document.getElementById('ticket-feedback');
+
+const raiseTicketCard = document.getElementById('raise-ticket-card');
+const raiseTicketSidebar = document.getElementById('raise-ticket-sidebar');
+
+// Open modal
+if (raiseTicketCard) {
+    raiseTicketCard.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.classList.add('show');
+      feedback.classList.add('hidden');
+      ticketForm.reset();
+      
+      // Reset preferred staff dropdown
+      const ticketStaffSelect = document.getElementById('ticket-staff-select');
+      if (ticketStaffSelect) {
+        ticketStaffSelect.innerHTML = '<option value="">Select category first or leave blank</option>';
+        ticketStaffSelect.disabled = false; // Re-enable dropdown on reset
+      }
+    });
+  }
+
+// Category change event - load staff members for ticket
+const ticketCategorySelect = document.getElementById('ticket-category-select');
+const ticketStaffSelect = document.getElementById('ticket-staff-select');
+
+// Map categories to departments for staff lookup
+const categoryToDepartment = {
+  'Technical': 'IT Support',
+  'Administrative': 'Admin',
+  'Academic': 'Academic Advisors',
+  'Financial Aid': 'Financial Aid',
+  'Registrar': 'Registrar'
+};
+
+if (ticketCategorySelect && ticketStaffSelect) {
+  ticketCategorySelect.addEventListener('change', async (e) => {
+    const category = e.target.value;
+    
+    if (!category || category === 'Other') {
+      ticketStaffSelect.innerHTML = '<option value="">Not applicable or leave blank</option>';
+      return;
+    }
+    
+    const department = categoryToDepartment[category];
+    if (!department) {
+      ticketStaffSelect.innerHTML = '<option value="">Leave blank</option>';
+      return;
+    }
+    
+    // Special handling for Admin department - auto-assign to admin
+    if (department === 'Admin') {
+      ticketStaffSelect.innerHTML = '<option value="auto-assign-admin">Auto-assigned to Admin</option>';
+      ticketStaffSelect.disabled = true;
+      return;
+    }
+    
+    // Enable dropdown for other departments
+    ticketStaffSelect.disabled = false;
+    
+    // Fetch staff members for selected category/department
+    ticketStaffSelect.innerHTML = '<option value="">Loading staff members...</option>';
+    
+    try {
+      const response = await fetch(`/api/staff/department/${encodeURIComponent(department)}`);
+      if (!response.ok) throw new Error('Failed to fetch staff');
+      
+      const staffMembers = await response.json();
+      
+      ticketStaffSelect.innerHTML = '<option value="">None (Admin will assign)</option>';
+      staffMembers.forEach(staff => {
+        const option = document.createElement('option');
+        option.value = staff.email;
+        option.textContent = `${staff.full_name || staff.email}`;
+        option.setAttribute('data-name', staff.full_name || staff.email);
+        ticketStaffSelect.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error fetching staff:', error);
+      ticketStaffSelect.innerHTML = '<option value="">Leave blank (Admin will assign)</option>';
+    }
+  });
+}
+
+// Close modal
+[closeBtn, cancelBtn].forEach(btn => btn.addEventListener('click', () => {
+  modal.classList.remove('show');
+  ticketForm.reset();
+  feedback.classList.add('hidden');
+  
+  // Reset staff dropdown state
+  const ticketStaffSelect = document.getElementById('ticket-staff-select');
+  if (ticketStaffSelect) {
+    ticketStaffSelect.disabled = false;
+    ticketStaffSelect.innerHTML = '<option value="">Select category first or leave blank</option>';
+  }
+}));
+
+// Close on outside click
+window.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    modal.classList.remove('show');
+    ticketForm.reset();
+    feedback.classList.add('hidden');
+    
+    // Reset staff dropdown state
+    const ticketStaffSelect = document.getElementById('ticket-staff-select');
+    if (ticketStaffSelect) {
+      ticketStaffSelect.disabled = false;
+      ticketStaffSelect.innerHTML = '<option value="">Select category first or leave blank</option>';
+    }
+  }
+});
+
+// Submit form (AJAX placeholder)
+ticketForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  feedback.classList.remove('hidden');
+  feedback.textContent = 'Submitting ticket...';
+
+  const formData = new FormData(ticketForm);
+  
+  // Handle disabled staff select (for auto-assign-admin)
+  const ticketStaffSelect = document.getElementById('ticket-staff-select');
+  if (ticketStaffSelect && ticketStaffSelect.disabled && ticketStaffSelect.value) {
+    formData.set('preferred_staff', ticketStaffSelect.value);
+  }
+  
+  // Fetch student info and add to form data
+  try {
+    const userRes = await fetch('/api/user');
+    if (userRes.ok) {
+      const user = await userRes.json();
+      formData.append('student_email', user.email);
+      formData.append('student_name', user.full_name || 'Unknown');
+    }
+  } catch (err) {
+    console.error('Error fetching user info:', err);
+    feedback.textContent = 'Error fetching user information.';
+    return;
+  }
+  
+  try {
+    const res = await fetch('/raise_ticket', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      feedback.textContent = 'Ticket submitted successfully!';
+      ticketForm.reset();
+      // refresh counts and tickets list
+      updateCounts();
+      loadTickets();
+      setTimeout(() => modal.classList.remove('show'), 1500);
+    } else {
+      feedback.textContent = data.error || 'Failed to submit ticket. Please try again.';
+    }
+  } catch (err) {
+    feedback.textContent = 'Error connecting to server.';
+  }
+});
+
+// Book Appointment Modal Logic
+const appointmentModal = document.getElementById('appointment-modal');
+const closeAppointmentBtn = document.getElementById('close-appointment-btn');
+const cancelAppointmentBtn = document.getElementById('cancel-appointment-btn');
+const appointmentForm = document.getElementById('appointment-form');
+const appointmentFeedback = document.getElementById('appointment-feedback');
+
+const bookAppointmentCard = document.getElementById('book-appointment-card');
+const bookAppointmentSidebar = document.getElementById('book-appointment-sidebar');
+
+// Open modal
+if (bookAppointmentCard) {
+  bookAppointmentCard.addEventListener('click', (e) => {
+    e.preventDefault();
+    appointmentModal.classList.add('show');
+    appointmentFeedback.classList.add('hidden');
+    appointmentForm.reset();
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = appointmentForm.querySelector('input[name="date"]');
+    if (dateInput) {
+      dateInput.setAttribute('min', today);
+    }
+    
+    // Reset staff dropdown
+    const staffSelect = document.getElementById('staff-select');
+    staffSelect.disabled = true;
+    staffSelect.innerHTML = '<option value="">First select a department</option>';
+  });
+}
+
+// Department change event - load staff members
+const departmentSelect = document.getElementById('department-select');
+const staffSelect = document.getElementById('staff-select');
+
+if (departmentSelect) {
+  departmentSelect.addEventListener('change', async (e) => {
+    const department = e.target.value;
+    
+    if (!department) {
+      staffSelect.disabled = true;
+      staffSelect.innerHTML = '<option value="">First select a department</option>';
+      return;
+    }
+    
+    // Special handling for Admin department - auto-assign to admin
+    if (department === 'Admin') {
+      staffSelect.innerHTML = '<option value="auto-assign-admin">Auto-assigned to Admin</option>';
+      staffSelect.disabled = true;
+      return;
+    }
+    
+    // Fetch staff members for selected department
+    staffSelect.disabled = true;
+    staffSelect.innerHTML = '<option value="">Loading staff members...</option>';
+    
+    try {
+      const response = await fetch(`/api/staff/department/${encodeURIComponent(department)}`);
+      if (!response.ok) throw new Error('Failed to fetch staff');
+      
+      const staffMembers = await response.json();
+      
+      if (staffMembers.length === 0) {
+        staffSelect.innerHTML = '<option value="">No staff available in this department</option>';
+        staffSelect.disabled = true;
+      } else {
+        staffSelect.innerHTML = '<option value="">Select a staff member</option>';
+        staffMembers.forEach(staff => {
+          const option = document.createElement('option');
+          option.value = staff.email;
+          option.textContent = `${staff.full_name || staff.email} - ${staff.department || ''}`;
+          option.setAttribute('data-name', staff.full_name || staff.email);
+          staffSelect.appendChild(option);
+        });
+        staffSelect.disabled = false;
+      }
+    } catch (error) {
+      console.error('Error fetching staff:', error);
+      staffSelect.innerHTML = '<option value="">Error loading staff members</option>';
+      staffSelect.disabled = true;
+    }
+  });
+}
+
+// Close modal
+[closeAppointmentBtn, cancelAppointmentBtn].forEach(btn => btn.addEventListener('click', () => {
+  appointmentModal.classList.remove('show');
+  appointmentForm.reset();
+  appointmentFeedback.classList.add('hidden');
+  
+  // Reset staff dropdown state
+  const staffSelect = document.getElementById('staff-select');
+  if (staffSelect) {
+    staffSelect.disabled = true;
+    staffSelect.innerHTML = '<option value="">First select a department</option>';
+  }
+}));
+
+// Close on outside click
+window.addEventListener('click', (e) => {
+  if (e.target === appointmentModal) {
+    appointmentModal.classList.remove('show');
+    appointmentForm.reset();
+    appointmentFeedback.classList.add('hidden');
+    
+    // Reset staff dropdown state
+    const staffSelect = document.getElementById('staff-select');
+    if (staffSelect) {
+      staffSelect.disabled = true;
+      staffSelect.innerHTML = '<option value="">First select a department</option>';
+    }
+  }
+});
+
+// Submit form (AJAX placeholder)
+appointmentForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  appointmentFeedback.classList.remove('hidden');
+  appointmentFeedback.textContent = 'Booking appointment...';
+
+  const formData = new FormData(appointmentForm);
+  
+  // Handle disabled staff select (for auto-assign-admin)
+  const staffSelect = document.getElementById('staff-select');
+  if (staffSelect && staffSelect.disabled && staffSelect.value) {
+    formData.set('assigned_staff', staffSelect.value);
+  }
+  
+  // Fetch student info and add to form data
+  try {
+    const userRes = await fetch('/api/user');
+    if (userRes.ok) {
+      const user = await userRes.json();
+      formData.append('student_email', user.email);
+      formData.append('student_name', user.full_name || 'Unknown');
+    }
+  } catch (err) {
+    console.error('Error fetching user info:', err);
+    appointmentFeedback.textContent = 'Error fetching user information.';
+    return;
+  }
+  
+  try {
+    const res = await fetch('/book_appointment', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      appointmentFeedback.textContent = 'Appointment booked successfully!';
+      appointmentForm.reset();
+      updateCounts();
+      setTimeout(() => appointmentModal.classList.remove('show'), 1500);
+    } else {
+      appointmentFeedback.textContent = data.error || 'Failed to book appointment. Please try again.';
+    }
+  } catch (err) {
+    appointmentFeedback.textContent = 'Error connecting to server.';
+  }
+});
+
+// New: Open Tickets & Upcoming Appointments modals
+const ticketsModal = document.getElementById('tickets-modal');
+const apptsModal = document.getElementById('appts-modal');
+const ticketsList = document.getElementById('tickets-list');
+const apptsList = document.getElementById('appts-list');
+
+const openTicketsById = document.getElementById('open-tickets-widget');
+const upcomingById = document.getElementById('upcoming-appts-widget');
+
+function renderTickets(items){
+  if(!items || items.length === 0){
+    ticketsList.innerHTML = '<p>No open tickets.</p>';
+    return;
+  }
+  ticketsList.innerHTML = items.map(t => {
+    const assignedStaff = t.assigned_to_name || t.assigned_staff || 'Not Assigned Yet';
+    const preferredStaff = t.preferred_staff_name || t.preferred_staff;
+    
+    return `
+    <div class="ticket-card card">
+      <div class="ticket-header">
+        <strong>Subject:</strong> ${t.subject}
+        <span class="ticket-status" style="color: ${getStatusColor(t.status)};">${t.status}</span>
+      </div>
+      <div class="ticket-meta">
+        <div>Category: ${t.category} • Priority: <span style="color: ${getPriorityColor(t.priority)};">${t.priority}</span></div>
+        <div>Created: ${t.date_created || t.created_at || 'Unknown'} • Last Updated: ${t.last_updated}</div>
+        <div><strong>Assigned Staff:</strong> ${assignedStaff}</div>
+        ${preferredStaff ? `<div style="color: #718096;"><strong>Preferred Staff:</strong> ${preferredStaff}</div>` : ''}
+      </div>
+      <div class="ticket-description">
+        <strong>Description:</strong> ${t.description}
+      </div>
+      <div class="ticket-attachment"><strong>Attachment:</strong> ${t.attachment_id ? `<a href="/api/attachment/${t.attachment_id}">Download</a>` : 'None'}</div>
+      <div class="ticket-actions">
+        <button class="cancel-ticket-btn" onclick="cancelTicket('${t._id}')">Cancel Ticket</button>
+      </div>
+    </div>
+  `;
+  }).join('');
+}
+
+function renderAppts(items){
+  if(!items || items.length === 0){
+    apptsList.innerHTML = '<p>No upcoming appointments.</p>';
+    return;
+  }
+  apptsList.innerHTML = items.map(a => {
+    const assignedStaff = a.assigned_staff_name || a.assigned_staff || 'Not Assigned Yet';
+    const statusColor = a.status === 'Confirmed' ? 'green' : a.status === 'Pending' ? 'orange' : a.status === 'Cancelled' ? 'red' : 'gray';
+    
+    return `
+    <div class="appt-card card">
+      <div class="appt-header">
+        <strong>Subject:</strong> ${a.subject || 'N/A'}
+        <span class="appt-status" style="color: ${statusColor};">${a.status} ${a.countdown || ''}</span>
+      </div>
+      <div class="appt-meta">
+        <div><strong>Department:</strong> ${a.department || 'N/A'}</div>
+        <div><strong>Assigned Staff:</strong> ${assignedStaff}</div>
+        <div><strong>Date & Time:</strong> ${a.date} • ${a.time_slot || a.time || 'N/A'}</div>
+        <div><strong>Meeting Mode:</strong> ${a.meeting_mode || 'N/A'}</div>
+        <div><strong>Location:</strong> ${a.location_mode || 'To be assigned'}</div>
+      </div>
+      <div class="appt-notes"><strong>Notes:</strong> ${a.notes || 'None'}</div>
+      <div class="appt-actions">
+        <button class="cancel-appt-btn" onclick="cancelAppointment('${a._id}')">Cancel</button>
+        ${a.status === 'Confirmed' ? `<button class="reschedule-appt-btn" onclick="rescheduleAppointment('${a._id}')">Reschedule</button>` : ''}
+      </div>
+    </div>
+  `;
+  }).join('');
+}
+
+async function fetchTickets(){
+  ticketsList.innerHTML = 'Loading...';
+  try{
+    // Get current user's email
+    const userRes = await fetch('/api/user');
+    if (!userRes.ok) {
+      console.error('Failed to fetch user information');
+      ticketsList.innerHTML = '<p>Error loading user information.</p>';
+      return;
+    }
+    const user = await userRes.json();
+    const studentEmail = user.email;
+    
+    // Fetch tickets for this student only (exclude Resolved and Cancelled)
+    const res = await fetch(`/api/tickets?status=open&student_email=${encodeURIComponent(studentEmail)}`);
+    if (!res.ok) {
+      console.error('Failed to fetch tickets:', res.status, res.statusText);
+      ticketsList.innerHTML = '<p>Error loading tickets. Please try again later.</p>';
+      return;
+    }
+    const data = await res.json();
+    console.log('Tickets API response:', data);
+    
+    // Extra client-side filtering to ensure no Resolved/Cancelled tickets show
+    const activeTickets = (data.tickets || []).filter(ticket => 
+      ticket.status !== 'Resolved' && 
+      ticket.status !== 'Cancelled' &&
+      ticket.status !== 'resolved' && 
+      ticket.status !== 'cancelled'
+    );
+    
+    renderTickets(activeTickets);
+  }catch(e){
+    console.error('Error in fetchTickets:', e);
+    ticketsList.innerHTML = '<p>Error loading tickets. Please check your connection.</p>';
+  }
+}
+
+async function fetchAppts(){
+  apptsList.innerHTML = 'Loading...';
+  try{
+    // Get current user's email
+    const userRes = await fetch('/api/user');
+    if (!userRes.ok) {
+      console.error('Failed to fetch user information');
+      apptsList.innerHTML = '<p>Error loading user information.</p>';
+      return;
+    }
+    const user = await userRes.json();
+    const studentEmail = user.email;
+    
+    // Fetch appointments for this student only (exclude Cancelled)
+    const res = await fetch(`/api/appointments?upcoming=true&student_email=${encodeURIComponent(studentEmail)}`);
+    const data = await res.json();
+    
+    // Extra client-side filtering to ensure no Cancelled appointments show
+    const activeAppointments = (data.appointments || []).filter(appointment => 
+      appointment.status !== 'Cancelled' &&
+      appointment.status !== 'cancelled'
+    );
+    
+    renderAppts(activeAppointments);
+  }catch(e){ 
+    console.error('Error in fetchAppts:', e);
+    apptsList.innerHTML = '<p>Error loading appointments.</p>'; 
+  }
+}
+
+// Load student appointment reminders (shows next upcoming appointment)
+async function loadStudentAppointmentReminders() {
+  try {
+    // Get current user's email
+    const userRes = await fetch('/api/user');
+    if (!userRes.ok) return;
+    const user = await userRes.json();
+    const studentEmail = user.email;
+    
+    const res = await fetch(`/api/appointments?student_email=${encodeURIComponent(studentEmail)}`);
+    if (!res.ok) return;
+    
+    const data = await res.json();
+    const appointments = data.appointments || [];
+    
+    const reminderContainer = document.getElementById('student-appointment-reminders');
+    reminderContainer.innerHTML = '';
+    
+    // Get today's date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Filter confirmed appointments with date >= today (exclude Cancelled)
+    const upcomingAppointments = appointments.filter(app => {
+      if (app.status !== 'Confirmed') return false;
+      if (app.status === 'Cancelled' || app.status === 'cancelled') return false;
+      const appDate = new Date(app.date);
+      appDate.setHours(0, 0, 0, 0);
+      return appDate >= today;
+    });
+    
+    // Sort by date ascending
+    upcomingAppointments.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    if (upcomingAppointments.length === 0) {
+      // No upcoming appointments - show a friendly message
+      reminderContainer.innerHTML = `
+        <div style="background:linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); padding:1rem 1.5rem; border-radius:12px; border-left:4px solid #cbd5e0; display:flex; align-items:center; gap:1rem;">
+          <i class="fa-solid fa-calendar-check" style="font-size:1.5rem; color:#a0aec0;"></i>
+          <div style="color:#718096; font-size:0.95rem;">
+            No upcoming appointments scheduled
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    // Show reminders for upcoming appointments (max 3)
+    const remindersToShow = upcomingAppointments.slice(0, 3);
+    
+    remindersToShow.forEach(app => {
+      const appDate = new Date(app.date);
+      appDate.setHours(0, 0, 0, 0);
+      
+      // Calculate days difference
+      const diffTime = appDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      // Determine message and styling based on days left
+      let message, bgGradient, borderColor, iconColor, icon;
+      
+      if (diffDays === 0) {
+        message = `Your appointment is <strong>today</strong>!`;
+        bgGradient = 'linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%)';
+        borderColor = '#fc8181';
+        iconColor = '#e53e3e';
+        icon = 'fa-bell';
+      } else if (diffDays === 1) {
+        message = `Your appointment is <strong>tomorrow</strong>!`;
+        bgGradient = 'linear-gradient(135deg, #fffaf0 0%, #feebc8 100%)';
+        borderColor = '#f6ad55';
+        iconColor = '#dd6b20';
+        icon = 'fa-clock';
+      } else if (diffDays <= 7) {
+        message = `Appointment in <strong>${diffDays} days</strong>`;
+        bgGradient = 'linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%)';
+        borderColor = '#4fd1c5';
+        iconColor = '#319795';
+        icon = 'fa-calendar-day';
+      } else {
+        message = `Appointment in <strong>${diffDays} days</strong>`;
+        bgGradient = 'linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%)';
+        borderColor = '#63b3ed';
+        iconColor = '#3182ce';
+        icon = 'fa-calendar';
+      }
+      
+      // Get meeting mode display
+      const meetingMode = app.meeting_mode === 'In-Person' ? 'in person' : 'virtual';
+      const meetingIcon = app.meeting_mode === 'In-Person' ? 'fa-user-group' : 'fa-video';
+      
+      // Format time
+      const timeSlot = app.time_slot || 'Time TBD';
+      
+      const reminderCard = document.createElement('div');
+      reminderCard.style.cssText = `
+        background:${bgGradient};
+        padding:1rem 1.5rem;
+        border-radius:12px;
+        border-left:4px solid ${borderColor};
+        display:flex;
+        align-items:center;
+        gap:1rem;
+        margin-bottom:0.75rem;
+        box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        transition:all 0.2s;
+      `;
+      
+      reminderCard.onmouseover = () => {
+        reminderCard.style.transform = 'translateY(-2px)';
+        reminderCard.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)';
+      };
+      
+      reminderCard.onmouseout = () => {
+        reminderCard.style.transform = 'translateY(0)';
+        reminderCard.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+      };
+      
+      reminderCard.innerHTML = `
+        <i class="fa-solid ${icon}" style="font-size:1.8rem; color:${iconColor};"></i>
+        <div style="flex:1;">
+          <div style="color:#2d3748; font-size:1rem; font-weight:600; margin-bottom:0.25rem;">
+            <i class="fa-solid fa-calendar-check" style="color:${iconColor}; font-size:0.9rem;"></i>
+            ${message}
+          </div>
+          <div style="color:#4a5568; font-size:0.875rem; display:flex; gap:1rem; flex-wrap:wrap;">
+            <span><i class="fa-solid ${meetingIcon}" style="color:${iconColor};"></i> ${meetingMode}</span>
+            <span><i class="fa-solid fa-clock" style="color:${iconColor};"></i> ${timeSlot}</span>
+            <span><i class="fa-solid fa-building" style="color:${iconColor};"></i> ${app.department}</span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="background:white; color:${iconColor}; border:2px solid ${borderColor}; padding:0.5rem 1rem; border-radius:8px; font-weight:600; font-size:0.875rem; margin-bottom:0.5rem;">
+            ${app.subject}
+          </div>
+          ${app.location_mode ? `<div style="color:#4a5568; font-size:0.75rem;"><i class="fa-solid fa-location-dot"></i> ${app.location_mode}</div>` : ''}
+        </div>
+      `;
+      
+      reminderContainer.appendChild(reminderCard);
+    });
+    
+  } catch (err) {
+    console.error('Error loading student appointment reminders:', err);
+  }
+}
+
+// Load and display events for students
+async function loadStudentEvents() {
+  try {
+    const response = await fetch('/api/events?status=active');
+    if (!response.ok) throw new Error('Failed to fetch events');
+    
+    const events = await response.json();
+    const eventsContainer = document.getElementById('student-events-section');
+    
+    // Filter events for students or all
+    const studentEvents = events.filter(event => 
+      event.target_audience === 'students' || event.target_audience === 'all'
+    );
+    
+    if (studentEvents.length === 0) {
+      eventsContainer.innerHTML = '';
+      return;
+    }
+    
+    eventsContainer.innerHTML = '';
+    
+    studentEvents.forEach(event => {
+      const eventCard = document.createElement('div');
+      eventCard.style.cssText = `
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        padding: 1.2rem;
+        color: white;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      `;
+      
+      const priorityIcon = event.priority === 'high' ? '🔴' : event.priority === 'urgent' ? '⚠️' : '📢';
+      const eventDate = new Date(event.event_date).toLocaleDateString();
+      
+      eventCard.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem;">
+              ${priorityIcon} ${event.title}
+            </h3>
+            <p style="margin: 0 0 0.5rem 0; opacity: 0.9; font-size: 0.95rem;">
+              ${event.description}
+            </p>
+            <div style="display: flex; gap: 1rem; font-size: 0.9rem; opacity: 0.8;">
+              <span>📅 ${eventDate}</span>
+              <span>⏰ ${event.event_time}</span>
+              <span>📂 ${event.category || 'General'}</span>
+            </div>
+          </div>
+          ${event.status === 'completed' ? '<span style="background: rgba(255,255,255,0.3); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem;">✓ Completed</span>' : ''}
+        </div>
+      `;
+      
+      eventsContainer.appendChild(eventCard);
+    });
+    
+  } catch (err) {
+    console.error('Error loading student events:', err);
+  }
+}
+
+// Update counts in stats widgets
+async function updateCounts(){
+  try{
+    // Get current user's email
+    const userRes = await fetch('/api/user');
+    if (!userRes.ok) throw new Error('Failed to fetch user information');
+    const user = await userRes.json();
+    const studentEmail = user.email;
+    
+    // Fetch ticket count for this student only
+    const t = await fetch(`/api/tickets?status=open&student_email=${encodeURIComponent(studentEmail)}`);
+    const tdata = await t.json();
+    document.getElementById('open-tickets-count').textContent = tdata.count || 0;
+
+    // Fetch appointment count for this student only
+    const a = await fetch(`/api/appointments?upcoming=true&student_email=${encodeURIComponent(studentEmail)}`);
+    const adata = await a.json();
+    document.getElementById('upcoming-appts-count').textContent = adata.count || 0;
+  }catch(e){
+    console.error('Failed to update counts', e);
+  }
+}
+
+// initial counts
+updateCounts();
+loadStudentEvents(); // Load events on page load
+loadStudentAppointmentReminders(); // Load appointment reminders on page load
+
+// wire up openers
+if(openTicketsById){
+  openTicketsById.addEventListener('click', () => { ticketsModal.classList.add('show'); fetchTickets(); });
+}
+if(upcomingById){
+  upcomingById.addEventListener('click', () => { apptsModal.classList.add('show'); fetchAppts(); });
+}
+
+// close buttons
+const closeTicketsBtn = document.getElementById('close-tickets-modal');
+const closeApptsBtn = document.getElementById('close-appts-modal');
+if (closeTicketsBtn && typeof ticketsModal !== 'undefined') {
+  closeTicketsBtn.addEventListener('click', () => ticketsModal.classList.remove('show'));
+}
+if (closeApptsBtn && typeof apptsModal !== 'undefined') {
+  closeApptsBtn.addEventListener('click', () => apptsModal.classList.remove('show'));
+}
+
+// close on outside click
+window.addEventListener('click', (e) => {
+  if(e.target === ticketsModal) ticketsModal.classList.remove('show');
+  if(e.target === apptsModal) apptsModal.classList.remove('show');
+});
+
+// Profile dropdown toggle
+const profileIcon = document.getElementById('profile-icon');
+const profileDropdown = document.getElementById('profile-dropdown');
+profileIcon.onclick = () => {
+  profileDropdown.classList.toggle('show');
+};
+
+// Close dropdown on outside click
+window.addEventListener('click', (e) => {
+  if (!profileDropdown.contains(e.target) && e.target !== profileIcon) {
+    profileDropdown.classList.remove('show');
+  }
+});
+
+// Load Tickets function
+async function loadTickets() {
+  try {
+    // First get the current user's email
+    const userRes = await fetch('/api/user');
+    if (!userRes.ok) {
+      throw new Error('Failed to fetch user information');
+    }
+    const user = await userRes.json();
+    const studentEmail = user.email;
+    
+    // Fetch tickets for this student only
+    const response = await fetch(`/api/tickets?status=open&student_email=${encodeURIComponent(studentEmail)}`);
+    const data = await response.json();
+    const ticketList = document.getElementById('ticket-list');
+    ticketList.innerHTML = '';
+
+    if (!data.tickets || data.tickets.length === 0) {
+      ticketList.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #718096;">No open tickets</td></tr>';
+      return;
+    }
+
+    data.tickets.forEach(ticket => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${ticket._id}</td>
+        <td>${ticket.subject}</td>
+        <td>${ticket.category}</td>
+        <td>${ticket.priority}</td>
+        <td>${ticket.status}</td>
+        <td>${ticket.assigned_to_name || 'Not Assigned Yet'}</td>
+      `;
+      ticketList.appendChild(row);
+    });
+  } catch (error) {
+    console.error('Error loading tickets:', error);
+    const ticketList = document.getElementById('ticket-list');
+    ticketList.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #e53e3e;">Error loading tickets</td></tr>';
+  }
+}
+
+// Load Appointments function
+async function loadAppointments() {
+  try {
+    // First get the current user's email
+    const userRes = await fetch('/api/user');
+    if (!userRes.ok) {
+      throw new Error('Failed to fetch user information');
+    }
+    const user = await userRes.json();
+    const studentEmail = user.email;
+    
+    // Fetch appointments for this student only
+    const response = await fetch(`/api/appointments?student_email=${encodeURIComponent(studentEmail)}`);
+    const data = await response.json();
+    const appointmentList = document.getElementById('appointment-list');
+    appointmentList.innerHTML = '';
+
+    if (!data.appointments || data.appointments.length === 0) {
+      appointmentList.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #718096;">No appointments scheduled</td></tr>';
+      return;
+    }
+
+    data.appointments.forEach(appt => {
+      const row = document.createElement('tr');
+      const statusColor = appt.status === 'Confirmed' ? 'green' : appt.status === 'Pending' ? 'orange' : appt.status === 'Cancelled' ? 'red' : 'gray';
+      row.innerHTML = `
+        <td>${appt.subject || 'N/A'}</td>
+        <td>${appt.department || 'N/A'}</td>
+        <td>${appt.assigned_staff_name || appt.assigned_staff || 'Not Assigned Yet'}</td>
+        <td>${appt.date}</td>
+        <td>${appt.time_slot || appt.time || 'N/A'}</td>
+        <td>${appt.meeting_mode || 'N/A'}</td>
+        <td style="color: ${statusColor}; font-weight: 600;">${appt.status}</td>
+        <td>${appt.location_mode || 'To be assigned'}</td>
+      `;
+      appointmentList.appendChild(row);
+    });
+  } catch (error) {
+    console.error('Error loading appointments:', error);
+    const appointmentList = document.getElementById('appointment-list');
+    appointmentList.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #e53e3e;">Error loading appointments</td></tr>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('/api/user');
+    if (res.ok) {
+      const user = await res.json();
+      const firstName = user.full_name ? user.full_name.split(' ')[0] : 'Student';
+      document.querySelector('.hero h2').textContent = `Welcome, ${firstName} 👋`;
+    } else {
+      console.error('Failed to fetch user details:', res.statusText);
+    }
+  } catch (err) {
+    console.error('Error fetching user details:', err);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('/api/user'); // Fetch user details from backend
+    if (res.ok) {
+      const user = await res.json();
+      const firstName = user.full_name ? user.full_name.split(' ')[0] : 'User'; // Extract first name or default to 'User'
+
+      // Update the welcome message
+      const welcomeMessage = document.querySelector('#welcome-message');
+      if (welcomeMessage) {
+        welcomeMessage.textContent = `Welcome, ${firstName}`;
+      }
+    } else {
+      console.error('Failed to fetch user details:', res.statusText);
+    }
+  } catch (err) {
+    console.error('Error fetching user details:', err);
+  }
+});
+
+// Tab switching function
+function showTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  event.target.closest('.tab').classList.add('active');
+  
+  // Update tab content
+  document.getElementById('ticketsTab').classList.remove('active');
+  document.getElementById('appointmentsTab').classList.remove('active');
+  
+  if (tabName === 'tickets') {
+    document.getElementById('ticketsTab').classList.add('active');
+  } else {
+    document.getElementById('appointmentsTab').classList.add('active');
+  }
+}
+
+// Load tickets on window load
+window.onload = () => {
+  loadTickets();
+  loadAppointments();
+  loadFeedbackCount();
+  };
+
+  document.getElementById('fetch-courses').addEventListener('click', async () => {
+    const term = document.getElementById('term').value;
+    if (!term) {
+      alert('Please select a term');
+      return;
+    }
+
+    const studentEmail = await fetch('/api/user').then(response => response.json()).then(data => data.email); // Dynamically fetch email from /api/user endpoint
+
+    // Fetch courses for the selected term
+    const coursesResponse = await fetch(`/api/courses/${term}`);
+    const courses = await coursesResponse.json();
+
+    // Fetch registered courses for the student
+    const registeredResponse = await fetch(`/api/registered_courses/${studentEmail}`);
+    const registeredCourses = await registeredResponse.json();
+    const registeredCourseIds = registeredCourses.map(reg => reg.course_id);
+
+    const coursesTable = document.getElementById('courses-table');
+    const coursesBody = document.getElementById('courses-body');
+
+    coursesBody.innerHTML = '';
+    courses.forEach(course => {
+      const isRegistered = registeredCourseIds.includes(course._id);
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${course.title}</td>
+        <td>${course.details}</td>
+        <td>${course.hours}</td>
+        <td>${course.crn}</td>
+        <td>${course.schedule_type}</td>
+        <td>${course.grade_mode}</td>
+        <td>${course.level}</td>
+        <td>${course.part_of_term}</td>
+        <td>
+          <button class="btn" ${isRegistered ? 'disabled' : ''} 
+            style="${isRegistered ? 'background-color: transparent; border: none; color: gray; cursor: default;' : ''}"
+            onclick="${isRegistered ? '' : `registerCourse('${course._id}', '${term}')`}">
+            ${isRegistered ? 'Registered' : 'Register'}
+          </button>
+        </td>
+      `;
+      coursesBody.appendChild(row);
+    });
+
+    coursesTable.style.display = 'table';
+  });
+
+  async function registerCourse(courseId, term) {
+    const studentEmail = await fetch('/api/user').then(response => response.json()).then(data => data.email); // Dynamically fetch email from /api/user endpoint
+
+    const response = await fetch('/api/register_course', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ student_email: studentEmail, course_id: courseId, term })
+    });
+
+    const result = await response.json();
+    alert(result.message);
+    
+    // Instantly refresh the courses table to reflect registration without page reload
+    if (response.ok) {
+      document.getElementById('fetch-courses').click();
+    }
+  }
+
+  // ================= SURVEYS FUNCTIONALITY =================
+  let currentSurveyId = null;
+  let currentQuestionIndex = 0;
+  let surveyQuestions = [];
+  let surveyAnswers = {};
+
+  // Open surveys modal and load available surveys
+  async function openSurveysModal() {
+    const modal = document.getElementById('surveys-modal');
+    modal.classList.add('show');
+    await loadAvailableSurveys();
+  }
+
+  // Close surveys modal
+  function closeSurveysModal() {
+    const modal = document.getElementById('surveys-modal');
+    modal.classList.remove('show');
+  }
+
+  // Close take survey modal
+  function closeTakeSurveyModal() {
+    const modal = document.getElementById('take-survey-modal');
+    modal.classList.remove('show');
+    currentSurveyId = null;
+    currentQuestionIndex = 0;
+    surveyAnswers = {};
+  }
+
+  // Load feedback submitted count
+  async function loadFeedbackCount() {
+    try {
+      const response = await fetch('/api/surveys/submitted/count');
+      if (!response.ok) throw new Error('Failed to fetch feedback count');
+      
+      const data = await response.json();
+      document.getElementById('feedback-submitted-count').textContent = data.count;
+    } catch (error) {
+      console.error('Error loading feedback count:', error);
+      document.getElementById('feedback-submitted-count').textContent = '0';
+    }
+  }
+
+  // Load available surveys
+  async function loadAvailableSurveys() {
+    try {
+      const response = await fetch('/api/surveys/available');
+      if (!response.ok) throw new Error('Failed to fetch surveys');
+      
+      const surveys = await response.json();
+      const surveysList = document.getElementById('surveys-list');
+      
+      if (surveys.length === 0) {
+        surveysList.innerHTML = `
+          <div style="text-align:center; padding:3rem; color:#718096;">
+            <i class="fa-solid fa-inbox" style="font-size:3rem; opacity:0.3;"></i>
+            <h3 style="margin-top:1rem; color:#4a5568;">No Surveys Available</h3>
+            <p>Check back later for new surveys!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      surveysList.innerHTML = surveys.map(survey => {
+        const endDate = new Date(survey.end_date).toLocaleDateString();
+        const questionCount = survey.questions?.length || 0;
+        const estimatedTime = Math.max(1, Math.ceil(questionCount * 0.5)); // 30 sec per question
+        
+        return `
+          <div style="border:2px solid #e2e8f0; border-radius:10px; padding:1.5rem; background:white; transition:all 0.2s; cursor:pointer;" 
+               onmouseover="this.style.borderColor='#0067A5'; this.style.boxShadow='0 4px 12px rgba(0,103,165,0.1)'" 
+               onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'">
+            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:1rem;">
+              <div style="flex:1;">
+                <h3 style="color:#2d3748; margin:0 0 0.5rem 0; font-size:1.1rem;">
+                  ${survey.survey_type === 'course_evaluation' ? '🎓' : survey.survey_type === 'service_feedback' ? '⭐' : '📋'} 
+                  ${survey.title}
+                </h3>
+                <p style="color:#718096; margin:0; font-size:0.9rem;">${survey.description || 'Please share your feedback'}</p>
+              </div>
+              ${survey.already_responded ? 
+                '<span style="background:#48bb78; color:white; padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem; font-weight:600; white-space:nowrap;">✓ Completed</span>' : 
+                '<span style="background:#0067A5; color:white; padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem; font-weight:600; white-space:nowrap;">Available</span>'
+              }
+            </div>
+            <div style="display:flex; gap:1.5rem; color:#718096; font-size:0.85rem; margin-bottom:1rem;">
+              <span><i class="fa-solid fa-list-check"></i> ${questionCount} questions</span>
+              <span><i class="fa-solid fa-clock"></i> ~${estimatedTime} min</span>
+              <span><i class="fa-solid fa-calendar"></i> Closes ${endDate}</span>
+              ${survey.is_anonymous ? '<span><i class="fa-solid fa-user-secret"></i> Anonymous</span>' : ''}
+            </div>
+            ${!survey.already_responded ? 
+              `<button onclick="startSurvey('${survey._id}')" style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); color:white; padding:0.6rem 1.2rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; font-size:0.9rem; transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                Start Survey <i class="fa-solid fa-arrow-right"></i>
+              </button>` :
+              '<p style="color:#48bb78; font-size:0.9rem; margin:0;"><i class="fa-solid fa-check-circle"></i> Thank you for your feedback!</p>'
+            }
+          </div>
+        `;
+      }).join('');
+      
+    } catch (error) {
+      console.error('Error loading surveys:', error);
+      document.getElementById('surveys-list').innerHTML = `
+        <div style="text-align:center; padding:2rem; color:#e53e3e;">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <p>Error loading surveys. Please try again later.</p>
+        </div>
+      `;
+    }
+  }
+
+  // Start taking a survey
+  async function startSurvey(surveyId) {
+    try {
+      const response = await fetch(`/api/surveys/${surveyId}`);
+      if (!response.ok) throw new Error('Failed to fetch survey');
+      
+      const survey = await response.json();
+      currentSurveyId = surveyId;
+      surveyQuestions = survey.questions || [];
+      currentQuestionIndex = 0;
+      surveyAnswers = {};
+      
+      document.getElementById('survey-title').textContent = survey.title;
+      document.getElementById('survey-description').textContent = survey.description || '';
+      
+      closeSurveysModal();
+      const takeSurveyModal = document.getElementById('take-survey-modal');
+      takeSurveyModal.classList.add('show');
+      showQuestion(0);
+      
+    } catch (error) {
+      console.error('Error starting survey:', error);
+      alert('Error loading survey. Please try again.');
+    }
+  }
+
+  // Show specific question
+  function showQuestion(index) {
+    if (index < 0 || index >= surveyQuestions.length) return;
+    
+    currentQuestionIndex = index;
+    const question = surveyQuestions[index];
+    const progress = ((index + 1) / surveyQuestions.length) * 100;
+    
+    document.getElementById('progress-bar').style.width = `${progress}%`;
+    document.getElementById('progress-text').textContent = `Question ${index + 1} of ${surveyQuestions.length}`;
+    
+    const questionsContainer = document.getElementById('survey-questions');
+    questionsContainer.innerHTML = renderQuestion(question, index);
+    
+    // Show/hide navigation buttons
+    document.getElementById('prev-question-btn').style.display = index > 0 ? 'block' : 'none';
+    document.getElementById('next-question-btn').style.display = index < surveyQuestions.length - 1 ? 'block' : 'none';
+    document.getElementById('submit-survey-btn').style.display = index === surveyQuestions.length - 1 ? 'block' : 'none';
+    
+    // Restore previous answer if exists
+    if (surveyAnswers[question.question_id]) {
+      restoreAnswer(question, surveyAnswers[question.question_id]);
+    }
+  }
+
+  // Render question based on type
+  function renderQuestion(question, index) {
+    let html = `
+      <div style="margin-bottom:2rem;">
+        <h3 style="color:#2d3748; margin-bottom:0.5rem; font-size:1.1rem;">
+          ${index + 1}. ${question.question_text}
+          ${question.required ? '<span style="color:#e53e3e;">*</span>' : ''}
+        </h3>
+        <div style="margin-top:1rem;">
+    `;
+    
+    switch(question.question_type) {
+      case 'rating':
+        html += `
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            ${[1,2,3,4,5].map(rating => `
+              <label style="cursor:pointer; display:flex; flex-direction:column; align-items:center; padding:1rem; border:2px solid #e2e8f0; border-radius:8px; transition:all 0.2s; min-width:60px;" 
+                     onmouseover="this.style.borderColor='#0067A5'; this.style.background='#f7fafc'" 
+                     onmouseout="if(!this.querySelector('input').checked) { this.style.borderColor='#e2e8f0'; this.style.background='white' }">
+                <input type="radio" name="question_${question.question_id}" value="${rating}" ${question.required ? 'required' : ''} 
+                       onchange="saveAnswer('${question.question_id}', this.value); this.parentElement.parentElement.querySelectorAll('label').forEach(l => { l.style.borderColor='#e2e8f0'; l.style.background='white' }); this.parentElement.style.borderColor='#0067A5'; this.parentElement.style.background='#ebf8ff'"
+                       style="display:none;">
+                <span style="font-size:1.5rem;">${'⭐'.repeat(rating)}</span>
+                <span style="font-size:0.85rem; color:#718096; margin-top:0.3rem;">${rating}</span>
+              </label>
+            `).join('')}
+          </div>
+        `;
+        break;
+        
+      case 'multiple_choice':
+        html += `
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            ${(question.options || []).map((option, i) => `
+              <label style="cursor:pointer; padding:1rem; border:2px solid #e2e8f0; border-radius:8px; transition:all 0.2s; display:flex; align-items:center; gap:0.75rem;"
+                     onmouseover="this.style.borderColor='#0067A5'; this.style.background='#f7fafc'" 
+                     onmouseout="if(!this.querySelector('input').checked) { this.style.borderColor='#e2e8f0'; this.style.background='white' }">
+                <input type="radio" name="question_${question.question_id}" value="${option}" ${question.required ? 'required' : ''}
+                       onchange="saveAnswer('${question.question_id}', this.value); this.parentElement.parentElement.querySelectorAll('label').forEach(l => { l.style.borderColor='#e2e8f0'; l.style.background='white' }); this.parentElement.style.borderColor='#0067A5'; this.parentElement.style.background='#ebf8ff'">
+                <span style="color:#2d3748; font-weight:500;">${option}</span>
+              </label>
+            `).join('')}
+          </div>
+        `;
+        break;
+        
+      case 'text':
+        html += `
+          <textarea name="question_${question.question_id}" rows="5" ${question.required ? 'required' : ''}
+                    onchange="saveAnswer('${question.question_id}', this.value)"
+                    placeholder="Type your answer here..."
+                    style="width:100%; padding:1rem; border:2px solid #e2e8f0; border-radius:8px; font-size:0.95rem; font-family:inherit; resize:vertical;"
+                    onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+        `;
+        break;
+        
+      case 'yes_no':
+        html += `
+          <div style="display:flex; gap:1rem;">
+            ${['Yes', 'No'].map(option => `
+              <label style="cursor:pointer; padding:1rem 2rem; border:2px solid #e2e8f0; border-radius:8px; transition:all 0.2s; flex:1; text-align:center; font-weight:500;"
+                     onmouseover="this.style.borderColor='#0067A5'; this.style.background='#f7fafc'" 
+                     onmouseout="if(!this.querySelector('input').checked) { this.style.borderColor='#e2e8f0'; this.style.background='white' }">
+                <input type="radio" name="question_${question.question_id}" value="${option}" ${question.required ? 'required' : ''}
+                       onchange="saveAnswer('${question.question_id}', this.value); this.parentElement.parentElement.querySelectorAll('label').forEach(l => { l.style.borderColor='#e2e8f0'; l.style.background='white' }); this.parentElement.style.borderColor='#0067A5'; this.parentElement.style.background='#ebf8ff'"
+                       style="display:none;">
+                ${option}
+              </label>
+            `).join('')}
+          </div>
+        `;
+        break;
+    }
+    
+    html += '</div></div>';
+    return html;
+  }
+
+  // Save answer
+  function saveAnswer(questionId, answer) {
+    surveyAnswers[questionId] = answer;
+  }
+
+  // Restore previous answer
+  function restoreAnswer(question, answer) {
+    const input = document.querySelector(`[name="question_${question.question_id}"]`);
+    if (input) {
+      if (input.type === 'radio') {
+        const radio = document.querySelector(`[name="question_${question.question_id}"][value="${answer}"]`);
+        if (radio) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change'));
+        }
+      } else if (input.tagName === 'TEXTAREA') {
+        input.value = answer;
+      }
+    }
+  }
+
+  // Next question
+  document.getElementById('next-question-btn').addEventListener('click', () => {
+    const currentQuestion = surveyQuestions[currentQuestionIndex];
+    if (currentQuestion.required && !surveyAnswers[currentQuestion.question_id]) {
+      alert('Please answer this question before proceeding.');
+      return;
+    }
+    showQuestion(currentQuestionIndex + 1);
+  });
+
+  // Previous question
+  document.getElementById('prev-question-btn').addEventListener('click', () => {
+    showQuestion(currentQuestionIndex - 1);
+  });
+
+  // Submit survey
+  document.getElementById('survey-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Check if all required questions are answered
+    const requiredQuestions = surveyQuestions.filter(q => q.required);
+    const missingAnswers = requiredQuestions.filter(q => !surveyAnswers[q.question_id]);
+    
+    if (missingAnswers.length > 0) {
+      alert('Please answer all required questions.');
+      return;
+    }
+    
+    try {
+      // Convert answers object to array format
+      const answersArray = Object.keys(surveyAnswers).map(questionId => ({
+        question_id: questionId,
+        answer: surveyAnswers[questionId]
+      }));
+      
+      console.log('Submitting survey:', currentSurveyId, answersArray); // Debug log
+      
+      const response = await fetch(`/api/surveys/${currentSurveyId}/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers: answersArray })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        console.error('Server error:', result);
+        throw new Error(result.detail || 'Failed to submit survey');
+      }
+      
+      // Show success message
+      alert('Survey submitted successfully! Thank you for your feedback.');
+      
+      closeTakeSurveyModal();
+      loadFeedbackCount(); // Update the feedback count
+      openSurveysModal(); // Reload surveys list
+      
+    } catch (error) {
+      console.error('Error submitting survey:', error);
+      alert(error.message || 'Error submitting survey. Please try again.');
+    }
+  });
+</script>
+
+</body>
+</html>

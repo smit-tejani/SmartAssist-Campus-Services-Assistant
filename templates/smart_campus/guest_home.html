@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAssist | Guest Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+  body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
+
+  /* Navbar */
+  nav {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1rem 2rem; 
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color:#fff; 
+    position:sticky; 
+    top:0; 
+    z-index:1000;
+    box-shadow:0 4px 20px rgba(0,0,0,0.15);
+  }
+  
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .nav-left h1 { 
+    font-size:1.5rem; 
+    font-weight:600; 
+    margin: 0;
+  }
+  
+  .nav-left p {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+  
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .nav-right a { 
+    color:#fff; 
+    text-decoration:none; 
+    font-weight:500; 
+    transition:0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .nav-right a:hover { 
+    color:#f0f0f0;
+    transform: translateY(-2px);
+  }
+  
+  .logout-btn {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: 0.3s;
+  }
+  
+  .logout-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(0) !important;
+  }
+
+  /* Container */
+  .content { 
+    padding:2rem; 
+    display:flex; 
+    flex-direction:column; 
+    gap:2rem; 
+    max-width:1400px; 
+    margin:auto; 
+  }
+
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color:#fff; 
+    padding:3rem 2.5rem; 
+    border-radius:20px;
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center; 
+    flex-wrap:wrap;
+    box-shadow:0 10px 40px rgba(0,103,165,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    z-index: 0;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+  }
+  
+  .hero h2 { 
+    font-size:2.2rem; 
+    margin-bottom:1rem;
+    font-weight: 700;
+  }
+  
+  .hero p { 
+    font-size:1.1rem; 
+    opacity:0.95;
+    line-height: 1.6;
+  }
+  
+  .hero-image {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .hero img { 
+    width:250px; 
+    max-width:100%;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+  }
+
+  /* Section Title */
+  .section-title {
+    font-size: 1.8rem;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .section-title i {
+    color: #0067A5;
+  }
+
+  /* Cards Grid */
+  .grid {
+    display:grid; 
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); 
+    gap:2rem;
+  }
+  
+  .card {
+    background:#fff; 
+    border-radius:20px; 
+    padding:2rem;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08); 
+    transition:0.4s; 
+    cursor:pointer;
+    display:flex; 
+    flex-direction:column;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #0067A5, #00A99D);
+    transform: scaleX(0);
+    transition: 0.4s;
+  }
+  
+  .card:hover::before {
+    transform: scaleX(1);
+  }
+  
+  .card:hover { 
+    transform:translateY(-10px); 
+    box-shadow:0 15px 40px rgba(0,103,165,0.2);
+    border-color: #0067A5;
+  }
+  
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,103,165,0.3);
+  }
+  
+  .card i { 
+    font-size:1.8rem; 
+    color:#fff;
+  }
+  
+  .card h3 { 
+    font-size:1.3rem; 
+    margin-bottom:0.75rem; 
+    color:#2d3748;
+    font-weight: 600;
+  }
+  
+  .card p { 
+    font-size:0.95rem; 
+    color:#718096;
+    line-height: 1.6;
+    flex-grow: 1;
+  }
+  
+  .card-action {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .card-action span {
+    color: #0067A5;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .card:hover .card-action span {
+    gap: 0.75rem;
+  }
+
+  /* Info Banner */
+  .info-banner {
+    background: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-left: 5px solid #00A99D;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .info-banner i {
+    font-size: 2rem;
+    color: #00A99D;
+  }
+  
+  .info-banner-content h3 {
+    color: #2d3748;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .info-banner-content p {
+    color: #718096;
+    font-size: 0.9rem;
+  }
+
+  /* Chatbot Button */
+  .chatbot-btn {
+    position:fixed; 
+    bottom:30px; 
+    right:30px; 
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color:#fff;
+    width:65px; 
+    height:65px; 
+    border-radius:50%; 
+    border:none;
+    font-size:1.8rem; 
+    cursor:pointer; 
+    box-shadow:0 8px 25px rgba(0,103,165,0.4);
+    transition:0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .chatbot-btn:hover { 
+    transform: scale(1.1);
+    box-shadow:0 10px 30px rgba(0,103,165,0.5);
+  }
+
+  @media(max-width:768px){
+    .grid { grid-template-columns:1fr; }
+    .hero { padding: 2rem 1.5rem; }
+    .hero h2 { font-size: 1.6rem; }
+    .hero p { font-size: 0.95rem; }
+    .nav-right { gap: 1rem; }
+    .content { padding: 1rem; }
+    .section-title { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <div class="nav-left">
+    <img src="{{ url_for('static', path='assets/images/logo.png') }}"
+      alt="SmartAssist Logo"
+      style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+    <div>
+      <h1>SmartAssist</h1>
+      <p>TAMUCC Campus Assistant</p>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="/logout" class="logout-btn">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      Logout
+    </a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="content">
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="hero-content">
+      <h2>Welcome to TAMUCC SmartAssist</h2>
+      <p>Your gateway to campus services and information. Explore our knowledge base, find your way around campus, and get instant answers to your questions - all without needing an account.</p>
+    </div>
+    <div class="hero-image">
+      <img src="https://img.icons8.com/bubbles/250/ffffff/user.png" alt="Guest Illustration">
+    </div>
+  </div>
+
+  <!-- Info Banner -->
+  <div class="info-banner">
+    <i class="fa-solid fa-lightbulb"></i>
+    <div class="info-banner-content">
+      <h3>Want More Features?</h3>
+      <p>Create an account or sign in to access personalized services including ticket management, appointment scheduling, and course registration.</p>
+    </div>
+  </div>
+
+  <!-- Section Title -->
+  <h2 class="section-title">
+    <i class="fa-solid fa-rocket"></i>
+    Quick Access
+  </h2>
+
+  <!-- Feature Cards -->
+  <div class="grid">
+    <div class="card" onclick="window.location.href='/chat'">
+      <div class="card-icon">
+        <i class="fa-solid fa-robot"></i>
+      </div>
+      <h3>AI Chatbot</h3>
+      <p>Get instant answers to common campus questions about admissions, courses, facilities, and more with our intelligent chatbot assistant.</p>
+      <div class="card-action">
+        <span>Start Chatting <i class="fa-solid fa-arrow-right"></i></span>
+      </div>
+    </div>
+    
+    <div class="card" onclick="window.open('https://campusmap.tamucc.edu/?id=1758#!ct/41227,45184,45185,42919,41218,41221,43145,43188,43193,43340,43341,43389,43391?s/:', '_blank')">
+      <div class="card-icon">
+        <i class="fa-solid fa-map-location-dot"></i>
+      </div>
+      <h3>Campus Map</h3>
+      <p>Navigate the campus with ease. Find buildings, classrooms, labs, offices, and get interactive directions to your destination.</p>
+      <div class="card-action">
+        <span>View Map <i class="fa-solid fa-arrow-right"></i></span>
+      </div>
+    </div>
+    
+    <div class="card" onclick="window.location.href='/contact_support'">
+      <div class="card-icon">
+        <i class="fa-solid fa-phone-volume"></i>
+      </div>
+      <h3>Contact & Support</h3>
+      <p>Need help? Reach out to university departments, IT support, or specific offices for assistance with your inquiries.</p>
+      <div class="card-action">
+        <span>Get in Touch <i class="fa-solid fa-arrow-right"></i></span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Chatbot Button -->
+<button class="chatbot-btn" onclick="window.location.href='/chat'">
+  <i class="fa-solid fa-comments"></i>
+</button>
+
+</body>
+</html>
