@@ -1,9 +1,6 @@
-# app/routers/__init__.py
 from typing import List
-
 from fastapi import FastAPI
 
-# import router modules
 from app.routers import (
     auth,
     chatbot,
@@ -19,7 +16,6 @@ from app.routers import (
     surveys,
 )
 
-# define public exports
 __all__ = [
     "auth",
     "chatbot",
@@ -38,17 +34,14 @@ __all__ = [
 
 
 def register_routers(app: FastAPI) -> None:
-    """
-    Register routers on the FastAPI app in a predictable order.
-    Keep the order stable to avoid accidental route masking.
-    """
+    """Attach all routers in a clean, deterministic order."""
     routers = [
         diagnostics.router,
         live_chat.router,
         pages.router,
         auth.router,
         chatbot.router,
-        support.router,
+        support.support.router,   # ensure nested routers load
         students.router,
         staff.router,
         departments.router,
@@ -56,6 +49,5 @@ def register_routers(app: FastAPI) -> None:
         events.router,
         surveys.router,
     ]
-
     for r in routers:
         app.include_router(r)
