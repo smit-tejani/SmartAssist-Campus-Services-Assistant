@@ -29,7 +29,7 @@ print("[BOOT] USE_LLM_FOLLOWUPS=", os.getenv("USE_LLM_FOLLOWUPS", "1"),
 # ------------------ FastAPI App ------------------
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="templates")  # folder for HTML templates
 
 app.add_middleware(
     SessionMiddleware,
