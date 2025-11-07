@@ -47,12 +47,14 @@ async def book_appointment(
         admin_user = users_collection.find_one({"role": "admin"})
         if admin_user:
             assigned_staff = admin_user.get("email")
-            assigned_staff_name = admin_user.get("full_name", admin_user.get("email"))
+            assigned_staff_name = admin_user.get(
+                "full_name", admin_user.get("email"))
         else:
             return JSONResponse({"success": False, "error": "Admin user not found"}, status_code=500)
     else:
         staff_member = users_collection.find_one({"email": assigned_staff})
-        assigned_staff_name = staff_member.get("full_name") if staff_member else assigned_staff
+        assigned_staff_name = staff_member.get(
+            "full_name") if staff_member else assigned_staff
 
     appt = {
         "student_email": student_email,
@@ -86,7 +88,8 @@ async def book_appointment(
 async def cancel_appointment(appointment_id: str):
     try:
         result = appointments_collection.update_one(
-            {"_id": ObjectId(appointment_id)}, {"$set": {"status": "Cancelled"}}
+            {"_id": ObjectId(appointment_id)}, {
+                "$set": {"status": "Cancelled"}}
         )
         if result.modified_count == 1:
             return {"success": True, "message": "Appointment cancelled successfully."}
@@ -100,7 +103,8 @@ async def reschedule_appointment(appointment_id: str, new_date: str, new_time: s
     try:
         result = appointments_collection.update_one(
             {"_id": ObjectId(appointment_id)},
-            {"$set": {"date": new_date, "time_slot": new_time, "last_updated": datetime.utcnow().isoformat()}},
+            {"$set": {"date": new_date, "time_slot": new_time,
+                      "last_updated": datetime.utcnow().isoformat()}},
         )
         if result.modified_count == 1:
             return {"success": True, "message": "Appointment rescheduled."}
@@ -117,7 +121,8 @@ async def list_appointments(student_email: Optional[str] = None, assigned_staff:
             query["student_email"] = student_email
         if assigned_staff:
             query["assigned_staff"] = assigned_staff
-        appointments = list(appointments_collection.find(query).sort("date", 1))
+        appointments = list(
+            appointments_collection.find(query).sort("date", 1))
         # convert ObjectId to str
         for a in appointments:
             a["_id"] = str(a["_id"])
@@ -129,9 +134,11 @@ async def list_appointments(student_email: Optional[str] = None, assigned_staff:
 @router.get("/api/appointments/{appointment_id}")
 async def get_appointment(appointment_id: str):
     try:
-        appt = appointments_collection.find_one({"_id": ObjectId(appointment_id)})
+        appt = appointments_collection.find_one(
+            {"_id": ObjectId(appointment_id)})
         if not appt:
-            raise HTTPException(status_code=404, detail="Appointment not found")
+            raise HTTPException(
+                status_code=404, detail="Appointment not found")
         appt["_id"] = str(appt["_id"])
         return {"success": True, "appointment": appt}
     except HTTPException:
@@ -143,9 +150,11 @@ async def get_appointment(appointment_id: str):
 @router.put("/api/appointments/{appointment_id}")
 async def update_appointment(appointment_id: str, request: Request):
     try:
-        appointment = appointments_collection.find_one({"_id": ObjectId(appointment_id)})
+        appointment = appointments_collection.find_one(
+            {"_id": ObjectId(appointment_id)})
         if not appointment:
-            raise HTTPException(status_code=404, detail="Appointment not found")
+            raise HTTPException(
+                status_code=404, detail="Appointment not found")
 
         body = await request.form()
         update_fields = {}
@@ -155,7 +164,8 @@ async def update_appointment(appointment_id: str, request: Request):
 
         if update_fields:
             update_fields["last_updated"] = datetime.utcnow().isoformat()
-            result = appointments_collection.update_one({"_id": ObjectId(appointment_id)}, {"$set": update_fields})
+            result = appointments_collection.update_one(
+                {"_id": ObjectId(appointment_id)}, {"$set": update_fields})
             if result.modified_count == 0:
                 return JSONResponse({"success": False, "message": "No changes applied."}, status_code=200)
 
@@ -180,9 +190,30 @@ async def confirm_appointment(appointment_id: str):
             },
         )
         if result.modified_count == 0:
-            raise HTTPException(status_code=404, detail="Appointment not found")
+            raise HTTPException(
+                status_code=404, detail="Appointment not found")
         return {"success": True, "message": "Appointment confirmed"}
     except HTTPException:
         raise
     except Exception as exc:
         return JSONResponse({"error": str(exc)}, status_code=500)
+
+
+@router.get("/api/appointments")
+async def api_appointments(
+    upcoming: bool = False,
+    student_email: str | None = None,
+    admin: bool = False,
+):
+    query = {}
+    if student_email:
+        query["student_email"] = student_email
+    if upcoming:
+        query["date"] = {"$gte": date.today().isoformat()}
+        query["status"] = {"$ne": "Cancelled"}
+    appointments = list(appointments_collection.find(query).sort("date", 1))
+    for appt in appointments:
+        appt["_id"] = str(appt["_id"])
+        if "attachment_id" in appt:
+            appt["attachment_id"] = str(appt["attachment_id"])
+    return appointments
