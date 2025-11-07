@@ -1,62 +1,52 @@
-from __future__ import annotations
+# app/services/support.py
+"""
+Support service layer for handling ticket and appointment saving.
+Provides MongoDB persistence and GridFS file handling.
+"""
 
-import json
 from datetime import datetime
-from typing import Optional
-
+from bson import ObjectId
 from fastapi import UploadFile
+from app.db.mongo import fs, tickets_collection, appointments_collection
 
-from app.db.mongo import appointments_collection, fs, tickets_collection
 
-
-def save_ticket(ticket: dict, attachment: Optional[UploadFile] = None):
-    if attachment is not None:
-        try:
-            content = attachment.file.read()
-            file_id = fs.put(content, filename=attachment.filename, contentType=attachment.content_type)
-            ticket["attachment_id"] = file_id
-            ticket["attachment_name"] = attachment.filename
-            ticket["attachment_content_type"] = attachment.content_type
-        except Exception as exc:
-            ticket["attachment_error"] = f"failed to save to gridfs: {exc}"
-
-    result = tickets_collection.insert_one(ticket)
-    inserted_id = result.inserted_id
-
-    debug_doc = ticket.copy()
-    if "attachment_id" in debug_doc:
-        debug_doc["attachment_id"] = str(debug_doc["attachment_id"])
+def save_ticket(ticket_data: dict, attachment: UploadFile | None = None) -> str:
+    """
+    Save a support ticket document to MongoDB and optionally upload its attachment.
+    Returns the inserted ticket's ObjectId as a string.
+    """
     try:
-        print(f"[DEBUG] Inserted ticket id: {inserted_id}")
-        print(f"[DEBUG] Ticket document: {json.dumps(debug_doc, default=str)}")
-    except Exception:
-        print("[DEBUG] Ticket document (fallback):", debug_doc)
-    return inserted_id
+        if attachment:
+            file_id = fs.put(
+                attachment.file.read(),
+                filename=attachment.filename,
+                content_type=attachment.content_type or "application/octet-stream",
+            )
+            ticket_data["attachment_id"] = file_id
+
+        result = tickets_collection.insert_one(ticket_data)
+        return str(result.inserted_id)
+    except Exception as exc:
+        print(f"[ERROR] save_ticket: {exc}")
+        raise
 
 
-def save_appointment(appt: dict, attachment: Optional[UploadFile] = None):
-    if attachment is not None:
-        try:
-            content = attachment.file.read()
-            file_id = fs.put(content, filename=attachment.filename, contentType=attachment.content_type)
-            appt["attachment_id"] = file_id
-            appt["attachment_name"] = attachment.filename
-            appt["attachment_content_type"] = attachment.content_type
-        except Exception as exc:
-            appt["attachment_error"] = f"failed to save to gridfs: {exc}"
-
-    result = appointments_collection.insert_one(appt)
-    inserted_id = result.inserted_id
-
-    debug_doc = appt.copy()
-    if "attachment_id" in debug_doc:
-        debug_doc["attachment_id"] = str(debug_doc["attachment_id"])
+def save_appointment(appointment_data: dict, attachment: UploadFile | None = None) -> str:
+    """
+    Save appointment data and optional attachment to MongoDB.
+    Returns the inserted appointment's ObjectId as a string.
+    """
     try:
-        print(f"[DEBUG] Inserted appointment id: {inserted_id}")
-        print(f"[DEBUG] Appointment document: {json.dumps(debug_doc, default=str)}")
-    except Exception:
-        print("[DEBUG] Appointment document (fallback):", debug_doc)
-    return inserted_id
+        if attachment:
+            file_id = fs.put(
+                attachment.file.read(),
+                filename=attachment.filename,
+                content_type=attachment.content_type or "application/octet-stream",
+            )
+            appointment_data["attachment_id"] = file_id
 
-
-__all__ = ["save_ticket", "save_appointment"]
+        result = appointments_collection.insert_one(appointment_data)
+        return str(result.inserted_id)
+    except Exception as exc:
+        print(f"[ERROR] save_appointment: {exc}")
+        raise
