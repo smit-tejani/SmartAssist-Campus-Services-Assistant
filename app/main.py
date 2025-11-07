@@ -5,8 +5,48 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.config import settings
-from app.core.templates import templates  # noqa: F401 ensures templates are loaded
 from app.routers import register_routers
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.routers import (
+    auth,
+    chatbot,
+    diagnostics,
+    departments,
+    events,
+    live_chat,
+    notifications,
+    pages,
+    staff,
+    students,
+    support,
+    surveys,
+)
+
+app = FastAPI(title="SmartAssist Campus Services Assistant")
+
+# CORS middleware setup
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Register routers
+support.register_routers(app)      # ✅ Unified support router
+app.include_router(auth.router)
+app.include_router(chatbot.router)
+app.include_router(diagnostics.router)
+app.include_router(departments.router)
+app.include_router(events.router)
+app.include_router(live_chat.router)
+app.include_router(notifications.router)
+app.include_router(pages.router)
+app.include_router(staff.router)
+app.include_router(students.router)
+app.include_router(surveys.router)
 
 
 def create_app() -> FastAPI:
