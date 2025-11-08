@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}SmartAssist | TAMUCC Campus Assistant{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/common.css') }}">
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="nav-left">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo"
+          style="width: 40px; height: 40px; object-fit: contain; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+        <div>
+          <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
+          <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">TAMUCC Campus Assistant
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="nav-links">
+      {% block nav_links %}
+      <a href="/">Home</a>
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+      {% endblock %}
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 SmartAssist | Texas A&M University-Corpus Christi</p>
+    <div>
+      <a href="#">Privacy</a> | <a href="#">Terms</a> | <a href="#">Contact</a>
+    </div>
+  </footer>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>
