@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registration | Student | TAMU-CC</title>
+  <style>
+    /* ---------- CSS Reset (minimal) ---------- */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); }
+    img { max-width: 100%; height: auto; display: block; }
+
+    /* ---------- SmartAssist Theme ---------- */
+    :root{
+      --brand: #0056A6;           /* primary blue */
+      --brand-dark: #004885;      /* hover/pressed */
+      --accent: #009688;          /* teal accent */
+      --success: #00C897;         /* button green */
+      --bg: #F5F7FA;              /* app background */
+      --panel: #FFFFFF;           /* cards */
+      --border: #E5EAF1;
+      --text: #1F2D3D;
+      --muted: #6B7B8C;
+      --link: #0056A6;
+      --focus: #FFD166;           /* warm focus ring */
+      --table-header: #EEF2F7;
+      --shadow: 0 8px 20px rgba(16, 24, 40, .06);
+    }
+
+    /* ---------- Layout ---------- */
+    .container{ width: min(1200px, 96%); margin-inline: auto; }
+
+    /* Top bar */
+    .topbar{ background: var(--brand); color: #fff; box-shadow: var(--shadow); }
+    .topbar__inner{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .brand__logo{ width:44px; height:44px; background: linear-gradient(135deg, #fff 15%, #b3d4ff 15% 50%, #fff 50%); border-radius:10px; }
+    .brand__text{ line-height:1; font-weight:800; display:flex; flex-direction:column; letter-spacing:.02em; }
+    .brand__line-1{ font-size:12px; opacity:.9; }
+    .brand__line-2{ font-size:18px; }
+
+    .utilnav ul{ display:flex; gap:22px; list-style:none; margin:0; padding:0; }
+    .utilnav a{ color:#fff; text-decoration:none; font-weight:600; opacity:.95; }
+    .utilnav a:hover{ opacity:1; }
+    .utilnav a:focus{ outline:3px solid var(--focus); outline-offset:2px; background:#003a6a; border-radius:6px; padding-inline:6px; }
+
+    /* Breadcrumb */
+    .breadcrumb{ background:#eaf1f8; border-bottom:1px solid var(--border); }
+    .breadcrumb ol{ list-style:none; margin:0; padding:10px 0; display:flex; flex-wrap:wrap; gap:8px; color:var(--muted); font-weight:500; }
+    .breadcrumb li::after{ content:'/'; margin-left:8px; color:#9aa5b1; }
+    .breadcrumb li:last-child::after{ content:''; }
+    .breadcrumb a{ color:#194b8f; text-decoration:none; }
+    .breadcrumb a:hover{ text-decoration:underline; }
+
+    .page-title{ margin:22px 0 12px; font-size:28px; color:var(--text); font-weight:800; letter-spacing:.01em; }
+
+    /* Cards / Panels */
+    .panel{ background:var(--panel); border:1px solid var(--border); border-radius:16px; margin:16px 0; box-shadow: var(--shadow); }
+    .panel__header{ padding:16px 18px; border-bottom:1px solid var(--border); background:#F2F6FB; border-top-left-radius:16px; border-top-right-radius:16px; }
+    .panel__header h2{ margin:0; font-size:18px; color:var(--text); }
+
+    /* Tiles (action cards) */
+    .tiles{ display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; padding:18px; }
+    .tile{ display:flex; gap:16px; padding:18px; border:1px solid var(--border); border-radius:14px; text-decoration:none; color:inherit; background:var(--panel); transition: box-shadow .2s ease, transform .06s ease; box-shadow: var(--shadow); }
+    .tile:hover{ transform: translateY(-2px); }
+    .tile__icon{ font-size:24px; width:48px; height:48px; display:grid; place-items:center; background:#E9F2FF; color:var(--brand); border-radius:12px; }
+    .tile__title{ margin:0 0 6px; font-size:16px; font-weight:800; color:var(--text); }
+    .tile__body p{ margin:0; color:var(--muted); font-size:14px; }
+
+    /* Forms */
+    .form-row{ padding:18px; display:grid; gap:10px; }
+    .form-label{ font-weight:700; color:var(--text); }
+    .select-row{ display:flex; gap:12px; flex-wrap:wrap; }
+    select{ min-width:260px; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:#fff; font-size:14px; color:var(--text); }
+    .btn{ padding:12px 18px; border:0; background:var(--brand); color:#fff; border-radius:12px; font-weight:800; cursor:pointer; box-shadow: var(--shadow); }
+    .btn:hover{ background:var(--brand-dark); }
+    .btn:focus, select:focus{ outline:3px solid var(--focus); outline-offset:2px; }
+
+    /* Tabs */
+    .tabs{ display:flex; gap:8px; padding:12px 12px 0; border-bottom:1px solid var(--border); }
+    .tab{ appearance:none; background:#E9F2FF; border:1px solid transparent; padding:10px 14px; border-radius:12px 12px 0 0; font-weight:700; color:#0d3b6e; cursor:pointer; }
+    .tab.is-active{ background:#fff; border-color:var(--border); border-bottom-color:#fff; color:var(--text); }
+
+    /* Data table */
+    .table-wrap{ padding:0 12px 12px; }
+    .table-caption{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 6px; }
+    .term-inline select{ padding:8px 10px; border:1px solid var(--border); border-radius:8px; }
+    .data-table{ width:100%; border-collapse: separate; border-spacing:0; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#fff; }
+    .data-table thead th{ position:sticky; top:0; background:var(--table-header); border-bottom:1px solid var(--border); text-align:left; padding:12px 14px; font-size:13px; color: #0d3b6e; }
+    .data-table td{ padding:14px; border-bottom:1px solid var(--border); font-size:14px; color:var(--text); }
+    .data-table tr:last-child td{ border-bottom:0; }
+    .link{ color:var(--link); text-decoration:none; font-weight:700; }
+    .link:hover{ text-decoration:underline; }
+
+    /* Week grid (visual placeholder) */
+    .week{ margin:8px 12px 18px; border:1px solid var(--border); border-radius:16px; overflow:hidden; background:#fff; box-shadow: var(--shadow); }
+    .week__header{ background:#F2F6FB; padding:12px; border-bottom:1px solid var(--border); }
+    .week__grid{
+      display:grid;
+      grid-template-columns: [time] 80px [sun] 1fr [mon] 1fr [tue] 1fr [wed] 1fr [thu] 1fr [fri] 1fr [sat] 1fr;
+      grid-template-rows:
+        [h8] 40px [h9] 40px [h10] 40px [h11] 40px [h12] 40px [h13] 40px [h14] 40px [h15] 40px;
+      background: repeating-linear-gradient(#ffffff, #ffffff 39px, #F6FAFF 40px);
+    }
+    .week__grid::before{
+      content: "";
+      grid-column: 1 / -1;
+      grid-row: 1 / -1;
+      background-image: linear-gradient(to right, transparent 80px, #EEF2F7 80px),
+                        repeating-linear-gradient(to right, transparent, transparent calc((100% - 80px)/7 - 1px), #EEF2F7 0, #EEF2F7 calc((100% - 80px)/7));
+      pointer-events: none;
+    }
+    .event{
+      background: var(--success);
+      color:#0b2b3a;
+      border-radius:10px;
+      padding:8px 10px;
+      box-shadow: var(--shadow);
+      align-self: center;
+      justify-self: stretch;
+    }
+    .event__title{ display:block; font-weight:800; font-size:13px; }
+    .event__meta{ display:block; font-size:12px; opacity:.9; }
+
+    /* Footer */
+    .footer{ color:var(--muted); padding:28px 0 36px; }
+
+    /* Utilities */
+    .sr-only{
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px){
+      .tiles{ grid-template-columns:1fr; }
+      .utilnav{ display:none; }
+      .data-table th:nth-child(7),
+      .data-table td:nth-child(7),
+      .data-table th:nth-child(10),
+      .data-table td:nth-child(10),
+      .data-table th:nth-child(11),
+      .data-table td:nth-child(11){ display:none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Blue Bar / Brand -->
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <div class="brand">
+        <div class="brand__logo" aria-hidden="true"></div>
+        <div class="brand__text">
+          <span class="brand__line-1">TEXAS A&amp;M UNIVERSITY</span>
+          <span class="brand__line-2">CORPUS CHRISTI</span>
+        </div>
+      </div>
+
+      <nav class="utilnav" aria-label="Utilities">
+        <ul>
+          <li><a href="#" aria-label="Apps">Apps</a></li>
+          <li><a href="#" aria-label="Canvas">Canvas</a></li>
+          <li><a href="#" aria-label="Teams">Teams</a></li>
+          <li><a href="#" aria-label="Help">Help</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Breadcrumbs -->
+  <div class="breadcrumb">
+    <div class="container">
+      <nav aria-label="Breadcrumb">
+        <ol>
+          <li><a href="#">Student</a></li>
+          <li><a href="#">Registration</a></li>
+          <li aria-current="page">Registration Home</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <main id="content" class="container">
+    <h1 class="page-title">Registration</h1>
+
+    <!-- What would you like to do? -->
+    <section class="panel" aria-labelledby="actions-heading">
+      <div class="panel__header">
+        <h2 id="actions-heading">What would you like to do?</h2>
+      </div>
+      <div class="tiles">
+        <a class="tile" href="#browse-classes">
+          <div class="tile__icon" aria-hidden="true">🔍</div>
+          <div class="tile__body">
+            <h3 class="tile__title">Browse Classes</h3>
+            <p>Looking for classes? Browse classes you find interesting.</p>
+          </div>
+        </a>
+
+        <a class="tile" href="#register-classes">
+          <div class="tile__icon" aria-hidden="true">📝</div>
+          <div class="tile__body">
+            <h3 class="tile__title">Register for Classes</h3>
+            <p>Search and register. You can also view and manage your schedule.</p>
+          </div>
+        </a>
+
+        <a class="tile" href="#course-catalog">
+          <div class="tile__icon" aria-hidden="true">📚</div>
+          <div class="tile__body">
+            <h3 class="tile__title">Browse Course Catalog</h3>
+            <p>Look up basic course information like subject, course, and description.</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Select a Term -->
+    <section id="browse-classes" class="panel" aria-labelledby="term-heading">
+      <div class="panel__header">
+        <h2 id="term-heading">Select a Term</h2>
+      </div>
+      <form class="form-row" action="#" method="get">
+        <label for="term" class="form-label">Select a Term for Class Search</label>
+        <div class="select-row">
+          <select id="term" name="term" required>
+            <option value="" selected>Select a term...</option>
+            <option>Spring 2025</option>
+            <option>Summer I 2025</option>
+            <option>Summer II 2025</option>
+            <option>Fall 2025</option>
+          </select>
+          <button class="btn" type="submit">Continue</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- View Registration Information -->
+    <section id="register-classes" class="panel" aria-labelledby="schedule-heading">
+      <div class="panel__header">
+        <h2 id="schedule-heading">View Registration Information</h2>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Schedule tabs">
+        <button class="tab is-active" role="tab" aria-selected="true" tabindex="0">Look up a Schedule</button>
+        <button class="tab" role="tab" aria-selected="false" tabindex="-1">Active Registrations</button>
+      </div>
+
+      <div class="table-wrap" role="region" aria-label="Class Schedule">
+        <div class="table-caption">
+          <strong>Class Schedule</strong>
+          <div class="term-inline">
+            <label for="term-inline" class="sr-only">Term</label>
+            <select id="term-inline">
+              <option>Fall Full Term 2024</option>
+              <option>Spring 2025</option>
+            </select>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Details</th>
+              <th scope="col">Hours</th>
+              <th scope="col">CRN</th>
+              <th scope="col">Schedule Type</th>
+              <th scope="col">Grade Mode</th>
+              <th scope="col">Level</th>
+              <th scope="col">Part Of Term</th>
+              <th scope="col">Date</th>
+              <th scope="col">Status</th>
+              <th scope="col">Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a class="link" href="#">Computer Vision</a></td>
+              <td>COSC 6326, 002</td>
+              <td>3</td>
+              <td>73633</td>
+              <td>Lecture</td>
+              <td>Normal Grading</td>
+              <td>Graduate</td>
+              <td>Full Term</td>
+              <td>07/09/2024</td>
+              <td>Registered</td>
+              <td>Web Registered</td>
+            </tr>
+            <tr>
+              <td><a class="link" href="#">Design and Analysis of Algorithms</a></td>
+              <td>COSC 6334, 001</td>
+              <td>3</td>
+              <td>70948</td>
+              <td>Lecture</td>
+              <td>Normal Grading</td>
+              <td>Graduate Doctoral</td>
+              <td>Full Term</td>
+              <td>07/09/2024</td>
+              <td>Registered</td>
+              <td>Web Registered</td>
+            </tr>
+            <tr>
+              <td><a class="link" href="#">Human-Computer Interaction</a></td>
+              <td>COSC 6340, 001</td>
+              <td>3</td>
+              <td>73635</td>
+              <td>Lecture</td>
+              <td>Normal Grading</td>
+              <td>Graduate</td>
+              <td>Full Term</td>
+              <td>07/09/2024</td>
+              <td>Registered</td>
+              <td>Web Registered</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Week grid placeholder -->
+      <!-- <div class="week">
+        <header class="week__header">
+          <h3>Class Schedule for Fall Full Term 2024</h3>
+        </header>
+        <div class="week__grid" aria-hidden="true"> -->
+          <!-- Grid only for visual parity with screenshot -->
+          <!-- You can populate with blocks if you add meeting times -->
+          <!-- Example block shown: -->
+          <!-- <div class="event" style="grid-column: tue; grid-row: h9 / h11;">
+            <span class="event__title">COSI 6326</span>
+            <span class="event__meta">9:00–11:00</span>
+          </div>
+        </div>
+      </div>
+    </section> -->
+
+    <!-- <footer class="footer">
+      <div class="container footer__inner">
+        <p>© TAMU-CC. Sample UI built with HTML and CSS only.</p>
+      </div>
+    </footer> -->
+  </main>
+</body>
+</html>
