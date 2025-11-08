@@ -362,21 +362,6 @@ nav .logo {
   font-size: 1.1rem;
   margin-bottom: 2rem;
 }
-footer {
-  background: #001f33;
-  text-align: center;
-  padding: 2rem;
-  color: #ccc;
-  font-size: 0.9rem;
-}
-footer a {
-  color: #00aeef;
-  text-decoration: none;
-  margin: 0 10px;
-}
-footer a:hover {
-  text-decoration: underline;
-}
 
 /* Responsive */
 @media (max-width: 1024px) {

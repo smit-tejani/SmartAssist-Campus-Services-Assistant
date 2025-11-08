@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}SmartAssist | TAMUCC Campus Assistant{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<link rel="stylesheet" href="{{ url_for('static', path='css/student.css') }}">
+{% endblock %}
+<title>SmartAssist | Student Dashboard</title>
+
+{% block content %}
+
+
+<!-- Sidebar + Content -->
+<div class="container">
+  <!-- Sidebar -->
+  <!-- Main Content -->
+  <div class="content">
+    <!-- Hero Section -->
+    <div class="hero">
+      <div>
+        <h2 style="color: #ffffff;">
+          Welcome, Student 👋
+        </h2>
+        <p>Your campus services dashboard. Access SmartAssist features and track your requests in real-time.</p>
+      </div>
+      <img src="https://img.icons8.com/ios/200/ffffff/student-male.png" alt="Student Illustration">
+    </div>
+
+    <!-- Events Section -->
+    <div id="student-events-section" style="margin-bottom: 1.5rem;">
+      <!-- Events will be dynamically populated here -->
+    </div>
+
+    <!-- Appointment Reminders -->
+    <div id="student-appointment-reminders" style="margin-bottom: 1.5rem;">
+      <!-- Reminders will be dynamically populated here -->
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats">
+      <div id="open-tickets-widget" class="stat" style="cursor:pointer;">
+        <div>
+          <div id="open-tickets-count" class="number">0</div>
+          <div class="label">Open Tickets</div>
+        </div>
+        <i class="fa-solid fa-ticket"></i>
+      </div>
+      <div id="upcoming-appts-widget" class="stat" style="cursor:pointer;">
+        <div>
+          <div id="upcoming-appts-count" class="number">0</div>
+          <div class="label">Upcoming Appointments</div>
+        </div>
+        <i class="fa-solid fa-calendar-check"></i>
+      </div>
+      <div class="stat">
+        <div>
+          <div id="feedback-submitted-count" class="number">0</div>
+          <div class="label">Feedback Submitted</div>
+        </div>
+        <i class="fa-solid fa-star"></i>
+      </div>
+    </div>
+
+    <!-- ================= SELECT TERM SECTION ================= -->
+    <section id="browse-classes" class="panel" aria-labelledby="term-heading">
+      <div class="panel__header">
+        <h2 id="term-heading">Select a Term</h2>
+      </div>
+      <form class="form-row" id="term-form">
+        <label for="term" class="form-label">Select a Term for Class Search</label>
+        <div class="select-row">
+          <select id="term" name="term" required>
+            <option value="" selected>Select a term...</option>
+            <option>Spring 2025</option>
+            <option>Summer I 2025</option>
+            <option>Summer II 2025</option>
+            <option>Fall 2025</option>
+          </select>
+          <button class="btn" type="button" id="fetch-courses">Fetch Courses</button>
+        </div>
+      </form>
+
+      <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table id="courses-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Details</th>
+              <th>Hours</th>
+              <th>CRN</th>
+              <th>Schedule Type</th>
+              <th>Grade Mode</th>
+              <th>Level</th>
+              <th>Part Of Term</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="courses-body">
+            <!-- Courses will be dynamically inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Feature Cards -->
+    <div class="grid">
+      <div class="card" onclick="window.location.href='chat'">
+        <i class="fa-solid fa-comments"></i>
+        <h3>Chatbot / FAQ</h3>
+        <p>Get instant answers to common campus questions anytime, anywhere.</p>
+      </div>
+      <div class="card" id="raise-ticket-card">
+        <i class="fa-solid fa-ticket"></i>
+        <h3>Raise Ticket</h3>
+        <p>Submit and track service requests with real-time updates.</p>
+      </div>
+      <div class="card" id="book-appointment-card">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h3>Book Appointment</h3>
+        <p>Schedule meetings with advisors, professors, or offices conveniently.</p>
+      </div>
+      <div class="card" onclick="openSurveysModal()" style="cursor: pointer;">
+        <i class="fa-solid fa-star"></i>
+        <h3>Feedback / Surveys</h3>
+        <p>Share feedback to help improve campus services.</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('tickets')">
+        <i class="fa-solid fa-ticket"></i> My Tickets
+      </button>
+      <button class="tab" onclick="showTab('appointments')">
+        <i class="fa-solid fa-calendar"></i> My Appointments
+      </button>
+    </div>
+
+    <!-- ================= MY TICKETS TAB ================= -->
+    <div id="ticketsTab" class="tab-content active">
+      <section id="my-tickets">
+        <h2>My Tickets</h2>
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Subject</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Assigned Staff</th>
+              </tr>
+            </thead>
+            <tbody id="ticket-list">
+              <!-- Tickets will be dynamically loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= MY APPOINTMENTS TAB ================= -->
+    <div id="appointmentsTab" class="tab-content">
+      <section id="my-appointments">
+        <h2>My Appointments</h2>
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Department</th>
+                <th>Assigned Staff</th>
+                <th>Date</th>
+                <th>Time Slot</th>
+                <th>Meeting Mode</th>
+                <th>Status</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody id="appointment-list">
+              <!-- Appointments will be dynamically loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Chatbot Button -->
+<button class="chatbot-btn" onclick="window.location.href='chat'"><i class="fa-solid fa-comments"></i></button>
+
+<div id="ticket-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-ticket-btn">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Raise a Ticket</h2>
+    <form id="ticket-form" class="space-y-4">
+      <div>
+        <label>Subject</label>
+        <input type="text" name="subject" placeholder="Enter ticket subject" required>
+      </div>
+      <div>
+        <label>Category</label>
+        <select id="ticket-category-select" name="category" required>
+          <option value="">Select Category</option>
+          <option value="Technical">Technical</option>
+          <option value="Administrative">Administrative</option>
+          <option value="Academic">Academic</option>
+          <option value="Financial Aid">Financial Aid</option>
+          <option value="Registrar">Registrar</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label>Priority</label>
+        <select name="priority" required>
+          <option value="">Select Priority</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+      <div>
+        <label>Preferred Staff (Optional)</label>
+        <select id="ticket-staff-select" name="preferred_staff">
+          <option value="">Select category first or leave blank</option>
+        </select>
+        <small style="color: #718096; font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+          Optional: Choose a staff member you'd prefer to handle this ticket. Admin will consider your preference during assignment.
+        </small>
+      </div>
+      <div>
+        <label>Description</label>
+        <textarea name="description" rows="4" placeholder="Describe your issue" required></textarea>
+      </div>
+      <div>
+        <label>Attachment (optional)</label>
+        <input type="file" name="attachment">
+      </div>
+      <div class="flex justify-end gap-3">
+        <button type="button" id="cancel-ticket-btn">Cancel</button>
+        <button type="submit">Submit</button>
+      </div>
+      <div id="ticket-feedback" class="feedback hidden"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= BOOK APPOINTMENT MODAL ================= -->
+<div id="appointment-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-appointment-btn">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Book an Appointment</h2>
+    <form id="appointment-form" class="space-y-4">
+      <div>
+        <label>Department</label>
+        <select id="department-select" name="department" required>
+          <option value="">Select Department</option>
+          <option value="IT Support">IT Support</option>
+          <option value="Academic Advisors">Academic Advisors</option>
+          <option value="Financial Aid">Financial Aid</option>
+          <option value="Registrar">Registrar</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div>
+        <label>Select Staff Member</label>
+        <select id="staff-select" name="assigned_staff" required disabled>
+          <option value="">First select a department</option>
+        </select>
+      </div>
+      <div>
+        <label>Subject/Purpose</label>
+        <input type="text" name="subject" placeholder="Brief description of your appointment purpose" required>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label>Preferred Date</label>
+          <input type="date" name="date" required min="">
+        </div>
+        <div>
+          <label>Preferred Time</label>
+          <select name="time_slot" required>
+            <option value="">Select Time Slot</option>
+            <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+            <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+            <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+            <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+            <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
+            <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+            <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+            <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Meeting Mode</label>
+        <select name="meeting_mode" required>
+          <option value="">Select Mode</option>
+          <option value="In-Person">In-Person</option>
+          <option value="Virtual (Zoom/Teams)">Virtual (Zoom/Teams)</option>
+          <option value="Phone Call">Phone Call</option>
+          <option value="No Preference">No Preference</option>
+        </select>
+      </div>
+      <div>
+        <label>Additional Notes (Optional)</label>
+        <textarea name="notes" rows="3" placeholder="Any special requirements or additional information"></textarea>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button type="button" id="cancel-appointment-btn">Cancel</button>
+        <button type="submit">Book Appointment</button>
+      </div>
+      <div id="appointment-feedback" class="feedback hidden"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= LIST OPEN TICKETS MODAL ================= -->
+<div id="tickets-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-tickets-modal">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Open Tickets</h2>
+    <div id="tickets-list">
+      <!-- Tickets will be dynamically injected here -->
+      <div class="card" style="margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;">
+        <strong>Subject: Sample Ticket</strong>
+        <div>Category: Technical • Priority: <span style="color: red;">High</span></div>
+        <div>Status: <span style="color: orange;">In Progress</span></div>
+        <div>Date Created: 2025-10-20</div>
+        <div>Last Updated: 2025-10-21 by Staff A</div>
+        <div>Assigned Staff: Staff A</div>
+        <hr>
+        <div>Description:</div>
+        <p>This is a sample ticket description.</p>
+        <hr>
+        <div>Attachment: <a href="#">Download</a></div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel Ticket</button>
+        </div>
+      </div>
+
+      <!-- Open Tickets Example -->
+      <div class="card" style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Subject:</strong> Cannot access library portal</div>
+        <div><strong>Category:</strong> Technical • <strong>Priority:</strong> <span style="color: red;">High</span></div>
+        <div><strong>Status:</strong> <span style="color: orange;">In Progress</span></div>
+        <div><strong>Created:</strong> 2025-10-20</div>
+        <div><strong>Last Updated:</strong> 2025-10-21 by Staff A</div>
+        <div><strong>Assigned Staff:</strong> Staff A</div>
+        <hr>
+        <div><strong>Description:</strong></div>
+        <p>When I try to log in, I get an error message: "Access denied".</p>
+        <hr>
+        <div><strong>Attachment:</strong> <a href="#">Download</a></div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel Ticket</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= UPCOMING APPOINTMENTS MODAL ================= -->
+<div id="appts-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="close-appts-modal">&times;</span>
+    <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Upcoming Appointments</h2>
+    <div id="appts-list">
+      <!-- Appointments will be injected here by JS -->
+      <div class="card" style="margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;">
+        <strong>Type: Academic Advising</strong>
+        <div>Date & Time: 2025-10-25 10:00 AM</div>
+        <div>Status: <span style="color: green;">Confirmed (In 3 days)</span></div>
+        <div>Location/Mode: In-Person (Room 101)</div>
+        <p>Notes: Bring all relevant documents.</p>
+        <button style="background: red; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Cancel Appointment</button>
+        <button style="background: orange; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+      </div>
+
+      <!-- Confirmed Appointment Example -->
+      <div class="card" style="border: 2px solid green; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Type:</strong> Academic Advising</div>
+        <div><strong>Date & Time:</strong> 2025-10-25 • 10:00 AM</div>
+        <div><strong>Status:</strong> <span style="color: green;">Confirmed (In 3 days)</span></div>
+        <div><strong>Location / Mode:</strong> Room 203, Admin Bldg</div>
+        <div><strong>Notes:</strong> Bring your course plan</div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+          <button style="background: orange; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+        </div>
+      </div>
+
+      <!-- Pending Appointment Example -->
+      <div class="card" style="border: 2px solid yellow; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div><strong>Type:</strong> Career Guidance</div>
+        <div><strong>Date & Time:</strong> 2025-10-27 • 2:00 PM</div>
+        <div><strong>Status:</strong> <span style="color: orange;">Confirmation Pending</span></div>
+        <div><strong>Location / Mode:</strong> To be assigned</div>
+        <div><strong>Notes:</strong> Optional prep info</div>
+        <div style="margin-top: 8px;">
+          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SURVEYS MODAL ================= -->
+<div id="surveys-modal" class="modal">
+  <div class="modal-content" style="max-width: 900px;">
+    <span class="close-btn" onclick="closeSurveysModal()">&times;</span>
+    <h2 style="color:#0067A5; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
+      <i class="fa-solid fa-clipboard-list"></i> Available Surveys
+    </h2>
+    
+    <div id="surveys-list" style="display:grid; gap:1rem;">
+      <!-- Surveys will be dynamically loaded here -->
+      <div style="text-align:center; padding:2rem; color:#718096;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i>
+        <p style="margin-top:1rem;">Loading surveys...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TAKE SURVEY MODAL ================= -->
+<div id="take-survey-modal" class="modal">
+  <div class="modal-content" style="max-width: 700px;">
+    <span class="close-btn" onclick="closeTakeSurveyModal()">&times;</span>
+    
+    <div id="survey-header" style="margin-bottom:1.5rem;">
+      <h2 id="survey-title" style="color:#0067A5; margin-bottom:0.5rem;"></h2>
+      <p id="survey-description" style="color:#4a5568; margin-bottom:1rem;"></p>
+      <div id="survey-progress" style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden; margin-bottom:1rem;">
+        <div id="progress-bar" style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); height:100%; width:0%; transition:width 0.3s;"></div>
+      </div>
+      <p id="progress-text" style="color:#718096; font-size:0.875rem;"></p>
+    </div>
+    
+    <form id="survey-form">
+      <div id="survey-questions">
+        <!-- Questions will be dynamically loaded here -->
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; margin-top:2rem; padding-top:1.5rem; border-top:2px solid #e2e8f0;">
+        <button type="button" id="prev-question-btn" style="background:#718096; color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; display:none;">
+          <i class="fa-solid fa-arrow-left"></i> Previous
+        </button>
+        <div style="flex:1;"></div>
+        <button type="button" id="next-question-btn" style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500;">
+          Next <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button type="submit" id="submit-survey-btn" style="background:#48bb78; color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; display:none;">
+          <i class="fa-solid fa-check"></i> Submit Survey
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<input type="hidden" id="student-email" value="tamucc1@tamucc.edu"> <!-- Dynamically set student email -->
+
+{% endblock %}
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="{{ url_for('static', path='js/student_home.js') }}"></script>
+{% endblock %}

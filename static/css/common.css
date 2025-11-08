@@ -121,3 +121,18 @@ nav .nav-links a:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
 }
+footer {
+  background: #001f33;
+  text-align: center;
+  padding: 2rem;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+footer a {
+  color: #00aeef;
+  text-decoration: none;
+  margin: 0 10px;
+}
+footer a:hover {
+  text-decoration: underline;
+}
