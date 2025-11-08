@@ -12,11 +12,13 @@ from app.routers import (
     pages,
     staff,
     students,
-    support,
+    support,   # support.py (tickets)
     surveys,
 )
+from app.routers.support import router as support_nested_router
 
-__all__: List[str] = [
+
+__all__ = [
     "auth",
     "chatbot",
     "diagnostics",
@@ -35,13 +37,14 @@ __all__: List[str] = [
 
 def register_routers(app: FastAPI) -> None:
     """Attach all routers in a clean, deterministic order."""
-    routers = [
+    routers: List = [
         diagnostics.router,
         live_chat.router,
         pages.router,
         auth.router,
         chatbot.router,
         support.router,
+        support_nested_router,
         students.router,
         staff.router,
         departments.router,

@@ -11,7 +11,14 @@ router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse)
 def landing(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
+    user = request.session.get("user")
+    return templates.TemplateResponse(
+        "home.html",
+        {
+            "request": request,
+            "user": user,
+        },
+    )
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -25,28 +32,55 @@ async def get_register(request: Request):
 
 
 @router.get("/student_home", response_class=HTMLResponse)
-async def student_dashboard(request: Request, user: dict = Depends(role_required("student"))):
-    return templates.TemplateResponse("student_home.html", {"request": request})
+async def student_dashboard(
+    request: Request,
+    user: dict = Depends(role_required("student")),
+):
+    return templates.TemplateResponse(
+        "student_home.html",
+        {
+            "request": request,
+            "user": user,
+        },
+    )
 
 
 @router.get("/staff_home", response_class=HTMLResponse)
-async def staff_dashboard(request: Request, user: dict = Depends(role_required("staff"))):
-    return templates.TemplateResponse("staff_home.html", {"request": request, "user": user})
+async def staff_dashboard(
+    request: Request,
+    user: dict = Depends(role_required("staff")),
+):
+    return templates.TemplateResponse(
+        "staff_home.html",
+        {"request": request, "user": user},
+    )
 
 
 @router.get("/admin_home", response_class=HTMLResponse)
-async def admin_dashboard(request: Request, user: dict = Depends(role_required("admin"))):
-    return templates.TemplateResponse("admin_home.html", {"request": request})
+async def admin_dashboard(
+    request: Request,
+    user: dict = Depends(role_required("admin")),
+):
+    return templates.TemplateResponse(
+        "admin_home.html",
+        {"request": request, "user": user},
+    )
+
+
+@router.get("/edit_profile", response_class=HTMLResponse)
+async def edit_profile(
+    request: Request,
+    user: dict = Depends(role_required("student")),
+):
+    return templates.TemplateResponse(
+        "edit_profile.html",
+        {"request": request, "user": user},
+    )
 
 
 @router.get("/knowledge_base", response_class=HTMLResponse)
 async def knowledge_base(request: Request, user: dict = Depends(role_required("admin"))):
     return templates.TemplateResponse("knowledge_base.html", {"request": request})
-
-
-@router.get("/edit_profile", response_class=HTMLResponse)
-async def edit_profile(request: Request, user: dict = Depends(role_required("student"))):
-    return templates.TemplateResponse("edit_profile.html", {"request": request})
 
 
 @router.get("/guest_home", response_class=HTMLResponse)

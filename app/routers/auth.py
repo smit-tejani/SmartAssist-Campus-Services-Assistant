@@ -6,10 +6,10 @@ import httpx
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import RedirectResponse
 
-from app.core.config import settings
-from app.core.oauth import oauth
-from app.core.templates import templates
-from app.db.mongo import users_collection
+from ..core.config import settings
+from ..core.oauth import oauth
+from ..core.templates import templates
+from ..db.mongo import users_collection
 
 router = APIRouter()
 
@@ -70,7 +70,8 @@ async def post_login(
         if role == "admin":
             return RedirectResponse("/admin_home", status_code=302)
     return templates.TemplateResponse(
-        "login.html", {"request": request, "error": "Invalid credentials or role!"}
+        "login.html", {"request": request,
+                       "error": "Invalid credentials or role!"}
     )
 
 

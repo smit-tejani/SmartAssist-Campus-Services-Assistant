@@ -1,3 +1,3 @@
-from .main import app, create_app
-
-__all__ = ["app", "create_app"]
+# app/__init__.py
+# Keep this file minimal to avoid circular imports.
+# Do NOT import `main` or `app` here.
