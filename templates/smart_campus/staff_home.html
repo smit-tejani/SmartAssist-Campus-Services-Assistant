@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAssist | Staff Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<style>
+  /* ==================== RESET & BASE ==================== */
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+  }
+  
+  body { 
+    background: #f5f7fa;
+    color: #2d3748;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ==================== NAVBAR ==================== */
+  nav { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 1rem 2.5rem; 
+    background: #0067A5; 
+    color: #fff; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  nav h1 { 
+    font-size: 1.4rem; 
+    font-weight: 600; 
+    color: #ffffff;
+  }
+  
+  nav .nav-links {
+    display: flex;
+    gap: 0;
+  }
+  
+  nav .nav-links a { 
+    color: #ffffff; 
+    text-decoration: none; 
+    margin-left: 1.5rem; 
+    font-weight: 500; 
+    transition: color 0.2s;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+  }
+  
+  nav .nav-links a:hover { 
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* ==================== CONTAINER & LAYOUT ==================== */
+  .content { 
+    flex: 1; 
+    padding: 2.5rem 3rem; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ==================== HERO SECTION ==================== */
+  .hero { 
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color: #ffffff; 
+    padding: 3rem 2.5rem; 
+    border-radius: 16px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    margin-bottom: 1rem;
+  }
+  
+  .hero h2 { 
+    font-size: 2rem; 
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .hero p { 
+    font-size: 1.05rem; 
+    opacity: 0.95;
+    max-width: 600px;
+  }
+  
+  .hero .staff-name { 
+    font-size: 1.1rem; 
+    font-weight: 600; 
+    margin-top: 0.5rem; 
+    opacity: 0.95;
+  }
+
+  /* ==================== STATS WIDGETS ==================== */
+  .stats { 
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .stat {
+    background: #ffffff;
+    padding: 1.5rem 1.75rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .stat:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 103, 165, 0.15);
+    border-color: #0067A5;
+  }
+  
+  .stat .number { 
+    font-size: 2rem; 
+    font-weight: 700; 
+    color: #0067A5;
+    line-height: 1;
+  }
+  
+  .stat .label { 
+    font-size: 0.875rem; 
+    color: #718096;
+    font-weight: 500;
+    margin-top: 0.25rem;
+  }
+  
+  .stat i {
+    font-size: 2.5rem;
+    color: #0067A5;
+    opacity: 0.15;
+  }
+
+  /* ==================== SECTION HEADERS ==================== */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .section-header h3 {
+    font-size: 1.25rem;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .section-header h3 i { 
+    color: #0067A5; 
+  }
+
+  /* ==================== TABLE CONTAINER ==================== */
+  .table-container { 
+    background: #ffffff; 
+    border-radius: 12px; 
+    padding: 1.75rem; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow-x: auto;
+  }
+  
+  table { 
+    width: 100%; 
+    border-collapse: collapse; 
+  }
+  
+  th, td { 
+    padding: 1rem; 
+    text-align: left; 
+  }
+  
+  th { 
+    background: #f7fafc;
+    color: #2d3748;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  tr { 
+    border-bottom: 1px solid #f0f0f0; 
+    transition: 0.2s; 
+  }
+  
+  tbody tr:hover { 
+    background: #f7fafc; 
+  }
+  
+  td { 
+    font-size: 0.9rem; 
+    color: #4a5568; 
+  }
+
+  /* ==================== STATUS & PRIORITY BADGES ==================== */
+  .status-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+  
+  .status-open { 
+    background: #e3f2fd; 
+    color: #1976d2; 
+  }
+  
+  .status-in-progress { 
+    background: #fff3e0; 
+    color: #f57c00; 
+  }
+  
+  .status-resolved { 
+    background: #e8f5e9; 
+    color: #388e3c; 
+  }
+  
+  .status-pending { 
+    background: #fff9c4; 
+    color: #f9a825; 
+  }
+  
+  .status-confirmed { 
+    background: #e8f5e9; 
+    color: #388e3c; 
+  }
+
+  /* Priority Badges */
+  .priority-high { 
+    background: #ffebee; 
+    color: #c62828; 
+  }
+  
+  .priority-medium { 
+    background: #fff3e0; 
+    color: #f57c00; 
+  }
+  
+  .priority-low { 
+    background: #e3f2fd; 
+    color: #1976d2; 
+  }
+  .priority-low { 
+    background: #e3f2fd; 
+    color: #1976d2; 
+  }
+
+  /* ==================== BUTTONS ==================== */
+  .btn { 
+    padding: 0.5rem 1rem; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 0.875rem; 
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-view { 
+    background: #0067A5; 
+    color: #fff; 
+  }
+  
+  .btn-view:hover { 
+    background: #004c7a; 
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 103, 165, 0.2);
+  }
+  
+  .btn-respond { 
+    background: #00A99D; 
+    color: #fff; 
+  }
+  
+  .btn-respond:hover { 
+    background: #008577; 
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 169, 157, 0.2);
+  }
+  
+  .btn-resolve { 
+    background: #4caf50; 
+    color: #fff; 
+  }
+  
+  .btn-resolve:hover { 
+    background: #388e3c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+  }
+  
+  .btn-close { 
+    background: #f44336; 
+    color: #fff; 
+  }
+  
+  .btn-close:hover { 
+    background: #c62828;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.2);
+  }
+
+  /* ==================== MODAL ==================== */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s;
+  }
+  
+  @keyframes fadeIn { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+  }
+  
+  .modal-content {
+    background: #fff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideUp 0.3s;
+  }
+  
+  @keyframes slideUp { 
+    from { transform: translateY(50px); opacity: 0; } 
+    to { transform: translateY(0); opacity: 1; } 
+  }
+  
+  .modal-header {
+    background: #0067A5;
+    color: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h3 { 
+    font-size: 1.25rem; 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .close-modal {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+  }
+  
+  .close-modal:hover { 
+    background: rgba(255,255,255,0.3); 
+    transform: rotate(90deg); 
+  }
+  
+  .modal-body { 
+    padding: 2rem; 
+  }
+  
+  .detail-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .detail-row:last-child { 
+    border-bottom: none; 
+  }
+  
+  .detail-label { 
+    font-weight: 600; 
+    color: #2d3748; 
+  }
+  
+  .detail-value { 
+    color: #4a5568; 
+  }
+  
+  .modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    background: #f7fafc;
+    border-radius: 0 0 12px 12px;
+  }
+
+  /* ==================== FORM ELEMENTS ==================== */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.875rem;
+  }
+  
+  .form-group textarea,
+  .form-group select,
+  .form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    transition: 0.2s;
+    color: #2d3748;
+  }
+  
+  .form-group textarea:focus,
+  .form-group select:focus,
+  .form-group input:focus {
+    outline: none;
+    border-color: #0067A5;
+    box-shadow: 0 0 0 3px rgba(0,103,165,0.1);
+  }
+  
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  /* ==================== EMPTY STATE ==================== */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #a0aec0;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    color: #cbd5e0;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-state p {
+    font-size: 1rem;
+    color: #718096;
+  }
+
+  /* ==================== TABS ==================== */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  .tab {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #718096;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .tab.active {
+    color: #0067A5;
+    border-bottom-color: #0067A5;
+  }
+  
+  .tab:hover {
+    color: #0067A5;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+
+  .logout-btn {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: 0.3s;
+  }
+  
+  .logout-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(0) !important;
+  }
+
+  /* ==================== RESPONSIVE ==================== */
+  @media(max-width:768px){
+    .content {
+      padding: 1.5rem;
+    }
+    
+    .stats { 
+      grid-template-columns: 1fr; 
+    }
+    
+    .detail-row { 
+      grid-template-columns: 1fr; 
+      gap: 0.25rem; 
+    }
+    
+    table { 
+      font-size: 0.8rem; 
+    }
+    
+    th, td { 
+      padding: 0.5rem; 
+    }
+    
+    nav {
+      padding: 1rem;
+    }
+    
+    .hero {
+      padding: 2rem 1.5rem;
+    }
+  }
+
+  /* ==================== NOTIFICATION BELL ==================== */
+  .notification-bell {
+    position: relative;
+    margin-right: 1.5rem;
+    display: inline-block;
+  }
+
+  .notification-bell-icon {
+    font-size: 1.5rem;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .notification-bell-icon:hover {
+    color: #00A99D;
+    transform: scale(1.1);
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e53e3e;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
+    border: 2px solid #0067A5;
+  }
+
+  .notification-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1001;
+    width: 380px;
+    max-height: 500px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .notification-dropdown.show {
+    display: block;
+  }
+
+  .notification-header {
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mark-all-read {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .mark-all-read:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .notification-item {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .notification-item:hover {
+    background: #f7fafc;
+  }
+
+  .notification-item.unread {
+    background: #ebf8ff;
+    border-left: 4px solid #0067A5;
+  }
+
+  .notification-item.unread:hover {
+    background: #bee3f8;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+  }
+
+  .notification-message {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+  }
+
+  .notification-time {
+    font-size: 0.75rem;
+    color: #a0aec0;
+  }
+
+  .notification-priority-high {
+    border-left-color: #e53e3e !important;
+  }
+
+  .notification-priority-urgent {
+    border-left-color: #dd6b20 !important;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .notification-empty {
+    padding: 2rem;
+    text-align: center;
+    color: #a0aec0;
+  }
+
+  .notification-empty i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .notification-footer {
+    padding: 0.75rem 1.25rem;
+    background: #f7fafc;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .notification-footer a {
+    color: #0067A5;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .notification-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .delete-notification {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: #a0aec0;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .delete-notification:hover {
+    background: #e53e3e;
+    color: #ffffff;
+  }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <img src="{{ url_for('static', path='assets/images/logo.png') }}"
+      alt="SmartAssist Logo"
+      style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
+      <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">TAMUCC Campus Assistant</p>
+    </div>
+  </div>
+  <div class="nav-links">
+    <!-- Notification Bell -->
+    <div class="notification-bell">
+      <i class="fa-solid fa-bell notification-bell-icon" id="notification-icon"></i>
+      <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+      
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="notification-header">
+          <span>Notifications</span>
+          <span class="mark-all-read" onclick="markAllAsRead()">Mark all read</span>
+        </div>
+        <div class="notification-list" id="notification-list">
+          <div class="notification-empty">
+            <i class="fa-solid fa-bell-slash"></i>
+            <p>No notifications</p>
+          </div>
+        </div>
+        <div class="notification-footer">
+          <a href="#" onclick="showAllNotifications(); return false;">View All Notifications</a>
+        </div>
+      </div>
+    </div>
+    
+    <a href="/logout" class="logout-btn">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      Logout
+    </a>
+  </div>
+</nav>
+
+<!-- Content -->
+<div class="content">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div>
+      <h2>Welcome, <span id="staffName">{{ user['full_name'] if user.get('full_name') else 'Staff' }}</span> 👋</h2>
+      <p>Manage your assigned tickets and appointments efficiently.</p>
+      <p class="staff-name" id="staffEmail">{{ user['email'] if user.get('email') else '' }}</p>
+    </div>
+  </div>
+
+  <!-- Events Section -->
+  <div id="staff-events-section" style="margin-bottom: 1.5rem;">
+    <!-- Events will be dynamically populated here -->
+  </div>
+
+  <!-- Appointment Reminders -->
+  <div id="appointment-reminders" style="margin-bottom: 1.5rem;">
+    <!-- Reminders will be dynamically populated here -->
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div>
+        <div class="number" id="statPendingTickets">0</div>
+        <div class="label">My Tickets</div>
+      </div>
+      <i class="fa-solid fa-ticket"></i>
+    </div>
+    <div class="stat">
+      <div>
+        <div class="number" id="statUpcomingAppointments">0</div>
+        <div class="label">My Appointments</div>
+      </div>
+      <i class="fa-solid fa-calendar-check"></i>
+    </div>
+    <div class="stat">
+      <div>
+        <div class="number" id="statResolvedToday">0</div>
+        <div class="label">Resolved Today</div>
+      </div>
+      <i class="fa-solid fa-check-circle"></i>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('tickets')">
+      <i class="fa-solid fa-ticket"></i> My Tickets
+    </button>
+    <button class="tab" onclick="showTab('appointments')">
+      <i class="fa-solid fa-calendar"></i> My Appointments
+    </button>
+  </div>
+
+  <!-- Tickets Tab -->
+  <div id="ticketsTab" class="tab-content active">
+    <div class="table-container">
+      <div class="section-header">
+        <h3><i class="fa-solid fa-inbox"></i> Assigned Tickets</h3>
+      </div>
+      <table id="ticketsTable">
+        <thead>
+          <tr>
+            <th>Ticket ID</th>
+            <th>Student</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ticketsTableBody">
+          <tr>
+            <td colspan="7" class="empty-state">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <p>Loading tickets...</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Appointments Tab -->
+  <div id="appointmentsTab" class="tab-content">
+    <div class="table-container">
+      <div class="section-header">
+        <h3><i class="fa-solid fa-calendar-days"></i> My Appointments</h3>
+      </div>
+      <table id="appointmentsTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Student</th>
+            <th>Department</th>
+            <th>Mode</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="appointmentsTableBody">
+          <tr>
+            <td colspan="7" class="empty-state">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <p>Loading appointments...</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Ticket Details Modal -->
+<div id="ticketModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-ticket"></i> Ticket Details</h3>
+      <button class="close-modal" onclick="closeTicketModal()">×</button>
+    </div>
+    <div class="modal-body" id="ticketModalBody">
+      <!-- Populated dynamically -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-close" onclick="closeTicketModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Appointment Details Modal (Two-Column Editable) -->
+<div id="appointmentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; padding:1rem;">
+  <div style="background:#fff; border-radius:12px; width:900px; max-width:95%; max-height:90vh; overflow:hidden; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.3); display:flex; flex-direction:column;">
+    <button class="close-modal" onclick="closeAppointmentModal()" style="position:absolute; top:1.5rem; right:1.5rem; z-index:10;">×</button>
+    
+    <!-- Modal Header -->
+    <div style="background:#0067A5; padding:2rem; color:#fff; flex-shrink:0;">
+      <h3 style="margin:0; font-size:1.5rem; font-weight:600;">
+        <i class="fa-solid fa-calendar-check"></i> Appointment Details
+      </h3>
+      <p style="margin:0.5rem 0 0 0; opacity:0.9; font-size:0.95rem;">Review and update appointment details</p>
+    </div>
+    
+    <!-- Two Column Layout (Scrollable) -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; overflow-y:auto; flex:1;">
+      
+      <!-- Left Column - Student Request Info (Read-only) -->
+      <div style="padding:2rem; background:#f7fafc; border-right:1px solid #e2e8f0;">
+        <h4 style="color:#0067A5; margin:0 0 1.5rem 0; font-size:1.1rem; font-weight:600; display:flex; align-items:center; gap:0.5rem;">
+          <i class="fa-solid fa-user-circle"></i> Student Information
+        </h4>
+        
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Student Name</label>
+            <div id="appt-student" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; font-weight:500;"></div>
+          </div>
+          
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Email</label>
+            <div id="appt-email" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; font-weight:500;"></div>
+          </div>
+          
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Department</label>
+            <div id="appt-department" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; font-weight:500;"></div>
+          </div>
+          
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Purpose</label>
+            <div id="appt-purpose" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; min-height:80px; max-height:120px; overflow-y:auto; white-space:pre-wrap;"></div>
+          </div>
+
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.25rem; font-weight:600;">Status</label>
+            <div id="appt-status-display" style="padding:0.75rem; background:#fff; border:1px solid #e2e8f0; border-radius:8px; color:#2d3748; font-weight:500;"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column - Staff Modifiable Fields -->
+      <div style="padding:2rem; background:#fff;">
+        <h4 style="color:#00A99D; margin:0 0 1.5rem 0; font-size:1.1rem; font-weight:600; display:flex; align-items:center; gap:0.5rem;">
+          <i class="fa-solid fa-pen-to-square"></i> Schedule Details
+        </h4>
+        
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+              <i class="fa-solid fa-calendar"></i> Date
+            </label>
+            <input type="date" id="appt-date" style="padding:0.75rem; border:2px solid #cbd5e0; border-radius:8px; width:100%; font-size:1rem; transition:border-color 0.2s;" onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#cbd5e0'">
+          </div>
+          
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+              <i class="fa-solid fa-clock"></i> Time Slot
+            </label>
+            <select id="appt-time-slot" style="padding:0.75rem; border:2px solid #cbd5e0; border-radius:8px; width:100%; font-size:1rem; transition:border-color 0.2s; background:#fff;" onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#cbd5e0'">
+              <option value="9:00 AM - 10:00 AM">9:00 AM - 10:00 AM</option>
+              <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+              <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+              <option value="12:00 PM - 1:00 PM">12:00 PM - 1:00 PM</option>
+              <option value="1:00 PM - 2:00 PM">1:00 PM - 2:00 PM</option>
+              <option value="2:00 PM - 3:00 PM">2:00 PM - 3:00 PM</option>
+              <option value="3:00 PM - 4:00 PM">3:00 PM - 4:00 PM</option>
+              <option value="4:00 PM - 5:00 PM">4:00 PM - 5:00 PM</option>
+            </select>
+          </div>
+          
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+              <i class="fa-solid fa-video"></i> Meeting Mode
+            </label>
+            <select id="appt-meeting-mode" style="padding:0.75rem; border:2px solid #cbd5e0; border-radius:8px; width:100%; font-size:1rem; transition:border-color 0.2s; background:#fff;" onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#cbd5e0'">
+              <option value="In-Person">In-Person</option>
+              <option value="Virtual">Virtual (Zoom/Teams)</option>
+              <option value="No Preference">No Preference</option>
+            </select>
+          </div>
+          
+          <div>
+            <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#718096; margin-bottom:0.5rem; font-weight:600;">
+              <i class="fa-solid fa-location-dot"></i> Location / Meeting Link
+            </label>
+            <input type="text" id="appt-location" placeholder="e.g., Room 205 or Zoom link" style="padding:0.75rem; border:2px solid #cbd5e0; border-radius:8px; width:100%; font-size:1rem; transition:border-color 0.2s;" onfocus="this.style.borderColor='#0067A5'" onblur="this.style.borderColor='#cbd5e0'">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal Footer (Fixed at bottom) -->
+    <div style="padding:1.5rem 2rem; background:#f7fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; gap:1rem; flex-shrink:0;">
+      <button class="btn btn-close" onclick="closeAppointmentModal()">Cancel</button>
+      <div style="display:flex; gap:1rem;">
+        <button id="update-appointment-btn" class="btn btn-respond" onclick="updateAppointmentDetails()">
+          <i class="fa-solid fa-save"></i> Update Details
+        </button>
+        <button id="confirm-appointment-btn" class="btn btn-resolve" onclick="confirmAppointment()" style="display:none;">
+          <i class="fa-solid fa-check-circle"></i> Confirm Appointment
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ======================================================================================
+  //                              NOTIFICATION SYSTEM
+  // ======================================================================================
+  
+  // Fetch and display notifications
+  async function loadNotifications() {
+    try {
+      const response = await fetch('/api/notifications?limit=10');
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      
+      const notifications = await response.json();
+      const notificationList = document.getElementById('notification-list');
+      const notificationCount = document.getElementById('notification-count');
+      
+      if (notifications.length === 0) {
+        notificationList.innerHTML = `
+          <div class="notification-empty">
+            <i class="fa-solid fa-bell-slash"></i>
+            <p>No notifications</p>
+          </div>
+        `;
+        notificationCount.style.display = 'none';
+        return;
+      }
+      
+      // Count unread
+      const unreadCount = notifications.filter(n => n.status === 'unread').length;
+      if (unreadCount > 0) {
+        notificationCount.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        notificationCount.style.display = 'block';
+      } else {
+        notificationCount.style.display = 'none';
+      }
+      
+      // Render notifications
+      notificationList.innerHTML = notifications.map(notif => `
+        <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''} ${notif.priority === 'high' ? 'notification-priority-high' : ''} ${notif.priority === 'urgent' ? 'notification-priority-urgent' : ''}"
+             onclick="markAsRead('${notif._id}', '${notif.link || '#'}')">
+          <div class="notification-title">${notif.title || 'Notification'}</div>
+          <div class="notification-message">${notif.message || ''}</div>
+          <div class="notification-time">${formatNotificationTime(notif.created_at)}</div>
+          <button class="delete-notification" onclick="deleteNotification(event, '${notif._id}')">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+      `).join('');
+      
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
+  }
+  
+  // Format notification time
+  function formatNotificationTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
+  }
+  
+  // Mark notification as read
+  async function markAsRead(notificationId, link) {
+    try {
+      await fetch(`/api/notifications/${notificationId}/read`, {
+        method: 'PUT'
+      });
+      
+      await loadNotifications();
+      
+      if (link && link !== '#') {
+        window.location.href = link;
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  }
+  
+  // Delete notification
+  async function deleteNotification(event, notificationId) {
+    event.stopPropagation();
+    
+    try {
+      await fetch(`/api/notifications/${notificationId}`, {
+        method: 'DELETE'
+      });
+      
+      await loadNotifications();
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  }
+  
+  // Mark all as read
+  async function markAllAsRead() {
+    try {
+      const response = await fetch('/api/notifications/mark-all-read', {
+        method: 'PUT'
+      });
+      
+      if (!response.ok) throw new Error('Failed to mark all as read');
+      
+      const result = await response.json();
+      console.log(`Marked ${result.count} notifications as read`);
+      
+      await loadNotifications();
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+    }
+  }
+  
+  // Show all notifications
+  function showAllNotifications() {
+    alert('View All Notifications feature coming soon!');
+  }
+  
+  // Toggle notification dropdown
+  const notificationIcon = document.getElementById('notification-icon');
+  const notificationDropdown = document.getElementById('notification-dropdown');
+  
+  notificationIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle('show');
+    
+    if (notificationDropdown.classList.contains('show')) {
+      loadNotifications();
+    }
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!notificationDropdown.contains(e.target) && e.target !== notificationIcon) {
+      notificationDropdown.classList.remove('show');
+    }
+  });
+  
+  // Poll for new notifications every 30 seconds
+  setInterval(async () => {
+    const response = await fetch('/api/notifications/unread/count');
+    if (response.ok) {
+      const data = await response.json();
+      const notificationCount = document.getElementById('notification-count');
+      if (data.count > 0) {
+        notificationCount.textContent = data.count > 99 ? '99+' : data.count;
+        notificationCount.style.display = 'block';
+      } else {
+        notificationCount.style.display = 'none';
+      }
+    }
+  }, 30000);
+  
+  // Initial load
+  loadNotifications();
+  
+  // ======================================================================================
+  //                              EXISTING STAFF CODE
+  // ======================================================================================
+  
+  let currentStaffEmail = '{{ user["email"] if user.get("email") else "" }}';
+  let allTickets = [];
+  let allAppointments = [];
+
+  // Initialize
+  window.addEventListener('DOMContentLoaded', async () => {
+    await loadStaffAppointmentReminders();
+    await loadTickets();
+    await loadAppointments();
+  });
+
+  // Load tickets assigned to this staff member
+  async function loadTickets() {
+    try {
+      const res = await fetch('/api/tickets');
+      const data = await res.json();
+      
+      // Filter tickets assigned to current staff and exclude Resolved/Cancelled
+      allTickets = data.tickets.filter(ticket => 
+        (ticket.assigned_staff === currentStaffEmail || 
+        ticket.preferred_staff === currentStaffEmail) &&
+        ticket.status !== 'Resolved' &&
+        ticket.status !== 'Cancelled' &&
+        ticket.status !== 'resolved' &&
+        ticket.status !== 'cancelled'
+      );
+
+      renderTickets();
+      updateStats();
+    } catch (error) {
+      console.error('Error loading tickets:', error);
+      showError('Failed to load tickets');
+    }
+  }
+
+  // Render tickets table
+  function renderTickets() {
+    const tbody = document.getElementById('ticketsTableBody');
+    
+    if (allTickets.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty-state">
+            <i class="fa-solid fa-inbox"></i>
+            <p>No tickets assigned to you yet</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = allTickets.map(ticket => {
+      const statusClass = ticket.status.toLowerCase().replace(' ', '-');
+      const priorityClass = `priority-${ticket.priority?.toLowerCase() || 'medium'}`;
+      
+      return `
+        <tr>
+          <td><strong>#${ticket._id.slice(-6)}</strong></td>
+          <td>${ticket.student_name || 'Unknown'}</td>
+          <td>${ticket.category || 'N/A'}</td>
+          <td><span class="status-badge ${priorityClass}">${ticket.priority || 'Medium'}</span></td>
+          <td><span class="status-badge status-${statusClass}">${ticket.status}</span></td>
+          <td>${new Date(ticket.date_created).toLocaleDateString()}</td>
+          <td>
+            <button class="btn btn-view" onclick="viewTicket('${ticket._id}')">
+              <i class="fa-solid fa-eye"></i> View
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Load appointments assigned to this staff member
+  async function loadAppointments() {
+    try {
+      const res = await fetch('/api/appointments');
+      const data = await res.json();
+      
+      // Filter appointments assigned to current staff and exclude Cancelled
+      allAppointments = data.appointments.filter(appointment => 
+        appointment.assigned_staff === currentStaffEmail &&
+        appointment.status !== 'Cancelled' &&
+        appointment.status !== 'cancelled'
+      );
+
+      renderAppointments();
+      updateStats();
+    } catch (error) {
+      console.error('Error loading appointments:', error);
+      showError('Failed to load appointments');
+    }
+  }
+
+  // Render appointments table
+  function renderAppointments() {
+    const tbody = document.getElementById('appointmentsTableBody');
+    
+    if (allAppointments.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty-state">
+            <i class="fa-solid fa-calendar"></i>
+            <p>No appointments assigned to you yet</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = allAppointments.map(appointment => {
+      const statusClass = appointment.status.toLowerCase().replace(' ', '-');
+      
+      return `
+        <tr>
+          <td>${new Date(appointment.date).toLocaleDateString()}</td>
+          <td>${appointment.time_slot || 'N/A'}</td>
+          <td>${appointment.student_name || appointment.student_email}</td>
+          <td>${appointment.department || 'N/A'}</td>
+          <td>${appointment.meeting_mode || 'N/A'}</td>
+          <td><span class="status-badge status-${statusClass}">${appointment.status}</span></td>
+          <td>
+            <button class="btn btn-view" onclick="viewAppointment('${appointment._id}')">
+              <i class="fa-solid fa-eye"></i> View
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Update statistics
+  function updateStats() {
+    const pendingTickets = allTickets.filter(t => 
+      t.status === 'Open' || t.status === 'In Progress'
+    ).length;
+    
+    const upcomingAppointments = allAppointments.filter(a => 
+      a.status === 'Confirmed' && new Date(a.date) >= new Date()
+    ).length;
+    
+    const resolvedToday = allTickets.filter(t => {
+      const today = new Date().toDateString();
+      const updatedDate = new Date(t.last_updated).toDateString();
+      return t.status === 'Resolved' && updatedDate === today;
+    }).length;
+
+    document.getElementById('statPendingTickets').textContent = pendingTickets;
+    document.getElementById('statUpcomingAppointments').textContent = upcomingAppointments;
+    document.getElementById('statResolvedToday').textContent = resolvedToday;
+  }
+
+  // Load appointment reminders for staff
+  async function loadStaffAppointmentReminders() {
+    try {
+      const res = await fetch('/api/appointments');
+      if (!res.ok) return;
+      
+      const data = await res.json();
+      const appointments = data.appointments || [];
+      
+      const reminderContainer = document.getElementById('appointment-reminders');
+      reminderContainer.innerHTML = '';
+      
+      // Get today's date
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Filter confirmed appointments assigned to this staff with date >= today (exclude Cancelled)
+      const upcomingAppointments = appointments.filter(app => {
+        if (app.status !== 'Confirmed' || app.assigned_staff !== currentStaffEmail) return false;
+        if (app.status === 'Cancelled' || app.status === 'cancelled') return false;
+        const appDate = new Date(app.date);
+        appDate.setHours(0, 0, 0, 0);
+        return appDate >= today;
+      });
+      
+      // Sort by date ascending
+      upcomingAppointments.sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      if (upcomingAppointments.length === 0) {
+        // No upcoming appointments - show a friendly message
+        reminderContainer.innerHTML = `
+          <div style="background:linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); padding:1rem 1.5rem; border-radius:12px; border-left:4px solid #cbd5e0; display:flex; align-items:center; gap:1rem;">
+            <i class="fa-solid fa-calendar-check" style="font-size:1.5rem; color:#a0aec0;"></i>
+            <div style="color:#718096; font-size:0.95rem;">
+              No upcoming confirmed appointments
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Show reminders for upcoming appointments (max 3)
+      const remindersToShow = upcomingAppointments.slice(0, 3);
+      
+      remindersToShow.forEach(app => {
+        const appDate = new Date(app.date);
+        appDate.setHours(0, 0, 0, 0);
+        
+        // Calculate days difference
+        const diffTime = appDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Determine message and styling based on days left
+        let message, bgGradient, borderColor, iconColor, icon;
+        
+        if (diffDays === 0) {
+          message = `Today with <strong>${app.student_name}</strong>`;
+          bgGradient = 'linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%)';
+          borderColor = '#fc8181';
+          iconColor = '#e53e3e';
+          icon = 'fa-bell';
+        } else if (diffDays === 1) {
+          message = `Tomorrow with <strong>${app.student_name}</strong>`;
+          bgGradient = 'linear-gradient(135deg, #fffaf0 0%, #feebc8 100%)';
+          borderColor = '#f6ad55';
+          iconColor = '#dd6b20';
+          icon = 'fa-clock';
+        } else if (diffDays <= 7) {
+          message = `In ${diffDays} days with <strong>${app.student_name}</strong>`;
+          bgGradient = 'linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%)';
+          borderColor = '#4fd1c5';
+          iconColor = '#319795';
+          icon = 'fa-calendar-day';
+        } else {
+          message = `In ${diffDays} days with <strong>${app.student_name}</strong>`;
+          bgGradient = 'linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%)';
+          borderColor = '#63b3ed';
+          iconColor = '#3182ce';
+          icon = 'fa-calendar';
+        }
+        
+        // Get meeting mode display
+        const meetingMode = app.meeting_mode === 'In-Person' ? 'in person' : 'virtual';
+        const meetingIcon = app.meeting_mode === 'In-Person' ? 'fa-user-group' : 'fa-video';
+        
+        // Format time
+        const timeSlot = app.time_slot || 'Time TBD';
+        
+        const reminderCard = document.createElement('div');
+        reminderCard.style.cssText = `
+          background:${bgGradient};
+          padding:1rem 1.5rem;
+          border-radius:12px;
+          border-left:4px solid ${borderColor};
+          display:flex;
+          align-items:center;
+          gap:1rem;
+          margin-bottom:0.75rem;
+          box-shadow:0 2px 8px rgba(0,0,0,0.08);
+          transition:all 0.2s;
+        `;
+        
+        reminderCard.onmouseover = () => {
+          reminderCard.style.transform = 'translateY(-2px)';
+          reminderCard.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)';
+        };
+        
+        reminderCard.onmouseout = () => {
+          reminderCard.style.transform = 'translateY(0)';
+          reminderCard.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+        };
+        
+        reminderCard.innerHTML = `
+          <i class="fa-solid ${icon}" style="font-size:1.8rem; color:${iconColor};"></i>
+          <div style="flex:1;">
+            <div style="color:#2d3748; font-size:1rem; font-weight:600; margin-bottom:0.25rem;">
+              <i class="fa-solid fa-calendar-check" style="color:${iconColor}; font-size:0.9rem;"></i>
+              Appointment ${message}
+            </div>
+            <div style="color:#4a5568; font-size:0.875rem; display:flex; gap:1rem; flex-wrap:wrap;">
+              <span><i class="fa-solid ${meetingIcon}" style="color:${iconColor};"></i> ${meetingMode}</span>
+              <span><i class="fa-solid fa-clock" style="color:${iconColor};"></i> ${timeSlot}</span>
+              <span><i class="fa-solid fa-building" style="color:${iconColor};"></i> ${app.department}</span>
+            </div>
+          </div>
+          <button onclick="viewAppointment('${app._id}')" 
+                  style="background:white; color:${iconColor}; border:2px solid ${borderColor}; padding:0.5rem 1rem; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.875rem; transition:all 0.2s; white-space:nowrap;"
+                  onmouseover="this.style.background='${iconColor}'; this.style.color='white'"
+                  onmouseout="this.style.background='white'; this.style.color='${iconColor}'">
+            <i class="fa-solid fa-eye"></i> View
+          </button>
+        `;
+        
+        reminderContainer.appendChild(reminderCard);
+      });
+      
+    } catch (err) {
+      console.error('Error loading appointment reminders:', err);
+    }
+  }
+
+  // View ticket details
+  async function viewTicket(ticketId) {
+    try {
+      const res = await fetch(`/api/tickets/${ticketId}`);
+      const ticket = await res.json();
+      
+      const modalBody = document.getElementById('ticketModalBody');
+      modalBody.innerHTML = `
+        <div class="detail-row">
+          <div class="detail-label">Ticket ID:</div>
+          <div class="detail-value"><strong>#${ticket._id.slice(-6)}</strong></div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Student Name:</div>
+          <div class="detail-value">${ticket.student_name || 'Unknown'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Student Email:</div>
+          <div class="detail-value">${ticket.student_email || 'N/A'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Category:</div>
+          <div class="detail-value">${ticket.category || 'N/A'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Priority:</div>
+          <div class="detail-value"><span class="status-badge priority-${ticket.priority?.toLowerCase() || 'medium'}">${ticket.priority || 'Medium'}</span></div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Status:</div>
+          <div class="detail-value"><span class="status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}">${ticket.status}</span></div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Description:</div>
+          <div class="detail-value">${ticket.description || 'No description provided'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Created:</div>
+          <div class="detail-value">${new Date(ticket.date_created).toLocaleString()}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Last Updated:</div>
+          <div class="detail-value">${new Date(ticket.last_updated).toLocaleString()}</div>
+        </div>
+        ${ticket.attachment_id ? `
+        <div class="detail-row">
+          <div class="detail-label">Attachment:</div>
+          <div class="detail-value">
+            <a href="/api/tickets/${ticket._id}/attachment" target="_blank" style="color: #0067A5;">
+              <i class="fa-solid fa-paperclip"></i> View Attachment
+            </a>
+          </div>
+        </div>
+        ` : ''}
+        
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label>Update Status:</label>
+          <select id="ticketStatus" class="form-control">
+            <option value="Open" ${ticket.status === 'Open' ? 'selected' : ''}>Open</option>
+            <option value="In Progress" ${ticket.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+            <option value="Resolved" ${ticket.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+            <option value="Closed" ${ticket.status === 'Closed' ? 'selected' : ''}>Closed</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Add Response/Note:</label>
+          <textarea id="ticketResponse" placeholder="Enter your response or notes..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button class="btn btn-respond" onclick="updateTicket('${ticket._id}')">
+            <i class="fa-solid fa-save"></i> Update Ticket
+          </button>
+          ${ticket.status !== 'Resolved' ? `
+          <button class="btn btn-resolve" onclick="resolveTicket('${ticket._id}')">
+            <i class="fa-solid fa-check"></i> Mark as Resolved
+          </button>
+          ` : ''}
+        </div>
+      `;
+      
+      document.getElementById('ticketModal').style.display = 'flex';
+    } catch (error) {
+      console.error('Error loading ticket:', error);
+      showError('Failed to load ticket details');
+    }
+  }
+
+  // Update ticket
+  async function updateTicket(ticketId) {
+    const status = document.getElementById('ticketStatus').value;
+    const response = document.getElementById('ticketResponse').value;
+    
+    try {
+      const res = await fetch(`/api/tickets/${ticketId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: status,
+          response: response,
+          last_updated: new Date().toISOString()
+        })
+      });
+      
+      if (res.ok) {
+        showSuccess('Ticket updated successfully!');
+        closeTicketModal();
+        await loadTickets();
+      } else {
+        showError('Failed to update ticket');
+      }
+    } catch (error) {
+      console.error('Error updating ticket:', error);
+      showError('Failed to update ticket');
+    }
+  }
+
+  // Resolve ticket
+  async function resolveTicket(ticketId) {
+    if (!confirm('Mark this ticket as resolved?')) return;
+    
+    try {
+      const res = await fetch(`/api/tickets/${ticketId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'Resolved',
+          last_updated: new Date().toISOString()
+        })
+      });
+      
+      if (res.ok) {
+        showSuccess('Ticket marked as resolved!');
+        closeTicketModal();
+        await loadTickets();
+      } else {
+        showError('Failed to resolve ticket');
+      }
+    } catch (error) {
+      console.error('Error resolving ticket:', error);
+      showError('Failed to resolve ticket');
+    }
+  }
+
+  // View appointment details
+  let currentAppointmentId = null;
+
+  async function viewAppointment(appointmentId) {
+    try {
+      const res = await fetch(`/api/appointments/${appointmentId}`);
+      const appointment = await res.json();
+      
+      currentAppointmentId = appointmentId;
+      
+      // Populate left column (read-only student info)
+      document.getElementById('appt-student').textContent = appointment.student_name || 'Unknown';
+      document.getElementById('appt-email').textContent = appointment.student_email || 'N/A';
+      document.getElementById('appt-department').textContent = appointment.department || 'N/A';
+      document.getElementById('appt-purpose').textContent = appointment.purpose || 'No purpose specified';
+      document.getElementById('appt-status-display').textContent = appointment.status || 'Pending';
+      
+      // Populate right column (editable fields)
+      document.getElementById('appt-date').value = appointment.date || '';
+      document.getElementById('appt-time-slot').value = appointment.time_slot || '9:00 AM - 10:00 AM';
+      document.getElementById('appt-meeting-mode').value = appointment.meeting_mode || 'No Preference';
+      document.getElementById('appt-location').value = appointment.location_mode || '';
+      
+      // Show/hide confirm button based on status
+      const confirmBtn = document.getElementById('confirm-appointment-btn');
+      if (appointment.status === 'Pending') {
+        confirmBtn.style.display = 'inline-flex';
+      } else {
+        confirmBtn.style.display = 'none';
+      }
+      
+      document.getElementById('appointmentModal').style.display = 'flex';
+    } catch (error) {
+      console.error('Error loading appointment:', error);
+      showError('Failed to load appointment details');
+    }
+  }
+
+  // Update appointment details
+  async function updateAppointmentDetails() {
+    if (!currentAppointmentId) return;
+    
+    const date = document.getElementById('appt-date').value;
+    const timeSlot = document.getElementById('appt-time-slot').value;
+    const meetingMode = document.getElementById('appt-meeting-mode').value;
+    const location = document.getElementById('appt-location').value;
+    
+    if (!date) {
+      showError('Please select a date');
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/api/appointments/${currentAppointmentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: date,
+          time_slot: timeSlot,
+          meeting_mode: meetingMode,
+          location_mode: location
+        })
+      });
+      
+      if (res.ok) {
+        showSuccess('Appointment details updated successfully!');
+        await loadAppointments();
+        await loadStaffAppointmentReminders();
+      } else {
+        showError('Failed to update appointment');
+      }
+    } catch (error) {
+      console.error('Error updating appointment:', error);
+      showError('Failed to update appointment');
+    }
+  }
+
+  // Confirm appointment
+  async function confirmAppointment() {
+    if (!currentAppointmentId) return;
+    
+    if (!confirm('Are you sure you want to confirm this appointment?')) return;
+    
+    try {
+      const res = await fetch(`/api/appointments/${currentAppointmentId}/confirm`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (res.ok) {
+        showSuccess('Appointment confirmed successfully!');
+        closeAppointmentModal();
+        await loadAppointments();
+        await loadStaffAppointmentReminders();
+      } else {
+        showError('Failed to confirm appointment');
+      }
+    } catch (error) {
+      console.error('Error confirming appointment:', error);
+      showError('Failed to confirm appointment');
+    }
+  }
+
+  // Tab switching
+  function showTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.target.closest('.tab').classList.add('active');
+    
+    // Update tab content
+    document.getElementById('ticketsTab').classList.remove('active');
+    document.getElementById('appointmentsTab').classList.remove('active');
+    
+    if (tabName === 'tickets') {
+      document.getElementById('ticketsTab').classList.add('active');
+    } else {
+      document.getElementById('appointmentsTab').classList.add('active');
+    }
+  }
+
+  // Modal functions
+  function closeTicketModal() {
+    document.getElementById('ticketModal').style.display = 'none';
+  }
+
+  function closeAppointmentModal() {
+    document.getElementById('appointmentModal').style.display = 'none';
+  }
+
+  // Close modal on outside click
+  window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+      event.target.style.display = 'none';
+    }
+  }
+
+  // Load and display events for staff
+  async function loadStaffEvents() {
+    try {
+      const response = await fetch('/api/events?status=active');
+      if (!response.ok) throw new Error('Failed to fetch events');
+      
+      const events = await response.json();
+      const eventsContainer = document.getElementById('staff-events-section');
+      
+      // Filter events for staff or all
+      const staffEvents = events.filter(event => 
+        event.target_audience === 'staff' || event.target_audience === 'all'
+      );
+      
+      if (staffEvents.length === 0) {
+        eventsContainer.innerHTML = '';
+        return;
+      }
+      
+      eventsContainer.innerHTML = '';
+      
+      staffEvents.forEach(event => {
+        const eventCard = document.createElement('div');
+        eventCard.style.cssText = `
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 10px;
+          padding: 1.2rem;
+          color: white;
+          margin-bottom: 1rem;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        `;
+        
+        const priorityIcon = event.priority === 'high' ? '🔴' : event.priority === 'urgent' ? '⚠️' : '📢';
+        const eventDate = new Date(event.event_date).toLocaleDateString();
+        
+        eventCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+              <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem;">
+                ${priorityIcon} ${event.title}
+              </h3>
+              <p style="margin: 0 0 0.5rem 0; opacity: 0.9; font-size: 0.95rem;">
+                ${event.description}
+              </p>
+              <div style="display: flex; gap: 1rem; font-size: 0.9rem; opacity: 0.8;">
+                <span>📅 ${eventDate}</span>
+                <span>⏰ ${event.event_time}</span>
+                <span>📂 ${event.category || 'General'}</span>
+              </div>
+            </div>
+            ${event.status === 'completed' ? '<span style="background: rgba(255,255,255,0.3); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem;">✓ Completed</span>' : ''}
+          </div>
+        `;
+        
+        eventsContainer.appendChild(eventCard);
+      });
+      
+    } catch (err) {
+      console.error('Error loading staff events:', err);
+    }
+  }
+
+  // Load events on page load
+  loadStaffEvents();
+
+  // Toast notifications
+  function showSuccess(message) {
+    Toastify({
+      text: message,
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#4caf50",
+    }).showToast();
+  }
+
+  function showError(message) {
+    Toastify({
+      text: message,
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#f44336",
+    }).showToast();
+  }
+</script>
+
+</body>
+</html>

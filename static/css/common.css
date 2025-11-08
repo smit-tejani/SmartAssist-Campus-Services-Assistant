@@ -1,0 +1,340 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #003d5c 0%, #0067a5 50%, #00a99d 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.background-shapes {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.background-shapes::before,
+.background-shapes::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.7;
+  mix-blend-mode: screen;
+}
+
+.background-shapes::before {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(0, 169, 157, 0.55), transparent 70%);
+  top: -100px;
+  left: -80px;
+}
+
+.background-shapes::after {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(0, 103, 165, 0.5), transparent 70%);
+  bottom: -140px;
+  right: -120px;
+}
+
+.background-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(
+      circle at 20% 50%,
+      rgba(0, 169, 157, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(0, 103, 165, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 20%,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 50%
+    );
+  animation: pulse 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+nav .nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+nav .nav-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+nav .nav-links a {
+  color: #fff;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  position: relative;
+}
+
+nav .nav-links a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  color: #00a99d;
+}
+footer {
+  background: #001f33;
+  text-align: center;
+  padding: 2rem;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+footer a {
+  color: #00aeef;
+  text-decoration: none;
+  margin: 0 10px;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* ==================== NAVBAR ==================== */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2.5rem;
+  background: #0067a5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+nav h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+nav .logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* ==================== NOTIFICATION BELL ==================== */
+.notification-bell {
+  position: relative;
+}
+
+.notification-bell-icon {
+  font-size: 1.5rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.notification-bell-icon:hover {
+  color: #00a99d;
+  transform: scale(1.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #e53e3e;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+  border: 2px solid #0067a5;
+}
+
+.notification-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 1001;
+  width: 380px;
+  max-height: 500px;
+  border: 1px solid #e2e8f0;
+}
+
+.notification-dropdown.show {
+  display: block;
+}
+
+.notification-header {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #0067a5 0%, #00a99d 100%);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mark-all-read {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mark-all-read:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.notification-item:hover {
+  background: #f7fafc;
+}
+
+.notification-item.unread {
+  background: #ebf8ff;
+  border-left: 4px solid #0067a5;
+}
+
+.notification-item.unread:hover {
+  background: #bee3f8;
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.notification-message {
+  font-size: 0.85rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.notification-time {
+  font-size: 0.75rem;
+  color: #a0aec0;
+}
+
+.notification-priority-high {
+  border-left-color: #e53e3e !important;
+}
+
+.notification-priority-urgent {
+  border-left-color: #dd6b20 !important;
+  animation: pulse 2s infinite;
+}
+
+/* ==================== PROFILE & UTILITY ==================== */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+#welcome-message {
+  font-weight: 500;
+  color: #f9f9f9;
+  font-size: 0.95rem;
+}
+
+#profile-icon {
+  font-size: 1.75rem;
+  cursor: pointer;
+  color: #ffffff;
+  transition: color 0.2s;
+}
+
+#profile-icon:hover {
+  color: #00a99d;
+}
+
+.profile-dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 1001;
+  min-width: 180px;
+  border: 1px solid #e2e8f0;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
+  color: #4a5568 !important;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.dropdown-content a:hover {
+  background: #f7fafc;
+  color: #0067a5 !important;
+}
+
+.dropdown-content.show {
+  display: block;
+}
