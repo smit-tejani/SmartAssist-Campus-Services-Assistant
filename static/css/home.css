@@ -16,48 +16,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Navbar */
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: #0067a5;
-  color: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-nav h1 {
-  font-size: 1.6rem;
-  font-weight: 600;
-}
-nav .logo {
-  width: 45px;
-  height: 45px;
-  object-fit: contain;
-  border-radius: 12px;
-  background: #fff;
-  padding: 4px;
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-.nav-links a {
-  color: #fff;
-  text-decoration: none;
-  margin-left: 1.5rem;
-  font-weight: 500;
-  transition: 0.3s;
-}
-.nav-links a:hover {
-  color: #00a99d;
-}
 
 /* HERO (split layout) */
 .hero {
