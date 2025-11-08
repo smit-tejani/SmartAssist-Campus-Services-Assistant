@@ -9,7 +9,7 @@ from app.routers import register_routers
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-
+# helper function to create app
 def create_app() -> FastAPI:
     app = FastAPI(title="SmartAssist Campus Services Assistant")
     app.mount("/static", StaticFiles(directory="static"), name="static")
