@@ -16,7 +16,7 @@ from app.routers import (
     surveys,
 )
 
-__all__ = [
+__all__: List[str] = [
     "auth",
     "chatbot",
     "diagnostics",
@@ -41,7 +41,7 @@ def register_routers(app: FastAPI) -> None:
         pages.router,
         auth.router,
         chatbot.router,
-        support.support.router,   # ensure nested routers load
+        support.router,
         students.router,
         staff.router,
         departments.router,

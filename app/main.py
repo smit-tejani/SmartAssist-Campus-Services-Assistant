@@ -23,34 +23,9 @@ from app.routers import (
     surveys,
 )
 
-app = FastAPI(title="SmartAssist Campus Services Assistant")
-
-# CORS middleware setup
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Register routers
-support.register_routers(app)      # ✅ Unified support router
-app.include_router(auth.router)
-app.include_router(chatbot.router)
-app.include_router(diagnostics.router)
-app.include_router(departments.router)
-app.include_router(events.router)
-app.include_router(live_chat.router)
-app.include_router(notifications.router)
-app.include_router(pages.router)
-app.include_router(staff.router)
-app.include_router(students.router)
-app.include_router(surveys.router)
-
 
 def create_app() -> FastAPI:
-    app = FastAPI()
+    app = FastAPI(title="SmartAssist Campus Services Assistant")
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
     app.add_middleware(
@@ -67,3 +42,28 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+# CORS middleware setup
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Register routers
+# app.include_router(auth.router)
+# app.include_router(chatbot.router)
+# app.include_router(diagnostics.router)
+# app.include_router(departments.router)
+# app.include_router(events.router)
+# app.include_router(live_chat.router)
+# app.include_router(notifications.router)
+# app.include_router(pages.router)
+# app.include_router(staff.router)
+# app.include_router(students.router)
+# app.include_router(surveys.router)
+
+
+
