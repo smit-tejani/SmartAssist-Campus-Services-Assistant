@@ -12,10 +12,11 @@ from app.routers import (
     pages,
     staff,
     students,
-    support,   # support.py (tickets)
+    support,
     surveys,
+    appointments,
+    kb
 )
-from app.routers.support import router as support_nested_router
 
 
 __all__ = [
@@ -44,13 +45,14 @@ def register_routers(app: FastAPI) -> None:
         auth.router,
         chatbot.router,
         support.router,
-        support_nested_router,
         students.router,
         staff.router,
         departments.router,
         notifications.router,
         events.router,
         surveys.router,
+        appointments.router,
+        kb.router
     ]
     for r in routers:
         app.include_router(r)
