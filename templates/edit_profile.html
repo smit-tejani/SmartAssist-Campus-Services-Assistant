@@ -457,7 +457,7 @@
       </div>
       <div class="form-group">
         <label for="email"><i class="fas fa-envelope"></i> Email</label>
-        <input type="email" id="email" name="email" readonly>
+        <input type="email" id="email" name="email" readonly value="{{user.email}}">
       </div>
       <div class="form-group">
         <label for="phone-number"><i class="fas fa-phone"></i> Phone Number</label>
@@ -600,14 +600,14 @@
     document.getElementById('date-of-birth').value = student.date_of_birth || '';
     document.getElementById('marital-status').value = student.marital_status || '';
     document.getElementById('legal-sex').value = student.legal_sex || '';
-    document.getElementById('email').value = student.email;
+    // document.getElementById('email').value = student.email;
     document.getElementById('phone-number').value = student.phone_number || '';
     document.getElementById('address').value = student.address || '';
   }
 
   async function fetchRegisteredClasses() {
       const email = document.getElementById('email').value;
-      const response = await fetch(`/api/registered_courses/${email}`);
+      const response = await fetch(`/api/student/${email}/registered_classes`);
 
       if (response.ok) {
         const classes = await response.json();
