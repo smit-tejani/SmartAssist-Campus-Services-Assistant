@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-DEFAULT_CAMPUS_MAP_VARIANT = "smartassist"
+DEFAULT_CAMPUS_MAP_VARIANT = "primary"
 # DEFAULT_CAMPUS_MAP_VARIANT = "primary"
 
 DEFAULT_TEMPLATE_VARIANT = "templates"

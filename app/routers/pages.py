@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
+from app.core.config import settings
 from app.core.templates import templates
 from app.dependencies.auth import get_current_user, role_required
 
@@ -106,4 +107,10 @@ async def contact_support(request: Request):
 async def chat_page(request: Request, user: dict = Depends(get_current_user)):
     if user.get("role") not in ["guest", "student", "admin"]:
         raise HTTPException(status_code=403, detail="Forbidden")
-    return templates.TemplateResponse("chat.html", {"request": request})
+
+    return templates.TemplateResponse(
+        "chat.html",
+        {
+            "request": request,
+        },
+    )

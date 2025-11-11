@@ -29,6 +29,52 @@ def _normalize_mode(raw: str | None) -> str:
     return "uni"
 
 
+def _maybe_add_map_followup(question: str, chips: list[dict[str, Any]]) -> None:
+    """
+    If the user's question looks like a campus location / directions
+    request and we can resolve it to a campus building, add a
+    'Show 3D Walking Map' follow-up chip.
+
+    The frontend (chat.html) handles this in onFollowupClick() by
+    calling showMapModal(destination).
+    """
+    try:
+        q_lower = question.lower()
+        map_keywords = (
+            "map",
+            "where is",
+            "location",
+            "building",
+            "directions",
+            "walk",
+            "navigate",
+            "route",
+        )
+        if not any(k in q_lower for k in map_keywords):
+            return
+
+        campus_map = get_campus_map(settings.campus_map_variant)
+        location = campus_map.lookup(question)
+        if not location:
+            return
+
+        # This string is what Google Maps will use as the destination.
+        destination = f"{location.name}, Texas A&M University-Corpus Christi"
+
+        chips.append(
+            {
+                "label": "🗺️ Show 3D Walking Map",
+                "payload": {
+                    "type": "action",
+                    "action": "show_map",
+                    "destination": destination,
+                },
+            }
+        )
+    except Exception as exc:
+        logging.warning("Failed to add map followup: %s", exc)
+
+
 @router.post("/chat_question")
 async def chat_question(question: str = Form(...), mode: str = Form("uni")):
     from rag_pipeline import get_answer
@@ -44,9 +90,14 @@ async def chat_question(question: str = Form(...), mode: str = Form("uni")):
         mode=normalized_mode,
     )
 
+    if chips is None:
+        chips = []
+    _maybe_add_map_followup(question, chips)
+
     if suggest_live_chat:
         chips = [
-            {"label": "Talk to an admin", "payload": {"type": "action", "action": "escalate"}}
+            {"label": "Talk to an admin", "payload": {
+                "type": "action", "action": "escalate"}}
         ]
 
     resp: Dict[str, Any] = {
@@ -79,9 +130,15 @@ async def chat_question_stream(question: str = Form(...), mode: str = Form("uni"
             mode=normalized_mode,
         )
 
+        if chips is None:
+            chips = []
+        # 🔹 Add map followup here as well
+        _maybe_add_map_followup(question, chips)
+
         if suggest_live_chat:
             chips = [
-                {"label": "Talk to an admin", "payload": {"type": "action", "action": "escalate"}}
+                {"label": "Talk to an admin", "payload": {
+                    "type": "action", "action": "escalate"}}
             ]
 
         followup_data: Dict[str, Any] = {
@@ -141,12 +198,17 @@ async def analyze_ticket_request(request: TicketAnalysisRequest):
         subject_match = re.search(r"SUBJECT:\s*(.+)", answer)
         category_match = re.search(r"CATEGORY:\s*(.+)", answer)
         priority_match = re.search(r"PRIORITY:\s*(.+)", answer)
-        description_match = re.search(r"DESCRIPTION:\s*(.+)", answer, re.DOTALL)
+        description_match = re.search(
+            r"DESCRIPTION:\s*(.+)", answer, re.DOTALL)
 
-        subject = subject_match.group(1).strip() if subject_match else "Support Request"
-        category = category_match.group(1).strip() if category_match else "Other"
-        priority = priority_match.group(1).strip() if priority_match else "Medium"
-        description = description_match.group(1).strip() if description_match else request.message
+        subject = subject_match.group(1).strip(
+        ) if subject_match else "Support Request"
+        category = category_match.group(
+            1).strip() if category_match else "Other"
+        priority = priority_match.group(
+            1).strip() if priority_match else "Medium"
+        description = description_match.group(
+            1).strip() if description_match else request.message
 
         valid_categories = [
             "Technical Support",
@@ -204,7 +266,8 @@ async def analyze_map_request(request: MapAnalysisRequest):
 
     except Exception as exc:
         logging.error(f"Error analyzing map request: {exc}")
-        raise HTTPException(status_code=500, detail="Failed to analyze map request")
+        raise HTTPException(
+            status_code=500, detail="Failed to analyze map request")
 
 
 class RoutingRequest(BaseModel):
@@ -270,4 +333,5 @@ async def analyze_routing_request(request: RoutingRequest):
 
     except Exception as exc:
         logging.error(f"Error analyzing routing request: {exc}")
-        raise HTTPException(status_code=500, detail="Failed to analyze routing request")
+        raise HTTPException(
+            status_code=500, detail="Failed to analyze routing request")
