@@ -368,6 +368,11 @@
       _queueTimer = null; _queueEndAt = null;
       queueTimerEl.classList.add('hidden');
     }
+    mapCloseBtn.addEventListener('click', () => {
+      mapModal.classList.add('hidden');
+      // Clear the map canvas so it reloads next time
+      mapCanvas.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-500">Loading map...</div>';
+    });
     function renderTimer() {
       if (!_queueEndAt) {
         console.log("_queueEndAt is not set");
