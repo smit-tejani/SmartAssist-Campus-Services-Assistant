@@ -818,7 +818,8 @@ async function fetchTickets() {
     console.log("Tickets API response:", data);
 
     // Extra client-side filtering to ensure no Resolved/Cancelled tickets show
-    const activeTickets = (data.tickets || []).filter(
+    const activeTickets = (data || []).filter(
+      // <-- FIX
       (ticket) =>
         ticket.status !== "Resolved" &&
         ticket.status !== "Cancelled" &&
@@ -856,7 +857,8 @@ async function fetchAppts() {
     const data = await res.json();
 
     // Extra client-side filtering to ensure no Cancelled appointments show
-    const activeAppointments = (data.appointments || []).filter(
+    const activeAppointments = (data || []).filter(
+      // <-- FIX
       (appointment) =>
         appointment.status !== "Cancelled" && appointment.status !== "cancelled"
     );
@@ -883,7 +885,7 @@ async function loadStudentAppointmentReminders() {
     if (!res.ok) return;
 
     const data = await res.json();
-    const appointments = data.appointments || [];
+    const appointments = data || []; // <-- FIX
 
     const reminderContainer = document.getElementById(
       "student-appointment-reminders"
@@ -1107,7 +1109,6 @@ async function updateCounts() {
     const user = await userRes.json();
     const studentEmail = user.email;
 
-    // Fetch ticket count for this student only
     const t = await fetch(
       `/api/tickets?status=open&student_email=${encodeURIComponent(
         studentEmail
@@ -1115,7 +1116,7 @@ async function updateCounts() {
     );
     const tdata = await t.json();
     document.getElementById("open-tickets-count").textContent =
-      tdata.count || 0;
+      tdata.length || 0;
 
     // Fetch appointment count for this student only
     const a = await fetch(
@@ -1125,7 +1126,7 @@ async function updateCounts() {
     );
     const adata = await a.json();
     document.getElementById("upcoming-appts-count").textContent =
-      adata.count || 0;
+      adata.length || 0;
   } catch (e) {
     console.error("Failed to update counts", e);
   }
@@ -1205,13 +1206,15 @@ async function loadTickets() {
     const ticketList = document.getElementById("ticket-list");
     ticketList.innerHTML = "";
 
-    if (!data.tickets || data.tickets.length === 0) {
+    if (!data || data.length === 0) {
+      // <-- FIX
       ticketList.innerHTML =
         '<tr><td colspan="6" style="text-align: center; color: #718096;">No open tickets</td></tr>';
       return;
     }
 
-    data.tickets.forEach((ticket) => {
+    data.forEach((ticket) => {
+      // <-- FIX
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${ticket._id}</td>
@@ -1250,13 +1253,15 @@ async function loadAppointments() {
     const appointmentList = document.getElementById("appointment-list");
     appointmentList.innerHTML = "";
 
-    if (!data.appointments || data.appointments.length === 0) {
+    if (!data || data.length === 0) {
+      // <-- FIX
       appointmentList.innerHTML =
         '<tr><td colspan="8" style="text-align: center; color: #718096;">No appointments scheduled</td></tr>';
       return;
     }
 
-    data.appointments.forEach((appt) => {
+    data.forEach((appt) => {
+      // <-- FIX
       const row = document.createElement("tr");
       const statusColor =
         appt.status === "Confirmed"

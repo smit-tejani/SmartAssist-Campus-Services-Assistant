@@ -1,5 +1,5 @@
-# app/routers/support/appointments.py
-from datetime import datetime
+# app/routers/appointments.py
+from datetime import datetime, date
 from typing import Optional
 
 from bson import ObjectId
@@ -18,6 +18,7 @@ from app.services.support import save_appointment
 from app.services.notifications import (
     _notify_admin_appointment_scheduled,
     _notify_staff_appointment_scheduled,
+    _create_appointment_notification
 )
 
 router = APIRouter()
@@ -78,6 +79,7 @@ async def book_appointment(
         inserted_id = save_appointment(appt, attachment)
         await _notify_admin_appointment_scheduled(appt, str(inserted_id))
         await _notify_staff_appointment_scheduled(appt, str(inserted_id))
+        """ await _create_appointment_notification(appt, str(inserted_id)) """
         return {"success": True, "appointment_id": str(inserted_id)}
     except Exception as exc:
         print(f"[ERROR] /book_appointment exception: {exc}")
@@ -113,22 +115,12 @@ async def reschedule_appointment(appointment_id: str, new_date: str, new_time: s
         return JSONResponse({"error": str(exc)}, status_code=500)
 
 
-@router.get("/api/appointments")
-async def list_appointments(student_email: Optional[str] = None, assigned_staff: Optional[str] = None):
-    try:
-        query = {}
-        if student_email:
-            query["student_email"] = student_email
-        if assigned_staff:
-            query["assigned_staff"] = assigned_staff
-        appointments = list(
-            appointments_collection.find(query).sort("date", 1))
-        # convert ObjectId to str
-        for a in appointments:
-            a["_id"] = str(a["_id"])
-        return {"success": True, "appointments": appointments}
-    except Exception as exc:
-        return JSONResponse({"error": str(exc)}, status_code=500)
+# ------------------------------------------------------------------
+# 
+#  [DELETED] The first, simpler "@router.get('/api/appointments')"
+#            function was removed from here.
+# 
+# ------------------------------------------------------------------
 
 
 @router.get("/api/appointments/{appointment_id}")
@@ -200,7 +192,7 @@ async def confirm_appointment(appointment_id: str):
 
 
 @router.get("/api/appointments")
-async def api_appointments(
+async def api_appointments(  # This is the one we are keeping
     upcoming: bool = False,
     student_email: str | None = None,
     admin: bool = False,

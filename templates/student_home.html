@@ -122,10 +122,10 @@
         <h3>Book Appointment</h3>
         <p>Schedule meetings with advisors, professors, or offices conveniently.</p>
       </div>
-      <div class="card" onclick="openSurveysModal()" style="cursor: pointer;">
+      <div class="card" onclick="window.location.href='/assignment-checker'" style="cursor: pointer;">
         <i class="fa-solid fa-star"></i>
-        <h3>Feedback / Surveys</h3>
-        <p>Share feedback to help improve campus services.</p>
+        <h3>Assignment Checker</h3>
+        <p>Check your assignments and get instant feedback.</p>
       </div>
     </div>
 
@@ -231,7 +231,8 @@
           <option value="">Select category first or leave blank</option>
         </select>
         <small style="color: #718096; font-size: 0.85rem; display: block; margin-top: 0.25rem;">
-          Optional: Choose a staff member you'd prefer to handle this ticket. Admin will consider your preference during assignment.
+          Optional: Choose a staff member you'd prefer to handle this ticket. Admin will consider your preference during
+          assignment.
         </small>
       </div>
       <div>
@@ -341,14 +342,17 @@
         <hr>
         <div>Attachment: <a href="#">Download</a></div>
         <div style="margin-top: 8px;">
-          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel Ticket</button>
+          <button
+            style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel
+            Ticket</button>
         </div>
       </div>
 
       <!-- Open Tickets Example -->
       <div class="card" style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
         <div><strong>Subject:</strong> Cannot access library portal</div>
-        <div><strong>Category:</strong> Technical • <strong>Priority:</strong> <span style="color: red;">High</span></div>
+        <div><strong>Category:</strong> Technical • <strong>Priority:</strong> <span style="color: red;">High</span>
+        </div>
         <div><strong>Status:</strong> <span style="color: orange;">In Progress</span></div>
         <div><strong>Created:</strong> 2025-10-20</div>
         <div><strong>Last Updated:</strong> 2025-10-21 by Staff A</div>
@@ -359,7 +363,9 @@
         <hr>
         <div><strong>Attachment:</strong> <a href="#">Download</a></div>
         <div style="margin-top: 8px;">
-          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel Ticket</button>
+          <button
+            style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel
+            Ticket</button>
         </div>
       </div>
     </div>
@@ -379,8 +385,11 @@
         <div>Status: <span style="color: green;">Confirmed (In 3 days)</span></div>
         <div>Location/Mode: In-Person (Room 101)</div>
         <p>Notes: Bring all relevant documents.</p>
-        <button style="background: red; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Cancel Appointment</button>
-        <button style="background: orange; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+        <button
+          style="background: red; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Cancel
+          Appointment</button>
+        <button
+          style="background: orange; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
       </div>
 
       <!-- Confirmed Appointment Example -->
@@ -391,8 +400,10 @@
         <div><strong>Location / Mode:</strong> Room 203, Admin Bldg</div>
         <div><strong>Notes:</strong> Bring your course plan</div>
         <div style="margin-top: 8px;">
-          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
-          <button style="background: orange; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+          <button
+            style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+          <button
+            style="background: orange; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
         </div>
       </div>
 
@@ -404,7 +415,8 @@
         <div><strong>Location / Mode:</strong> To be assigned</div>
         <div><strong>Notes:</strong> Optional prep info</div>
         <div style="margin-top: 8px;">
-          <button style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+          <button
+            style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
         </div>
       </div>
     </div>
@@ -418,7 +430,7 @@
     <h2 style="color:#0067A5; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
       <i class="fa-solid fa-clipboard-list"></i> Available Surveys
     </h2>
-    
+
     <div id="surveys-list" style="display:grid; gap:1rem;">
       <!-- Surveys will be dynamically loaded here -->
       <div style="text-align:center; padding:2rem; color:#718096;">
@@ -433,30 +445,37 @@
 <div id="take-survey-modal" class="modal">
   <div class="modal-content" style="max-width: 700px;">
     <span class="close-btn" onclick="closeTakeSurveyModal()">&times;</span>
-    
+
     <div id="survey-header" style="margin-bottom:1.5rem;">
       <h2 id="survey-title" style="color:#0067A5; margin-bottom:0.5rem;"></h2>
       <p id="survey-description" style="color:#4a5568; margin-bottom:1rem;"></p>
-      <div id="survey-progress" style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden; margin-bottom:1rem;">
-        <div id="progress-bar" style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); height:100%; width:0%; transition:width 0.3s;"></div>
+      <div id="survey-progress"
+        style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden; margin-bottom:1rem;">
+        <div id="progress-bar"
+          style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); height:100%; width:0%; transition:width 0.3s;">
+        </div>
       </div>
       <p id="progress-text" style="color:#718096; font-size:0.875rem;"></p>
     </div>
-    
+
     <form id="survey-form">
       <div id="survey-questions">
         <!-- Questions will be dynamically loaded here -->
       </div>
-      
-      <div style="display:flex; justify-content:space-between; margin-top:2rem; padding-top:1.5rem; border-top:2px solid #e2e8f0;">
-        <button type="button" id="prev-question-btn" style="background:#718096; color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; display:none;">
+
+      <div
+        style="display:flex; justify-content:space-between; margin-top:2rem; padding-top:1.5rem; border-top:2px solid #e2e8f0;">
+        <button type="button" id="prev-question-btn"
+          style="background:#718096; color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; display:none;">
           <i class="fa-solid fa-arrow-left"></i> Previous
         </button>
         <div style="flex:1;"></div>
-        <button type="button" id="next-question-btn" style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500;">
+        <button type="button" id="next-question-btn"
+          style="background:linear-gradient(135deg, #0067A5 0%, #00A99D 100%); color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500;">
           Next <i class="fa-solid fa-arrow-right"></i>
         </button>
-        <button type="submit" id="submit-survey-btn" style="background:#48bb78; color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; display:none;">
+        <button type="submit" id="submit-survey-btn"
+          style="background:#48bb78; color:white; padding:0.75rem 1.5rem; border:none; border-radius:6px; cursor:pointer; font-weight:500; display:none;">
           <i class="fa-solid fa-check"></i> Submit Survey
         </button>
       </div>

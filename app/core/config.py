@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
-
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 DEFAULT_CAMPUS_MAP_VARIANT = "primary"
 # DEFAULT_CAMPUS_MAP_VARIANT = "primary"

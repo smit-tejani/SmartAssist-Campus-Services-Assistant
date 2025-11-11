@@ -1,5 +1,6 @@
-from __future__ import annotations
+# app/routers/support.py
 
+from __future__ import annotations
 import io
 from datetime import date, datetime
 from typing import Optional
@@ -97,6 +98,7 @@ async def raise_ticket(
     try:
         inserted_id = save_ticket(ticket, attachment)
         await _notify_admin_new_ticket(ticket, str(inserted_id))
+        await _create_ticket_notification(ticket, str(inserted_id), "created")
         return {"success": True, "ticket_id": str(inserted_id)}
     except Exception as exc:
         print(f"[ERROR] /raise_ticket exception: {exc}")
@@ -107,7 +109,7 @@ async def raise_ticket(
 async def api_tickets(status: str | None = None, student_email: str | None = None):
     query = {}
     if status:
-        query["status"] = status
+        query["status"] = {"$regex": f"^{status}$", "$options": "i"}
     if student_email:
         query["student_email"] = student_email
     tickets = list(tickets_collection.find(query).sort("created_at", -1))
@@ -133,38 +135,12 @@ async def get_user_details(request: Request):
         return JSONResponse({"error": str(exc)}, status_code=500)
 
 
-@router.post("/api/tickets")
-async def create_ticket(ticket: TicketCreateRequest, user: dict = Depends(get_current_user)):
-    try:
-        student_email = user.get("email", "")
-        student_name = user.get("full_name", "")
-
-        ticket_doc = {
-            "student_email": student_email,
-            "student_name": student_name,
-            "subject": ticket.subject,
-            "category": ticket.category,
-            "priority": ticket.priority,
-            "description": ticket.description,
-            "status": "Open",
-            "created_at": datetime.now().isoformat(),
-            "last_updated": datetime.now().isoformat(),
-            "assigned_staff": None,
-            "assigned_to_name": None,
-        }
-
-        result = tickets_collection.insert_one(ticket_doc)
-
-        await _create_ticket_notification(ticket_doc, str(result.inserted_id), "created")
-
-        return {
-            "success": True,
-            "ticket_id": str(result.inserted_id),
-            "message": "Ticket created successfully",
-        }
-    except Exception as exc:
-        print(f"Error creating ticket: {exc}")
-        raise HTTPException(status_code=500, detail=str(exc))
+# ------------------------------------------------------------------
+# 
+#  [DELETED] The "@router.post('/api/tickets')" function
+#            was removed from here.
+# 
+# ------------------------------------------------------------------
 
 
 @router.get("/api/tickets/{ticket_id}")
