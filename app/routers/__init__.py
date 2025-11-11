@@ -16,7 +16,8 @@ from app.routers import (
     surveys,
     appointments,
     kb,
-    assignment_checker
+    assignment_checker,
+    forum
 )
 
 
@@ -55,6 +56,7 @@ def register_routers(app: FastAPI) -> None:
         appointments.router,
         kb.router,
         assignment_checker.router,
+        forum.router,
     ]
     for r in routers:
         app.include_router(r)

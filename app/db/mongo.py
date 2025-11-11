@@ -23,6 +23,9 @@ students_collection = db.users
 departments_collection = db.departments
 appointments_collection = db.appointments
 tickets_collection = db.tickets
+forum_categories = db.forum_categories
+forum_posts = db.forum_posts
+forum_comments = db.forum_comments
 fs = gridfs.GridFS(db)
 
 

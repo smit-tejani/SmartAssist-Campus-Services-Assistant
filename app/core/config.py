@@ -11,10 +11,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-DEFAULT_CAMPUS_MAP_VARIANT = "islanderhack"
+DEFAULT_CAMPUS_MAP_VARIANT = "smartassist"
 # DEFAULT_CAMPUS_MAP_VARIANT = "primary"
 
-DEFAULT_TEMPLATE_VARIANT = "smart_campus"
+DEFAULT_TEMPLATE_VARIANT = "templates"
 # DEFAULT_TEMPLATE_VARIANT = "classic"
 
 @dataclass
