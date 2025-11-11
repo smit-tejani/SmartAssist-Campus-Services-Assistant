@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Assignment Checker | Smart Assist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/assignment_checker.css') }}">
+
+
+</head>
+
+<body>
+  <nav>
+    <div class="nav-left">
+      <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="Smart Assist Logo" class="logo">
+      <h1>Smart Assist</h1>
+    </div>
+
+    <div class="nav-links">
+      <a href="/">Home</a>
+
+      {% if request.session.get('user') %}
+      {% set u = request.session.get('user') %}
+
+      {% if u.role == 'student' %}
+      <a href="/student_home">Dashboard</a>
+      {% elif u.role == 'staff' %}
+      <a href="/staff_home">Dashboard</a>
+      {% elif u.role == 'admin' %}
+      <a href="/admin_home">Dashboard</a>
+      {% endif %}
+
+      <a href="/forum">Community</a>
+      <a href="/edit_profile">Profile</a>
+      <a href="/logout">Logout</a>
+      {% else %}
+      <a href="/login">Portal</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <main class="ac-wrapper">
+    <div class="ac-header">
+      <h2>Assignment Checker</h2>
+      <p>Upload a document, add professor requirements, and see what’s missing before you submit.</p>
+    </div>
+
+    <div class="ac-main">
+      <div id="pageLoader" class="loader-overlay">
+        <div class="loader-box">
+          <div class="loader-spinner"></div>
+          <div>Analyzing your assignment…</div>
+        </div>
+      </div>
+
+      <section class="ac-left">
+        <div>
+          <div class="ac-section-title">Upload assignment</div>
+          <div class="ac-section-note">Drag & drop or browse a file from your system.</div>
+          <div class="upload-zone" id="uploadZone">
+            <span>Drop file here or</span>
+            <button class="ac-btn" id="pickFileBtn" type="button">Browse</button>
+            <small style="font-size:.7rem; color:#555;">Supported: .txt, .pdf, .doc, .docx, .png, .jpg</small>
+            <input type="file" id="fileInput" style="display:none;"
+              accept=".txt,.pdf,.doc,.docx,.png,.jpg,.jpeg,.webp" />
+          </div>
+        </div>
+
+        <div>
+          <div class="ac-section-title">Professor requirements</div>
+          <div class="ac-section-note">Paste the checklist or instructions from your syllabus.</div>
+          <label class="ac-label" for="req">Requirements</label>
+          <textarea id="req" class="ac-textarea" placeholder="font size 32
+Explaining forecasting model
+should include shoes prediction
+minimum assets 150
+at least 1 image
+must have author name"></textarea>
+          <div class="ac-helper">The score is based only on these requirements.</div>
+        </div>
+
+        <div>
+          <div class="ac-section-title">Paste student text (optional)</div>
+          <div class="ac-section-note">Use this when the file preview cannot be read properly.</div>
+          <label class="ac-label" for="studentText">Assignment text</label>
+          <textarea id="studentText" class="ac-textarea"
+            placeholder="Paste the student assignment text here if the file cannot be read."></textarea>
+        </div>
+
+        <div class="ac-run-row">
+          <button class="ac-btn" id="scoreBtn" type="button">Calculate score</button>
+          <div class="ac-run-hint">You’ll see the score, highlights, and a list of missing items on the right.</div>
+        </div>
+      </section>
+
+      <section class="ac-right">
+        <div class="preview-box" id="previewBox">
+          <div class="preview-content" id="previewContent">
+            <p class="preview-title">File preview</p>
+            <p class="preview-desc">Upload a file or paste text on the left. After running the check, related parts will
+              be highlighted.</p>
+          </div>
+        </div>
+
+        <div class="score-panel" id="scorePanel">
+          
+          <div class="score-circle-wrap" style="margin: 0 auto 0.5rem;">
+            <svg width="110" height="110">
+              <circle class="circle-bg" cx="55" cy="55" r="45" fill="none"></circle>
+              <circle class="circle-progress" id="circleProgress" cx="55" cy="55" r="45" fill="none"
+                stroke-dasharray="283" stroke-dashoffset="283"></circle>
+            </svg>
+            <div class="circle-center-text" id="scoreText">0%</div>
+          </div>
+
+          <div class="score-meta" style="text-align: center;">
+            <div class="score-meta-title">Match summary</div>
+            <div class="line" id="reqMatched">Requirements matched: -- / --</div>
+            <div class="line" id="reqMissing">Missing: --</div>
+            <div class="line" id="plag">--% plagiarism</div>
+            <div class="line" id="fmt">--% formatting</div>
+            <div style="font-size:.68rem; opacity:.75; margin-top:.3rem;">Based on the requirements you entered.</div>
+          </div>
+            <div class="requirement-checklist" id="requirementChecklist">
+            </div>
+          <hr class="panel-divider">
+
+          <div class="score-panel-details" id="scorePanelDetails">
+            <h4>Detailed Feedback</h4>
+            <p>Run a check to see positive feedback and improvement notes.</p>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    &copy; {{ now().year if now is defined else "2025" }} Smart Assist. All rights reserved.
+  </footer>
+
+  <script>
+    const loader = document.getElementById("pageLoader");
+    const fileInput = document.getElementById("fileInput");
+    const pickFileBtn = document.getElementById("pickFileBtn");
+    const uploadZone = document.getElementById("uploadZone");
+    const previewContent = document.getElementById("previewContent");
+    const previewBox = document.getElementById("previewBox") || document.querySelector(".preview-box");
+    const scorePanel = document.getElementById("scorePanel") || document.querySelector(".score-panel");
+
+    const scoreBtn = document.getElementById("scoreBtn");
+    const reqText = document.getElementById("req");
+    const studentText = document.getElementById("studentText");
+    const circleProgress = document.getElementById("circleProgress");
+    const scoreText = document.getElementById("scoreText");
+    const plag = document.getElementById("plag");
+    const fmt = document.getElementById("fmt");
+    const reqMatched = document.getElementById("reqMatched");
+    const reqMissing = document.getElementById("reqMissing");
+
+    const API_URL = "/api/assignment-checker/score";
+
+    // file pick
+    pickFileBtn.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) showLocalPreview(file);
+    });
+
+    // drag & drop
+    uploadZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = "#007a78";
+    });
+    uploadZone.addEventListener("dragleave", () => {
+      uploadZone.style.borderColor = "#c4c4c4";
+    });
+    uploadZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = "#c4c4c4";
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        showLocalPreview(file);
+      }
+    });
+
+    function showLocalPreview(file) {
+      const name = file.name;
+      const type = file.type;
+      previewContent.innerHTML =
+        `<p class="preview-title">${escapeHTML(name)}</p>`;
+
+      if (type.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.style.maxWidth = "100%";
+        img.style.borderRadius = "4px";
+        img.style.marginTop = "0.3rem";
+        previewContent.appendChild(img);
+      } else if (type === "application/pdf") {
+        const iframe = document.createElement("iframe");
+        iframe.src = URL.createObjectURL(file);
+        iframe.style.width = "100%";
+        iframe.style.height = "320px";
+        iframe.style.border = "none";
+        iframe.style.borderRadius = "4px";
+        iframe.style.marginTop = "0.3rem";
+        previewContent.appendChild(iframe);
+      } else {
+        previewContent.innerHTML +=
+          `<p class="preview-desc" style="margin-top:.3rem;">Preview may be limited for this file type, but it can still be analyzed when you run the check.</p>`;
+      }
+
+      if (previewBox) previewBox.style.display = "block";
+      if (scorePanel) scorePanel.style.display = "none";
+    }
+
+    // scoring
+    scoreBtn.addEventListener("click", async () => {
+      const reqVal = reqText.value.trim();
+      if (!reqVal) {
+        alert("Please add professor requirements first.");
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append("requirements", reqVal);
+      if (studentText.value.trim()) {
+        fd.append("student_text", studentText.value.trim());
+      }
+      if (fileInput.files && fileInput.files[0]) {
+        fd.append("file", fileInput.files[0], fileInput.files[0].name);
+      }
+
+      scoreBtn.disabled = true;
+      scoreBtn.textContent = "Checking...";
+      loader.style.display = "flex";
+      requestAnimationFrame(() => {
+        loader.style.opacity = "1";
+      });
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: fd
+        });
+
+        if (!res.ok) {
+          let errText = "Could not process document.";
+          try {
+            const errData = await res.json();
+            if (errData.detail) errText = errData.detail;
+          } catch { }
+          alert(`Error: ${errText}`);
+          return;
+        }
+
+        const data = await res.json();
+        renderResult(data);
+
+      } catch (err){
+        console.error("Fetch error:", err);
+        alert("A network error occurred.");
+      } finally {
+        loader.style.opacity = "0";
+        setTimeout(() => {
+          loader.style.display = "none";
+        }, 200);
+        scoreBtn.disabled = false;
+        scoreBtn.textContent = "Calculate score";
+      }
+
+    });
+
+    // escape text for regex
+    function escapeRegExp(string) {
+      return (string || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    // escape text for HTML
+    function escapeHTML(str) {
+      return (str || "").replace(/[&<>"']/g, function (match) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        }[match];
+      });
+    }
+
+    // NEW function to fix invisible character mismatches
+    function normalizePunctuation(str) {
+      if (!str) return "";
+      return str
+        .replace(/[\u2013\u2014]/g, '-') // Replace en-dash and em-dash with a simple hyphen
+        .replace(/[\u2018\u2019]/g, "'") // Replace smart single quotes with a simple apostrophe
+        .replace(/[\u201C\u201D]/g, '"'); // Replace smart double quotes with a simple quote
+    }
+
+    // Show wrong / mismatching content based only on snippets from the backend
+    function renderHighlights(fullText, fixes) {
+      // Only use items that actually have a snippet
+      const items = (fixes || []).filter(
+        f => f && f.snippet && f.snippet.trim()
+      );
+
+      let html = '';
+      html += '<p class="preview-title" style="margin-bottom:.5rem;">Wrong / Off-Topic Content</p>';
+
+      if (!items.length) {
+        html += '<p class="preview-desc" style="margin-top:.3rem;">No off-topic content was flagged. Any feedback in the "Detailed Feedback" section below is for on-topic content that can be improved.</p>';
+      } else {
+        html += '<p class="preview-desc" style="margin-top:.3rem;">These sections were flagged as off-topic or not relevant to the requirements.</p>';
+      }
+
+      items.forEach((item, index) => {
+        const snippet = escapeHTML(item.snippet || '');
+        const feedback = escapeHTML(item.feedback || '');
+
+        html += `
+          <div style="
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: .55rem .6rem;
+            margin-bottom: .5rem;
+            background: rgba(0,0,0,0.25);
+          ">
+            <mark style="
+              background:#ffd54f; 
+              color:#000; 
+              padding:2px 3px; 
+              border-radius:2px;
+              white-space: pre-wrap;
+              word-break: break-word;
+              display: block;
+            ">
+              ${snippet}
+            </mark>
+            
+            <div style="font-size:.7rem; opacity:.9; margin-top: .4rem; padding-top: .3rem; border-top: 1px solid rgba(255,255,255,0.1);">
+              <strong>Feedback:</strong> ${feedback}
+            </div>
+          </div>
+        `;
+      });
+
+      previewContent.innerHTML = html;
+      previewContent.scrollTop = 0; // Force repaint and scroll to top
+    }
+
+    // --- *** THIS FUNCTION IS NOW CORRECT *** ---
+    function renderResult(data) {
+      // show both preview + score area
+      if (previewBox) previewBox.style.display = "block";
+      if (scorePanel) scorePanel.style.display = "block"; // Changed to block
+
+      // update numbers
+      const scoreValue = data.score ?? 0;
+      updateScore(scoreValue);
+      if (plag) plag.textContent = (data.plagiarism ?? "--") + "% plagiarism";
+      if (fmt) fmt.textContent = (data.formatting ?? "--") + "% formatting";
+
+      const totalReq = data.requirements_count ?? 0;
+      const details = data.details ?? [];
+      const failed = details.filter(d => !d.passed).length;
+      const passed = totalReq - failed;
+
+      if (reqMatched) reqMatched.textContent = `Requirements matched: ${passed} / ${totalReq}`;
+      if (reqMissing) reqMissing.textContent = `Missing: ${failed}`;
+
+      // --- ALL LOGIC MOVED HERE, WHERE IT BELONGS ---
+      // 🔹 Call the new checklist renderer
+      renderChecklist(details); 
+
+      // 🔹 pull snippets for wrong content
+      const toFixList = (data.feedback && data.feedback.to_fix) ? data.feedback.to_fix : [];
+
+      // 🔹 render the "Wrong content" box
+      renderHighlights(data.full_text || "Could not load preview.", toFixList);
+
+      // 🔹 render the "Detailed Feedback" box (Met / Notes)
+      renderFixList(data);
+    }
+
+    function updateScore(score) {
+      const radius = 45;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (score / 100) * circumference;
+      circleProgress.style.strokeDasharray = circumference;
+      circleProgress.style.strokeDashoffset = offset;
+      scoreText.textContent = (score || 0) + "%";
+    }
+
+    // --- NEW FUNCTION to build the checklist ---
+    function renderChecklist(details) {
+      const container = document.getElementById("requirementChecklist");
+      if (!container) return;
+
+      let html = "";
+      if (details && details.length > 0) {
+        details.forEach(item => {
+          if (item.passed) {
+            html += `
+              <div class="checklist-item passed">
+                <span class="icon">✅</span>
+                <span>${escapeHTML(item.requirement)}</span>
+              </div>`;
+          } else {
+            html += `
+              <div class="checklist-item failed">
+                <span class="icon">❌</span>
+                <span>${escapeHTML(item.requirement)}</span>
+              </div>`;
+          }
+        });
+      } else {
+        html = `<p style="font-size: .75rem; text-align: center; opacity: .8;">No specific requirements were checked.</p>`;
+      }
+      container.innerHTML = html;
+    }
+
+    // --- *** THIS FUNCTION IS NOW CORRECT *** ---
+    function renderFixList(data) {
+      const feedback = data.feedback || {};
+      const container = document.getElementById("scorePanelDetails");
+      if (!container) return; // Safety check
+
+      let html = "<h4>Detailed Feedback</h4>";
+
+      // --- SECTION 1: "MET" (Positive Feedback) ---
+      html += "<h5 style='margin-top:.6rem; font-size:.84rem;'>What you did well (Met)</h5>";
+      if (feedback.met && feedback.met.length) {
+        html += "<ul style='padding-left:1rem;'>";
+        feedback.met.forEach(item => {
+          html += `<li class="feedback-item">${escapeHTML(item.feedback)}`;
+          if (item.snippet) {
+            let p = item.snippet.substring(0, 100) + (item.snippet.length > 100 ? "..." : "");
+            html += `<blockquote class="feedback-blockquote">"${escapeHTML(p)}"</blockquote>`;
+          }
+          html += `</li>`;
+        });
+        html += "</ul>";
+      } else {
+        html += "<p style='font-size:.75rem; margin-top:.25rem;'>No specific positive points were flagged.</p>";
+      }
+
+      // --- SECTION 2: "NOTES" (Improvement Feedback) ---
+      html += "<h5 style='margin-top:.6rem; font-size:.84rem;'>Where to improve (Notes)</h5>";
+      if (feedback.notes && feedback.notes.length) {
+        html += "<ul style='padding-left:1rem;'>";
+        feedback.notes.forEach(item => {
+          html += `<li class="feedback-item">${escapeHTML(item.feedback)}`;
+          if (item.snippet) {
+            let p = item.snippet.substring(0, 100) + (item.snippet.length > 100 ? "..." : "");
+            html += `<blockquote class="feedback-blockquote">"${escapeHTML(p)}"</blockquote>`;
+          }
+          html += `</li>`;
+        });
+        html += "</ul>";
+      } else {
+        html += "<p style='font-size:.75rem; margin-top:.25rem;'>No specific improvement notes were flagged.</p>";
+      }
+      
+      // --- ALL THE INCORRECT, RECURSIVE LOGIC IS NOW GONE ---
+      container.innerHTML = html;
+    }
+    
+    // init
+    updateScore(0);
+  </script>
+</body>
+
+</html>
