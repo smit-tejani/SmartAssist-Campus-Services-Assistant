@@ -1033,6 +1033,17 @@
       <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">TAMUCC Campus Assistant</p>
     </div>
   </div>
+
+    <!-- Registrants Modal -->
+    <div id="registrants-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:3000; padding:1rem;">
+      <div style="background:#fff; border-radius:16px; width:500px; max-width:95%; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.3); padding:2rem;">
+        <span id="close-registrants-modal" style="position:absolute; top:1rem; right:1rem; cursor:pointer; font-size:1.5rem; color:#718096; transition:color 0.2s;" onmouseover="this.style.color='#0067A5'" onmouseout="this.style.color='#718096'">&times;</span>
+        <h3 style="margin-bottom:1rem; font-size:1.2rem; font-weight:600; color:#2d3748;"><i class="fa-solid fa-users"></i> Event Registrants</h3>
+        <ul id="registrants-list" style="list-style:none; padding:0; margin:0;">
+          <!-- Registrants populated dynamically -->
+        </ul>
+      </div>
+    </div>
   <div class="nav-links">
     <!-- Notification Bell -->
     <div class="notification-bell">
@@ -1197,6 +1208,9 @@
                 <th>Priority</th>
                 <th>Target Audience</th>
                 <th>Category</th>
+                <th>Location</th>
+                <th>Seats</th>
+                <th>Registrants</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -1265,6 +1279,18 @@
               </select>
             </div>
           </div>
+
+        <!-- New fields: Location and Seat Capacity -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Location</label>
+            <input type="text" id="event-location" placeholder="Building / Room" style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Seats (optional)</label>
+            <input type="number" id="event-seats" min="0" placeholder="Unlimited" style="width:100%; padding:0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.9rem;" />
+          </div>
+        </div>
           
           <div>
             <label style="display:block; font-size:0.85rem; font-weight:600; color:#2d3748; margin-bottom:0.5rem;">Target Audience</label>
@@ -2830,6 +2856,16 @@ async function loadEvents() {
         </td>
         <td style="padding:0.75rem 0.5rem; color:#4a5568; text-transform:capitalize;">${event.target_audience || 'all'}</td>
         <td style="padding:0.75rem 0.5rem; color:#4a5568; text-transform:capitalize;">${event.category || 'general'}</td>
+        <td style="padding:0.75rem 0.5rem; color:#4a5568;">${event.location || '-'}</td>
+        <td style="padding:0.75rem 0.5rem; color:#4a5568; text-align:center;">
+          ${event.seats_total != null ? `${event.seats_available ?? event.seats_total}/${event.seats_total}` : '-'}
+        </td>
+        <td style="padding:0.75rem 0.5rem; color:#4a5568; text-align:center;">
+          ${Array.isArray(event.registrants) ? event.registrants.length : 0}
+          <button onclick="viewRegistrants('${event._id}')" title="View Registrants" style="margin-left:0.25rem; background:#0067A5; color:#fff; padding:0.2rem 0.4rem; border:none; border-radius:4px; cursor:pointer; font-size:0.75rem; line-height:1; display:inline-flex; align-items:center; justify-content:center;">
+            <i class="fa-solid fa-users" style="font-size:0.75rem; color:#fff;"></i>
+          </button>
+        </td>
         <td style="padding:0.75rem 0.5rem;">
           <span style="padding:0.15rem 0.5rem; border-radius:3px; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; background:${getStatusBg(event.status)}; color:${getStatusTextColor(event.status)};">
             ${event.status || 'active'}
@@ -2915,6 +2951,8 @@ function closeEventModal() {
 document.getElementById('event-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   
+  const seatsInput = document.getElementById('event-seats').value;
+  const seatsTotal = seatsInput === '' ? null : parseInt(seatsInput, 10);
   const eventData = {
     title: document.getElementById('event-title').value,
     description: document.getElementById('event-description').value,
@@ -2922,7 +2960,10 @@ document.getElementById('event-form').addEventListener('submit', async (e) => {
     event_time: document.getElementById('event-time').value || null,
     priority: document.getElementById('event-priority').value,
     category: document.getElementById('event-category').value,
-    target_audience: document.getElementById('event-target').value
+    target_audience: document.getElementById('event-target').value,
+    location: document.getElementById('event-location').value || null,
+    seats_total: seatsTotal,
+    // When creating an event, seats_available will be set server-side to seats_total
   };
   
   try {
@@ -3014,6 +3055,10 @@ async function editEvent(eventId) {
     document.getElementById('event-priority').value = event.priority || 'normal';
     document.getElementById('event-category').value = event.category || 'general';
     document.getElementById('event-target').value = event.target_audience || 'all';
+
+    // Populate new fields if present on the event
+    document.getElementById('event-location').value = event.location || '';
+    document.getElementById('event-seats').value = event.seats_total != null ? event.seats_total : '';
     
     document.getElementById('event-modal').style.display = 'flex';
   } catch (error) {
@@ -3070,6 +3115,49 @@ async function deleteEvent(eventId) {
     console.error('Error deleting event:', error);
   }
 }
+
+// View registrants for a specific event (admin only)
+async function viewRegistrants(eventId) {
+  try {
+    const res = await fetch(`/api/events/${eventId}/registrants`);
+    if (!res.ok) throw new Error('Failed to fetch registrants');
+    const registrants = await res.json();
+    const listEl = document.getElementById('registrants-list');
+    listEl.innerHTML = '';
+    if (!registrants || registrants.length === 0) {
+      const li = document.createElement('li');
+      li.textContent = 'No registrants yet';
+      li.style.padding = '0.5rem 0';
+      li.style.color = '#4a5568';
+      listEl.appendChild(li);
+    } else {
+      registrants.forEach(item => {
+        const li = document.createElement('li');
+        li.style.padding = '0.4rem 0';
+        li.style.borderBottom = '1px solid #e2e8f0';
+        li.textContent = item.full_name && item.full_name !== item.email
+          ? `${item.full_name} (${item.email})`
+          : item.email;
+        listEl.appendChild(li);
+      });
+    }
+    document.getElementById('registrants-modal').style.display = 'flex';
+  } catch (error) {
+    console.error('Error fetching registrants:', error);
+    Toastify({ text: 'Unable to load registrants', duration: 3000, gravity: 'top', position: 'right', style: { background: '#e53e3e' } }).showToast();
+  }
+}
+
+// Close registrants modal
+document.getElementById('close-registrants-modal').addEventListener('click', () => {
+  document.getElementById('registrants-modal').style.display = 'none';
+});
+// Close on outside click
+document.getElementById('registrants-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'registrants-modal') {
+    document.getElementById('registrants-modal').style.display = 'none';
+  }
+});
 
 // Close event modal on X click
 document.getElementById('close-event-modal').addEventListener('click', closeEventModal);

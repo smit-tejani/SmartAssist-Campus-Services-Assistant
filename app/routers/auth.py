@@ -23,26 +23,64 @@ async def post_register(
     confirm_password: str = Form(...),
     role: str = Form(...),
 ):
+    """
+    Register a new user.
+
+    This handler performs basic validation on the provided email and password
+    before creating the account.  It ensures that:
+
+    - Passwords match.
+    - Email follows a simple pattern (contains one '@' and at least one dot).
+    - Password meets complexity requirements (minimum length and contains
+      uppercase, lowercase, digit and special characters).
+    - The email is not already registered.
+
+    If any check fails, the user is returned to the registration page with
+    an appropriate error message.  Otherwise a new user document is created.
+    Note: passwords are currently stored in plaintext; a real system should
+    hash passwords before storage.
+    """
+    # Password match check
     if password != confirm_password:
         return templates.TemplateResponse(
             "register.html",
             {"request": request, "error": "Passwords do not match!"},
         )
 
+    # Email format validation using a simple regex
+    import re  # local import to avoid global side effect
+    email_regex = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
+    if not re.match(email_regex, email):
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "error": "Invalid email format!"},
+        )
+
+    # Password complexity: at least 8 characters, one uppercase, one lowercase, one digit, one special char
+    if len(password) < 8 or not re.search(r"[A-Z]", password) or not re.search(r"[a-z]", password) or not re.search(r"\d", password) or not re.search(r"[^A-Za-z0-9]", password):
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "error": "Password must be at least 8 characters long and include uppercase, lowercase, digit and special character."},
+        )
+
+    # Check if email already exists
     if users_collection.find_one({"email": email}):
         return templates.TemplateResponse(
             "register.html",
             {"request": request, "error": "Email already registered!"},
         )
 
+    # Insert user (note: password stored as-is; consider hashing in production)
     users_collection.insert_one(
         {
             "full_name": full_name,
             "email": email,
             "password": password,
             "role": role,
+            "created_at": datetime.utcnow(),
         }
     )
+
     return templates.TemplateResponse(
         "login.html",
         {"request": request, "message": "Registration successful! Please login."},

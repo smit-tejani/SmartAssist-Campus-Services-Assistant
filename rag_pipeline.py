@@ -120,7 +120,70 @@ def _retrieve_learning_articles(question: str, top_k: int = 3, score_threshold: 
 
 def retrieve_relevant_articles(question, top_k=3, score_threshold=0.5, mode="uni"):
     if mode == "learning":
-        return _retrieve_learning_articles(question, top_k=top_k, score_threshold=0.25)
+        # In learning mode, combine course metadata with course material texts for retrieval.
+        # First, ensure the course cache is populated.
+        _ensure_learning_cache()
+
+        # Gather documents and corresponding text segments. We will treat course metadata
+        # summaries and course material text documents equally. Titles and content will be
+        # included for ranking.
+        docs: list[dict] = []
+        texts: list[str] = []
+
+        # Add course summaries (from courses_collection) built in _ensure_learning_cache
+        for doc, text in zip(_learning_docs, _learning_texts):
+            # Represent as a doc with title and content for ranking
+            course_doc = dict(doc)
+            # Title includes term for clarity
+            course_doc["title"] = f"{course_doc.get('title', 'Course')} ({course_doc.get('term', 'Term')})"
+            course_doc["content"] = text
+            docs.append(course_doc)
+            texts.append(text)
+
+        # Add course material text docs
+        try:
+            materials = list(db.course_materials_text.find({}))
+        except Exception:
+            materials = []
+        for m in materials:
+            content = m.get("text") or ""
+            if not content:
+                continue
+            # Use course_title and file_name to label the doc
+            title = m.get("course_title") or "Course Material"
+            fname = m.get("file_name") or ""
+            label = f"{title}: {fname}" if fname else title
+            # Build a document entry for this material. Include file_url if file_name is present
+            file_url = None
+            file_name = m.get("file_name")
+            if file_name:
+                file_url = f"/static/uploads/materials/{file_name}"
+            mat_doc = {
+                "title": label,
+                "content": content,
+                "course_id": str(m.get("course_id")),
+                "material_id": str(m.get("material_id")),
+                "file_url": file_url,
+            }
+            docs.append(mat_doc)
+            texts.append(content)
+
+        # If no texts, return empty
+        if not texts:
+            return []
+        # Compute embeddings for all texts
+        embeddings = embed_model.encode(texts, convert_to_tensor=True, normalize_embeddings=True)
+        q_emb = embed_model.encode(question, convert_to_tensor=True, normalize_embeddings=True)
+        scores = util.cos_sim(q_emb, embeddings)[0]
+        # Determine number of results to return
+        k = min(top_k, len(docs))
+        top_results = torch.topk(scores, k=k)
+        idxs = top_results.indices.tolist()
+        relevant = []
+        for i in idxs:
+            if float(scores[i]) >= 0.25:
+                relevant.append(docs[i])
+        return relevant
 
     articles = list(kb_collection.find({}))
     if not articles:
@@ -152,7 +215,14 @@ def format_sources_md(articles):
     seen = set()
     for a in articles:
         title = (a.get("title") or "Untitled").strip()
-        url = (a.get("url") or a.get("source") or "").strip()  # support either field name
+        # Determine a URL for source citations. Support multiple field names:
+        # 'url', 'source', 'file_url'. 'file_url' is used for local course material files.
+        url = (
+            a.get("url")
+            or a.get("source")
+            or a.get("file_url")
+            or ""
+        ).strip()
         key = (title, url)
         if key in seen:
             continue

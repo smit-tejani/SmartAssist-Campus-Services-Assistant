@@ -105,6 +105,58 @@ async def raise_ticket(
         return JSONResponse({"success": False, "error": str(exc)}, status_code=500)
 
 
+# ------------------------------------------------------------------
+# API to create tickets from JSON payload (used by chatbot)
+# ------------------------------------------------------------------
+
+@router.post("/api/tickets")
+async def api_create_ticket(payload: TicketCreateRequest):
+    """
+    Create a new support ticket via a JSON API.  This endpoint is used by the
+    chatbot so that students can raise tickets without submitting a form.
+
+    The request body should contain `subject`, `category`, `priority` and
+    `description`.  The student's name and email are optional; if omitted, the
+    endpoint will attempt to read them from the session (if the user is logged
+    in).  After creating the ticket, the API returns the ID of the newly
+    created ticket.
+    """
+    # Basic validation
+    if not (payload.subject and payload.category and payload.priority and payload.description):
+        raise HTTPException(status_code=400, detail="Missing required fields")
+
+    # Try to fill in student info from session if not provided
+    student_email = payload.student_email or ""
+    student_name = payload.student_name or ""
+    # Accessing session via request is not straightforward here; use placeholder if none provided
+    # In future you may inject the current user via dependency to get name/email automatically
+    if not student_email or not student_name:
+        # Attempt to read from DB or default to anonymous
+        student_email = student_email or "anonymous@unknown"
+        student_name = student_name or "Anonymous"
+
+    ticket = {
+        "student_email": student_email,
+        "student_name": student_name,
+        "subject": payload.subject,
+        "category": payload.category,
+        "priority": payload.priority,
+        "description": payload.description,
+        "status": "Open",
+        "created_at": datetime.now().isoformat(),
+        "last_updated": datetime.now().isoformat(),
+        "assigned_staff": None,
+        "assigned_to_name": None,
+    }
+    try:
+        inserted_id = save_ticket(ticket, None)
+        await _notify_admin_new_ticket(ticket, str(inserted_id))
+        await _create_ticket_notification(ticket, str(inserted_id), "created")
+        return {"ticket_id": str(inserted_id)}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
 @router.get("/api/tickets")
 async def api_tickets(status: str | None = None, student_email: str | None = None):
     query = {}

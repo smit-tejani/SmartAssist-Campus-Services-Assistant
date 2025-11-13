@@ -540,18 +540,51 @@
     </div>
   </div>
   <script>
+    let userEmail = null;
     function triggerFileUpload() {
       document.getElementById('profile-picture-input').click();
     }
 
-    function previewProfilePicture(event) {
+    /**
+     * Preview the selected profile picture and immediately upload it to the server.
+     *
+     * Once a file is chosen, this function displays a preview in the UI and
+     * sends the file to the backend via a multipart/form-data POST request.
+     */
+    async function previewProfilePicture(event) {
       const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          document.getElementById('profile-picture').src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+      if (!file) return;
+      // Show preview to the user
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('profile-picture').src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // Upload to server if userEmail is known
+      if (!userEmail) {
+        console.error('User email not loaded yet.');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const response = await fetch(`/api/student/${encodeURIComponent(userEmail)}/profile_picture`, {
+          method: 'POST',
+          body: formData
+        });
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          alert(errData.detail || 'Failed to upload profile picture');
+          return;
+        }
+        const data = await response.json();
+        // Update preview with returned URL if provided
+        if (data.url) {
+          document.getElementById('profile-picture').src = data.url;
+        }
+      } catch (err) {
+        console.error('Error uploading profile picture:', err);
       }
     }
 
@@ -619,12 +652,17 @@
       }
 
       const email = user.email;
+      userEmail = email;
       document.getElementById('email-display').textContent = email;
 
       const studentResponse = await fetch(`/api/student/${email}`);
       const student = await studentResponse.json();
 
       document.getElementById('full-name').textContent = student.full_name;
+      // If a profile image is stored for this student, display it
+      if (student.profile_image) {
+        document.getElementById('profile-picture').src = student.profile_image;
+      }
       document.getElementById('first-name').value = student.first_name || '';
       document.getElementById('last-name').value = student.last_name || '';
       document.getElementById('date-of-birth').value = student.date_of_birth || '';
@@ -685,9 +723,18 @@
         tbody.innerHTML = '';
         mats.forEach(m => {
           const tr = document.createElement('tr');
-          const linkHtml = m.file_name
-            ? `<a href="/uploads/${m.file_name}" target="_blank">Open</a>`
-            : (m.external_url ? `<a href="${m.external_url}" target="_blank">Open</a>` : '-');
+          // Build link: prefer file_url if available; otherwise external_url
+          let linkHtml;
+          if (m.file_url) {
+            linkHtml = `<a href="${m.file_url}" target="_blank">Open</a>`;
+          } else if (m.file_name) {
+            // fallback for old materials: use legacy uploads path
+            linkHtml = `<a href="/static/uploads/materials/${m.file_name}" target="_blank">Open</a>`;
+          } else if (m.external_url) {
+            linkHtml = `<a href="${m.external_url}" target="_blank">Open</a>`;
+          } else {
+            linkHtml = '-';
+          }
 
           tr.innerHTML = `
         <td>${m.course_title || '—'}</td>

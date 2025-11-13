@@ -4,13 +4,14 @@ import json
 import logging
 from typing import Any, Dict
 
-from fastapi import APIRouter, Form, HTTPException
+from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from app.core.config import settings
 from app.data import get_campus_map
 from app.services.llm_followups import build_llm_style_followups
+from app.services.student_learning import answer_from_student_scope
 
 router = APIRouter()
 
@@ -31,56 +32,145 @@ def _normalize_mode(raw: str | None) -> str:
 
 def _maybe_add_map_followup(question: str, chips: list[dict[str, Any]]) -> None:
     """
-    If the user's question looks like a campus location / directions
-    request and we can resolve it to a campus building, add a
-    'Show 3D Walking Map' follow-up chip.
+    Inspect the user's question to determine if it references a campus location or
+    a request for directions. When a location can be resolved, append
+    follow‑up action chips that allow the student to explore the location,
+    get directions, or view the walking map.
 
-    The frontend (chat.html) handles this in onFollowupClick() by
-    calling showMapModal(destination).
+    This helper is intentionally liberal in matching: it attempts to resolve the
+    question to a known campus building even when explicit map keywords are not
+    present. The goal is to surface map functionality for queries such as
+    "Where is the engineering department?", "library hours", or simply the
+    name of a building. If a building is recognized, multiple follow‑ups are
+    provided:
+
+      • ℹ️ About {location.name} – shows basic information about the location
+        (description, hours, category).
+      • 🧭 Get Directions – opens the directions flow (origin→destination)
+        using the student's current location as the origin.
+      • 🗺️ Show Map – opens the 3D map modal centered on the location.
+
+    The frontend (chat.html) should interpret these payloads in onFollowupClick().
     """
     try:
-        q_lower = question.lower()
-        map_keywords = (
-            "map",
-            "where is",
-            "location",
-            "building",
-            "directions",
-            "walk",
-            "navigate",
-            "route",
-        )
-        if not any(k in q_lower for k in map_keywords):
-            return
-
         campus_map = get_campus_map(settings.campus_map_variant)
+        # Attempt to resolve the question to a campus location. This will return
+        # None if no matching alias or building name is found.
         location = campus_map.lookup(question)
-        if not location:
-            return
 
-        # This string is what Google Maps will use as the destination.
+        # If no match is found and the question clearly doesn't mention any
+        # navigation keywords, bail out early. We still want to catch cases
+        # where the question contains a building name but not the word "map".
+        q_lower = (question or "").lower()
+        if not location:
+            map_keywords = (
+                "map",
+                "where is",
+                "location",
+                "building",
+                "directions",
+                "walk",
+                "navigate",
+                "route",
+            )
+            # If there are no keywords present and no location match, there is
+            # nothing to suggest.
+            if not any(k in q_lower for k in map_keywords):
+                return
+            # Try a fuzzy lookup by splitting the question into words and
+            # matching aliases. This increases recall for phrases like
+            # "how do I get to the nrc". The campus_map.iter_aliases() yields
+            # (alias, location) pairs for all known buildings.
+            for alias, loc in campus_map.iter_aliases():
+                if alias.lower() in q_lower:
+                    location = loc
+                    break
+            if not location:
+                return
+
+        # Destination string used by Google Maps / directions API.
         destination = f"{location.name}, Texas A&M University-Corpus Christi"
 
-        chips.append(
-            {
-                "label": "🗺️ Show 3D Walking Map",
-                "payload": {
-                    "type": "action",
-                    "action": "show_map",
-                    "destination": destination,
-                },
-            }
-        )
+        # Avoid duplicate suggestions by checking existing chip payloads.
+        def _already_exists(action: str) -> bool:
+            for chip in chips:
+                payload = chip.get("payload", {})
+                if payload.get("action") == action and payload.get("destination") == destination:
+                    return True
+            return False
+
+        # ℹ️ Information chip
+        if not _already_exists("show_location_info"):
+            chips.append(
+                {
+                    "label": f"ℹ️ About {location.name}",
+                    "payload": {
+                        "type": "action",
+                        "action": "show_location_info",
+                        "destination": destination,
+                    },
+                }
+            )
+
+        # 🧭 Directions chip (uses current location as origin)
+        if not _already_exists("show_directions"):
+            chips.append(
+                {
+                    "label": "🧭 Get Directions",
+                    "payload": {
+                        "type": "action",
+                        "action": "show_directions",
+                        "destination": destination,
+                    },
+                }
+            )
+
+        # 🗺️ Map chip
+        if not _already_exists("show_map"):
+            chips.append(
+                {
+                    "label": "🗺️ Show Map",
+                    "payload": {
+                        "type": "action",
+                        "action": "show_map",
+                        "destination": destination,
+                    },
+                }
+            )
     except Exception as exc:
         logging.warning("Failed to add map followup: %s", exc)
 
 
 @router.post("/chat_question")
-async def chat_question(question: str = Form(...), mode: str = Form("uni")):
+async def chat_question(request: Request, question: str = Form(...), mode: str = Form("uni")):
+    """
+    Respond to chat questions from the student.
+
+    For learning mode, delegate to the student learning assistant to handle course‑specific
+    queries (listing courses, materials, quizzes, flashcards, summaries, etc.).
+    Otherwise, use the generic RAG pipeline to answer campus questions.
+    """
     from rag_pipeline import get_answer
 
     normalized_mode = _normalize_mode(mode)
 
+    # If the question is in learning mode, use the student learning assistant
+    if normalized_mode == "learning":
+        user = request.session.get("user") or {}
+        email = user.get("email")
+        resp_obj = await answer_from_student_scope(request, question, email)
+        answer = resp_obj.get("answer", "")
+        chips = resp_obj.get("suggested_followups", [])
+        suggest_live_chat = resp_obj.get("suggest_live_chat", False)
+        # Note: map followups are not relevant for learning mode
+        return {
+            "answer": answer,
+            "suggest_live_chat": suggest_live_chat,
+            "suggested_followups": chips,
+            "mode": normalized_mode,
+        }
+
+    # University mode: use the standard RAG pipeline
     answer, _ = get_answer(question, mode=normalized_mode)
 
     chips, suggest_live_chat, fu_source = build_llm_style_followups(
@@ -112,11 +202,49 @@ async def chat_question(question: str = Form(...), mode: str = Form("uni")):
 
 
 @router.post("/chat_question_stream")
-async def chat_question_stream(question: str = Form(...), mode: str = Form("uni")):
+async def chat_question_stream(request: Request, question: str = Form(...), mode: str = Form("uni")):
+    """
+    Stream chatbot responses.  For learning mode, a single answer is returned without streaming.
+    For university mode, responses are streamed using the RAG pipeline.
+    """
     from rag_pipeline import get_answer_stream
 
     normalized_mode = _normalize_mode(mode)
 
+    # If learning mode, produce a single SSE event with the full answer and followups
+    if normalized_mode == "learning":
+        user = request.session.get("user") or {}
+        email = user.get("email")
+        resp_obj = await answer_from_student_scope(request, question, email)
+        answer = resp_obj.get("answer", "")
+        chips = resp_obj.get("suggested_followups", [])
+        suggest_live_chat = resp_obj.get("suggest_live_chat", False)
+
+        async def simple_stream():
+            # Send the answer as a single chunk
+            yield f"data: {json.dumps({'type': 'chunk', 'content': answer})}\n\n"
+            # Send followups
+            followup_data: Dict[str, Any] = {
+                "type": "followups",
+                "suggest_live_chat": suggest_live_chat,
+                "suggested_followups": chips,
+                "mode": normalized_mode,
+            }
+            yield f"data: {json.dumps(followup_data)}\n\n"
+            # Done
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+
+        return StreamingResponse(
+            simple_stream(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+
+    # Otherwise, stream using the RAG pipeline (university mode)
     async def event_generator():
         full_answer = ""
         for chunk in get_answer_stream(question, mode=normalized_mode):
@@ -129,28 +257,23 @@ async def chat_question_stream(question: str = Form(...), mode: str = Form("uni"
             k=4,
             mode=normalized_mode,
         )
-
         if chips is None:
             chips = []
-        # 🔹 Add map followup here as well
+        # Add map followup suggestions
         _maybe_add_map_followup(question, chips)
-
         if suggest_live_chat:
             chips = [
                 {"label": "Talk to an admin", "payload": {
                     "type": "action", "action": "escalate"}}
             ]
-
         followup_data: Dict[str, Any] = {
             "type": "followups",
             "suggest_live_chat": suggest_live_chat,
             "suggested_followups": chips,
             "mode": normalized_mode,
         }
-
         if settings.debug_followups:
             followup_data["followup_generator"] = fu_source
-
         yield f"data: {json.dumps(followup_data)}\n\n"
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
@@ -272,6 +395,92 @@ async def analyze_map_request(request: MapAnalysisRequest):
 
 class RoutingRequest(BaseModel):
     message: str
+
+
+class DirectionsRequest(BaseModel):
+    """
+    Request model used by /api/get_directions.
+
+    The client sends a destination (location name) and optionally an origin name.
+    If the origin is omitted, the user's current GPS location (obtained by the
+    frontend) should be used. This endpoint resolves the requested locations to
+    campus map coordinates so that the frontend can build a Google Maps
+    directions request.
+    """
+    destination: str
+    origin: str | None = None
+
+
+@router.post("/api/get_directions")
+async def get_directions(request: DirectionsRequest):
+    """
+    Resolve a destination (and optional origin) into campus map coordinates.
+
+    Returns the variant of the campus map and the structured location data for
+    the destination and origin. If the origin is not provided or cannot be
+    resolved, ``origin`` will be null and the frontend should use the user's
+    current GPS coordinates instead.
+    """
+    campus_map = get_campus_map(settings.campus_map_variant)
+    dest_loc = campus_map.lookup(request.destination)
+    origin_loc = None
+    if request.origin:
+        origin_loc = campus_map.lookup(request.origin)
+
+    response: Dict[str, Any] = {
+        "variant": campus_map.variant,
+        "destination": dest_loc.to_response() if dest_loc else None,
+        "origin": origin_loc.to_response() if origin_loc else None,
+        "found": bool(dest_loc),
+    }
+    if not dest_loc:
+        response["message"] = "I couldn't find the destination building."
+    return response
+
+
+# ===== New API Endpoints for Enhanced Map Flow =====
+
+class LocationInfoRequest(BaseModel):
+    """
+    Request model used by /api/get_location_info.
+
+    The frontend will send the exact location name or alias that was selected from a
+    follow‑up chip. This endpoint returns rich metadata about the location so the
+    assistant can respond with a detailed description.
+    """
+    location: str
+
+
+@router.post("/api/get_location_info")
+async def get_location_info(request: LocationInfoRequest):
+    """
+    Return details about a campus location.
+
+    The response includes the location's name, address, description, hours of
+    operation (if available), category, and geographic coordinates. If the
+    location cannot be resolved, ``found`` will be set to False and a generic
+    message provided. This endpoint powers the "About …" follow‑up chip.
+    """
+    campus_map = get_campus_map(settings.campus_map_variant)
+    location = campus_map.lookup(request.location)
+    if not location:
+        return {
+            "found": False,
+            "message": "I'm sorry, I couldn't find details about that location.",
+        }
+    data = location.to_response()
+    return {
+        "found": True,
+        "name": data["name"],
+        "address": data.get("address"),
+        "description": data.get("description"),
+        "hours": data.get("hours"),
+        "category": data.get("category"),
+        "coordinates": {
+            "lat": data.get("lat"),
+            "lng": data.get("lng"),
+        },
+    }
 
 
 @router.post("/api/analyze_routing_request")

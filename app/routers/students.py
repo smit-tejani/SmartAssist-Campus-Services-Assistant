@@ -131,6 +131,53 @@ def get_all_students():
         student["_id"] = str(student["_id"])
     return students
 
+# ------------------------------------------------------------------------------
+# Profile Picture Upload
+# ------------------------------------------------------------------------------
+from fastapi import UploadFile, File
+from pathlib import Path
+
+
+@router.post("/api/student/{email}/profile_picture")
+async def upload_profile_picture(email: str, file: UploadFile = File(...)):
+    """
+    Upload a profile picture for the specified student.
+
+    The file is saved into a subdirectory of the static folder and the
+    student's record is updated with the relative file path.  Only image
+    formats (png, jpg, jpeg, gif) are accepted.
+    """
+    # Validate file extension
+    filename = file.filename or ""
+    ext = filename.rsplit(".", 1)[-1].lower()
+    if ext not in {"png", "jpg", "jpeg", "gif"}:
+        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload an image.")
+
+    # Ensure upload directory exists
+    upload_dir = Path("static/uploads/profile_pictures")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    # Compose unique file name
+    timestamp = int(datetime.utcnow().timestamp())
+    safe_email = email.replace("@", "_").replace(".", "_")
+    saved_name = f"{safe_email}_{timestamp}.{ext}"
+    file_path = upload_dir / saved_name
+
+    # Save file content
+    content = await file.read()
+    with open(file_path, "wb") as f:
+        f.write(content)
+
+    # Update student record with new profile image path
+    result = students_collection.update_one(
+        {"email": email},
+        {"$set": {"profile_image": f"/static/uploads/profile_pictures/{saved_name}"}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    return {"success": True, "url": f"/static/uploads/profile_pictures/{saved_name}"}
+
 
 @router.get("/api/materials/mine")
 def get_my_materials(request: Request):
@@ -155,6 +202,10 @@ def get_my_materials(request: Request):
 
     result = []
     for m in mats:
+        # compute file_url for client if a local file is present
+        file_url = None
+        if m.get("file_name"):
+            file_url = f"/static/uploads/materials/{m['file_name']}"
         result.append({
             "_id": str(m["_id"]),
             "course_id": str(m["course_id"]),
@@ -162,6 +213,7 @@ def get_my_materials(request: Request):
             "title": m.get("title"),
             "description": m.get("description"),
             "file_name": m.get("file_name"),
+            "file_url": file_url,
             "external_url": m.get("external_url"),
             "uploaded_by": m.get("uploaded_by"),
             "uploaded_at": m.get("uploaded_at").isoformat() if m.get("uploaded_at") else None,
@@ -209,24 +261,44 @@ async def create_course_material(
         raise HTTPException(404, "Course not found")
 
     saved_filename = None
-    if file and file.filename:
-        # sanitize filename
-        cleaned = re.sub(r"[^a-zA-Z0-9._-]+", "_", file.filename)
-        abs_path = os.path.join(UPLOAD_DIR, cleaned)
-        with open(abs_path, "wb") as f:
-            f.write(await file.read())
-        saved_filename = cleaned  # <-- store only this
     saved_path = None
     file_type = None
 
-    # if staff uploaded an actual file
-    if file:
+    # -------------------------------------------------------------------
+    # Save uploaded file into a static directory for public access.
+    # We sanitize the filename to prevent directory traversal and ensure
+    # uniqueness. Files are stored under static/uploads/materials.
+    # Previously the code attempted to save files into both `UPLOAD_DIR`
+    # (uploads) and the relative `uploads/` folder, which is not served
+    # by FastAPI and resulted in 404 links. Here we write only once to a
+    # static subdirectory so the file is accessible at `/static/uploads/materials/<name>`.
+    # -------------------------------------------------------------------
+    if file and file.filename:
+        # sanitize filename
+        original_name = file.filename
+        cleaned = re.sub(r"[^a-zA-Z0-9._-]+", "_", original_name)
+        # ensure subdir exists
+        from pathlib import Path
+        mat_dir = Path("static/uploads/materials")
+        mat_dir.mkdir(parents=True, exist_ok=True)
+        # ensure unique filename with timestamp
+        timestamp = int(datetime.utcnow().timestamp())
+        name_parts = cleaned.rsplit(".", 1)
+        if len(name_parts) == 2:
+            base, ext = name_parts
+            cleaned = f"{base}_{timestamp}.{ext}"
+        else:
+            cleaned = f"{cleaned}_{timestamp}"
+        abs_path = mat_dir / cleaned
+        # save content
         contents = await file.read()
-        saved_path = f"uploads/{file.filename}"
-        with open(saved_path, "wb") as f:
+        with open(abs_path, "wb") as f:
             f.write(contents)
+        saved_filename = cleaned
+        saved_path = f"/static/uploads/materials/{cleaned}"
         file_type = file.content_type or "application/octet-stream"
     elif external_url:
+        # if an external URL is provided, we don't save a file but record the link
         saved_path = external_url
         file_type = "link"
 
@@ -240,19 +312,25 @@ async def create_course_material(
         "visible": True,
     }
 
+    # store file metadata
     if saved_filename:
+        # use sanitized filename and compute URL relative to static so front-end can build link
         doc["file_name"] = saved_filename
+        # also include file_url for convenience
+        doc["file_url"] = saved_path  # e.g. /static/uploads/materials/<name>
 
+    # store external URL if provided
     if external_url:
         doc["external_url"] = external_url
 
     result = db.course_materials.insert_one(doc)
     material_id = result.inserted_id
-    # try to extract text if it's a PDF
+    # try to extract text if it's a PDF; use the saved absolute path computed above
     try:
         if saved_filename and saved_filename.lower().endswith(".pdf"):
-            abs_path = os.path.join(UPLOAD_DIR, saved_filename)
-            text = extract_pdf_text(abs_path)  # we'll define this below
+            # compute absolute path for the saved file under static/uploads/materials
+            abs_path_for_pdf = os.path.join("static/uploads/materials", saved_filename)
+            text = extract_pdf_text(abs_path_for_pdf)  # we'll define this below
             if text:
                 db.course_materials_text.insert_one({
                     "material_id": material_id,
@@ -273,11 +351,28 @@ async def get_materials_by_course(course_id: str):
         "visible": True
     }).sort("uploaded_at", -1))
     # convert ObjectId -> str
-    out = []
+    out: list[dict] = []
     for m in mats:
-        m["_id"] = str(m["_id"])
-        m["course_id"] = str(m["course_id"])
-        out.append(m)
+        # convert IDs
+        m_id = str(m["_id"])
+        c_id = str(m["course_id"])
+        # compute file_url for local files
+        file_url = None
+        if m.get("file_name"):
+            file_url = f"/static/uploads/materials/{m['file_name']}"
+        out.append({
+            "_id": m_id,
+            "course_id": c_id,
+            "course_title": m.get("course_title"),
+            "title": m.get("title"),
+            "description": m.get("description"),
+            "file_name": m.get("file_name"),
+            "file_url": file_url,
+            "external_url": m.get("external_url"),
+            "uploaded_by": m.get("uploaded_by"),
+            "uploaded_at": m.get("uploaded_at").isoformat() if m.get("uploaded_at") else None,
+            "visible": m.get("visible", True),
+        })
     return out
 
 
@@ -301,12 +396,25 @@ async def get_all_materials(request: Request):
     courses = {c["_id"]: c for c in db.courses.find(
         {"_id": {"$in": course_ids}})}
 
-    out = []
+    out: list[dict] = []
     for m in mats:
-        m["_id"] = str(m["_id"])
         cid = m["course_id"]
-        m["course_id"] = str(cid)
         course = courses.get(cid)
-        m["course_title"] = course["title"] if course else "Unknown course"
-        out.append(m)
+        # compute file_url for local files
+        file_url = None
+        if m.get("file_name"):
+            file_url = f"/static/uploads/materials/{m['file_name']}"
+        out.append({
+            "_id": str(m["_id"]),
+            "course_id": str(cid),
+            "course_title": course["title"] if course else "Unknown course",
+            "title": m.get("title"),
+            "description": m.get("description"),
+            "file_name": m.get("file_name"),
+            "file_url": file_url,
+            "external_url": m.get("external_url"),
+            "uploaded_by": m.get("uploaded_by"),
+            "uploaded_at": m.get("uploaded_at").isoformat() if m.get("uploaded_at") else None,
+            "visible": m.get("visible", True),
+        })
     return out

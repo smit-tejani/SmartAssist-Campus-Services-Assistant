@@ -30,8 +30,43 @@
     </div>
 
     <!-- Events Section -->
-    <div id="student-events-section" style="margin-bottom: 1.5rem;">
-      <!-- Events will be dynamically populated here -->
+    <!-- Events Section -->
+    <div style="margin-bottom: 1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <h3 style="margin:0; color:#0067A5; font-size:1.25rem; font-weight:600;">Upcoming Events</h3>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <label for="event-category-filter" style="font-size:0.85rem; color:#2d3748;">Filter:</label>
+          <select id="event-category-filter" style="padding:0.4rem 0.6rem; border:1px solid #e2e8f0; border-radius:6px; font-size:0.85rem;">
+            <option value="all" selected>All</option>
+            <option value="academic">Academic</option>
+            <option value="administrative">Administrative</option>
+            <option value="social">Social</option>
+            <option value="general">General</option>
+          </select>
+        </div>
+      </div>
+      <div id="student-events-section">
+        <!-- Events will be dynamically populated here -->
+      </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div id="student-event-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; padding:1rem;">
+      <div style="background:#fff; border-radius:16px; width:500px; max-width:95%; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.3); padding:1.5rem;">
+        <span id="close-student-event-modal" style="position:absolute; top:1rem; right:1rem; cursor:pointer; font-size:1.5rem; color:#718096;" >&times;</span>
+        <h3 id="student-event-title" style="color:#0067A5; margin-top:0; margin-bottom:0.75rem; font-size:1.4rem; font-weight:600;"></h3>
+        <p id="student-event-description" style="margin:0 0 0.5rem 0; color:#4a5568; line-height:1.4;"></p>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:0.75rem; font-size:0.9rem; color:#4a5568;">
+          <div><strong>Date:</strong> <span id="student-event-date"></span></div>
+          <div><strong>Time:</strong> <span id="student-event-time"></span></div>
+          <div><strong>Location:</strong> <span id="student-event-location"></span></div>
+          <div><strong>Category:</strong> <span id="student-event-category"></span></div>
+          <div><strong>Seats:</strong> <span id="student-event-seats"></span></div>
+        </div>
+        <div id="student-event-register-section" style="display:flex; flex-direction:column; gap:0.75rem;">
+          <!-- Register/unregister button will be inserted here -->
+        </div>
+      </div>
     </div>
 
     <!-- Appointment Reminders -->

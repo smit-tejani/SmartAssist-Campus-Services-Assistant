@@ -1029,75 +1029,206 @@ async function loadStudentAppointmentReminders() {
   }
 }
 
-// Load and display events for students
+// Global variables to track events and current user
+let studentEmail = null;
+let eventsData = [];
+
+// Utility: generate a Google Calendar link for an event
+function getGoogleCalendarLink(event) {
+  try {
+    const startDate = new Date(`${event.event_date}T${event.event_time || '00:00'}`);
+    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour duration
+    const start = startDate.toISOString().replace(/[-:]|\.\d{3}/g, '');
+    const end = endDate.toISOString().replace(/[-:]|\.\d{3}/g, '');
+    const text = encodeURIComponent(event.title || 'Event');
+    const details = encodeURIComponent(`${event.description || ''}\nLocation: ${event.location || ''}`);
+    const location = encodeURIComponent(event.location || '');
+    return `https://calendar.google.com/calendar/r/eventedit?text=${text}&dates=${start}/${end}&details=${details}&location=${location}`;
+  } catch (e) {
+    return '#';
+  }
+}
+
+// Render student events based on global eventsData and selected filter
+function renderStudentEvents() {
+  const eventsContainer = document.getElementById('student-events-section');
+  const filterValue = document.getElementById('event-category-filter').value;
+  eventsContainer.innerHTML = '';
+  if (!eventsData || eventsData.length === 0) return;
+  // Filter for students/all and category
+  const filtered = eventsData.filter(ev => {
+    // Hide events the student has already RSVPed to
+    let isRegistered = false;
+    if (Array.isArray(ev.registrants) && studentEmail) {
+      isRegistered = ev.registrants.includes(studentEmail);
+    }
+    if (isRegistered) return false;
+    const audienceMatch = ev.target_audience === 'students' || ev.target_audience === 'all';
+    const categoryMatch = filterValue === 'all' || (ev.category || 'general').toLowerCase() === filterValue;
+    return audienceMatch && categoryMatch;
+  });
+  if (filtered.length === 0) {
+    eventsContainer.innerHTML = '<p style="color:#718096;">No events found.</p>';
+    return;
+  }
+  filtered.forEach(event => {
+    const eventCard = document.createElement('div');
+    eventCard.classList.add('student-event-card');
+    // Use a blue/green gradient consistent with the site theme
+    eventCard.style.cssText = `
+      background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      color: white;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+    `;
+    // Determine priority icon
+    const priorityIcon = event.priority === 'high' ? '🔴' : event.priority === 'urgent' ? '⚠️' : '📢';
+    const eventDate = new Date(event.event_date).toLocaleDateString();
+    // Build card HTML with a visual cue to indicate clickability
+    eventCard.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div style="flex:1;">
+          <h3 style="margin:0 0 0.4rem 0; font-size:1rem; font-weight:600;">${priorityIcon} ${event.title}</h3>
+          <p style="margin:0 0 0.4rem 0; font-size:0.9rem; opacity:0.9; line-height:1.4;">${event.description}</p>
+          <div style="display:flex; flex-wrap:wrap; gap:0.8rem; font-size:0.8rem; opacity:0.85;">
+            <span>📅 ${eventDate}</span>
+            <span>⏰ ${event.event_time || '-'}</span>
+            <span>📂 ${(event.category || 'General').charAt(0).toUpperCase() + (event.category || 'General').slice(1)}</span>
+            <span>📍 ${event.location || '-'}</span>
+            <span>🎫 ${event.seats_total != null ? `${event.seats_available ?? event.seats_total}/${event.seats_total}` : '∞'}</span>
+          </div>
+        </div>
+        ${event.status === 'completed' ? '<span style="background:rgba(255,255,255,0.3); padding:0.25rem 0.6rem; border-radius:16px; font-size:0.75rem;">✓ Completed</span>' : ''}
+      </div>
+      <div style="margin-top:0.6rem; display:flex; justify-content:flex-end; align-items:center; font-size:0.8rem; opacity:0.9;">
+        Tap for details & RSVP <i class="fa-solid fa-chevron-right" style="margin-left:0.25rem;"></i>
+      </div>
+    `;
+    // Attach click handler to open modal
+    eventCard.addEventListener('click', () => openStudentEventModal(event));
+    eventsContainer.appendChild(eventCard);
+  });
+}
+
+// Load student events and user info
 async function loadStudentEvents() {
   try {
-    const response = await fetch("/api/events?status=active");
-    if (!response.ok) throw new Error("Failed to fetch events");
-
-    const events = await response.json();
-    const eventsContainer = document.getElementById("student-events-section");
-
-    // Filter events for students or all
-    const studentEvents = events.filter(
-      (event) =>
-        event.target_audience === "students" || event.target_audience === "all"
-    );
-
-    if (studentEvents.length === 0) {
-      eventsContainer.innerHTML = "";
-      return;
+    // Get current user email for registration status
+    if (!studentEmail) {
+      const userRes = await fetch('/api/user');
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        studentEmail = userData.email;
+      }
     }
-
-    eventsContainer.innerHTML = "";
-
-    studentEvents.forEach((event) => {
-      const eventCard = document.createElement("div");
-      eventCard.style.cssText = `
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
-        padding: 1.2rem;
-        color: white;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      `;
-
-      const priorityIcon =
-        event.priority === "high"
-          ? "🔴"
-          : event.priority === "urgent"
-          ? "⚠️"
-          : "📢";
-      const eventDate = new Date(event.event_date).toLocaleDateString();
-
-      eventCard.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-          <div style="flex: 1;">
-            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem;">
-              ${priorityIcon} ${event.title}
-            </h3>
-            <p style="margin: 0 0 0.5rem 0; opacity: 0.9; font-size: 0.95rem;">
-              ${event.description}
-            </p>
-            <div style="display: flex; gap: 1rem; font-size: 0.9rem; opacity: 0.8;">
-              <span>📅 ${eventDate}</span>
-              <span>⏰ ${event.event_time}</span>
-              <span>📂 ${event.category || "General"}</span>
-            </div>
-          </div>
-          ${
-            event.status === "completed"
-              ? '<span style="background: rgba(255,255,255,0.3); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem;">✓ Completed</span>'
-              : ""
-          }
-        </div>
-      `;
-
-      eventsContainer.appendChild(eventCard);
-    });
+    const response = await fetch('/api/events?status=active');
+    if (!response.ok) throw new Error('Failed to fetch events');
+    const events = await response.json();
+    eventsData = events;
+    renderStudentEvents();
   } catch (err) {
-    console.error("Error loading student events:", err);
+    console.error('Error loading student events:', err);
   }
+}
+
+// Open event details modal for a specific event
+function openStudentEventModal(event) {
+  const modal = document.getElementById('student-event-modal');
+  document.getElementById('student-event-title').textContent = event.title;
+  document.getElementById('student-event-description').textContent = event.description;
+  document.getElementById('student-event-date').textContent = new Date(event.event_date).toLocaleDateString();
+  document.getElementById('student-event-time').textContent = event.event_time || '-';
+  document.getElementById('student-event-location').textContent = event.location || '-';
+  document.getElementById('student-event-category').textContent = (event.category || 'general').charAt(0).toUpperCase() + (event.category || 'general').slice(1);
+  // Seats display
+  const seatsDisplay = event.seats_total != null ? `${event.seats_available ?? event.seats_total}/${event.seats_total}` : 'Unlimited';
+  document.getElementById('student-event-seats').textContent = seatsDisplay;
+  // Build RSVP / cancel RSVP / calendar actions
+  const actionContainer = document.getElementById('student-event-register-section');
+  actionContainer.innerHTML = '';
+  // Determine if student already RSVPed
+  const alreadyRegistered = Array.isArray(event.registrants) && studentEmail && event.registrants.includes(studentEmail);
+  const btn = document.createElement('button');
+  btn.style.cssText = 'padding:0.6rem 1rem; border:none; border-radius:6px; font-size:0.9rem; font-weight:500; color:white; cursor:pointer; display:flex; align-items:center; gap:0.4rem;';
+  if (alreadyRegistered) {
+    btn.textContent = 'Cancel RSVP';
+    btn.style.background = '#e53e3e';
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const res = await fetch(`/api/events/${event._id}/register`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to cancel RSVP');
+        // Update local event state
+        if (event.seats_available != null) event.seats_available += 1;
+        if (Array.isArray(event.registrants)) {
+          const idx = event.registrants.indexOf(studentEmail);
+          if (idx !== -1) event.registrants.splice(idx, 1);
+        }
+        // Refresh UI
+        renderStudentEvents();
+        // Show toast for cancellation
+        Toastify({ text: 'RSVP cancelled', duration: 3000, gravity: 'top', position: 'right', style: { background: '#e53e3e' } }).showToast();
+        // Reopen modal to reflect new state
+        openStudentEventModal(event);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  } else {
+    btn.textContent = 'RSVP';
+    btn.style.background = '#0067A5';
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const res = await fetch(`/api/events/${event._id}/register`, { method: 'POST' });
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          const errorMsg = data && data.detail ? data.detail : 'Failed to RSVP';
+          // Display error via toast
+          Toastify({ text: errorMsg, duration: 3000, gravity: 'top', position: 'right', style: { background: '#e53e3e' } }).showToast();
+          btn.disabled = false;
+          return;
+        }
+        // Update local event state
+        if (event.seats_available != null) event.seats_available -= 1;
+        if (!Array.isArray(event.registrants)) event.registrants = [];
+        if (studentEmail) event.registrants.push(studentEmail);
+        // Refresh event list
+        renderStudentEvents();
+        // Hide RSVP button and show confirmation message
+        btn.style.display = 'none';
+        const doneMsg = document.createElement('div');
+        doneMsg.textContent = 'RSVP confirmed ✅';
+        doneMsg.style.cssText = 'font-size:0.9rem; font-weight:500; color:#00A99D;';
+        actionContainer.appendChild(doneMsg);
+        // Toast notification
+        Toastify({ text: 'RSVP confirmed!', duration: 3000, gravity: 'top', position: 'right', style: { background: '#48bb78' } }).showToast();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+  actionContainer.appendChild(btn);
+  // Add to calendar link
+  const calLink = document.createElement('a');
+  calLink.href = getGoogleCalendarLink(event);
+  calLink.target = '_blank';
+  calLink.textContent = 'Add to Google Calendar';
+  calLink.style.cssText = 'display:inline-block; margin-top:0.5rem; font-size:0.85rem; color:#0067A5; text-decoration:underline;';
+  actionContainer.appendChild(calLink);
+  // Show modal
+  modal.style.display = 'flex';
+  // Setup close handler
+  document.getElementById('close-student-event-modal').onclick = () => {
+    modal.style.display = 'none';
+  };
 }
 
 // Update counts in stats widgets
@@ -1135,6 +1266,13 @@ async function updateCounts() {
 // initial counts
 updateCounts();
 loadStudentEvents(); // Load events on page load
+// Attach filter change handler
+const categoryFilterEl = document.getElementById('event-category-filter');
+if (categoryFilterEl) {
+  categoryFilterEl.addEventListener('change', () => {
+    renderStudentEvents();
+  });
+}
 loadStudentAppointmentReminders(); // Load appointment reminders on page load
 
 // wire up openers
