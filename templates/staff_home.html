@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/common.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <style>
     /* ==================== RESET & BASE ==================== */
@@ -600,70 +601,7 @@
       }
     }
 
-    /* ==================== NOTIFICATION BELL ==================== */
-    .notification-bell {
-      position: relative;
-      margin-right: 1.5rem;
-      display: inline-block;
-    }
 
-    .notification-bell-icon {
-      font-size: 1.5rem;
-      color: #ffffff;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-
-    .notification-bell-icon:hover {
-      color: #00A99D;
-      transform: scale(1.1);
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: #e53e3e;
-      color: white;
-      border-radius: 50%;
-      padding: 2px 6px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      min-width: 18px;
-      text-align: center;
-      border: 2px solid #0067A5;
-    }
-
-    .notification-dropdown {
-      display: none;
-      position: absolute;
-      top: calc(100% + 0.5rem);
-      right: 0;
-      background: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      border-radius: 8px;
-      overflow: hidden;
-      z-index: 1001;
-      width: 380px;
-      max-height: 500px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .notification-dropdown.show {
-      display: block;
-    }
-
-    .notification-header {
-      padding: 1rem 1.25rem;
-      background: linear-gradient(135deg, #0067A5 0%, #00A99D 100%);
-      color: #ffffff;
-      font-weight: 600;
-      font-size: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
 
     .mark-all-read {
       background: rgba(255, 255, 255, 0.2);
@@ -801,43 +739,68 @@
 
 <body>
 
-  <!-- Navbar -->
   <nav>
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
-      <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo"
-        style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
-      <div>
-        <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
-        <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">TAMUCC Campus Assistant</p>
+    <div class="nav-left">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo"
+          style="width: 40px; height: 40px; object-fit: contain; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+        <div>
+          <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
+          <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">
+            TAMUCC Campus Assistant
+          </p>
+        </div>
       </div>
     </div>
-    <div class="nav-links">
-      <!-- Notification Bell -->
-      <div class="notification-bell">
-        <i class="fa-solid fa-bell notification-bell-icon" id="notification-icon"></i>
-        <span class="notification-badge" id="notification-count" style="display: none;">0</span>
 
-        <div class="notification-dropdown" id="notification-dropdown">
-          <div class="notification-header">
-            <span>Notifications</span>
-            <span class="mark-all-read" onclick="markAllAsRead()">Mark all read</span>
-          </div>
-          <div class="notification-list" id="notification-list">
-            <div class="notification-empty">
-              <i class="fa-solid fa-bell-slash"></i>
-              <p>No notifications</p>
+    <div class="nav-links">
+      {% block nav_links %}
+      {% if user is defined and user %}
+      <a href="/">Home</a>
+      {% if user['role'] == 'student' %}
+      <a href="/student_home">Dashboard</a>
+      {% elif user['role'] == 'staff' %}
+      <a href="/staff_home">Dashboard</a>
+      {% elif user['role'] == 'admin' %}
+      <a href="/admin_home">Dashboard</a>
+      {% endif %}
+      <a href="/forum">Community</a>
+      <div class="nav-right">
+        <!-- Notification Bell -->
+        <div class="notification-bell">
+          <i class="fa-solid fa-bell notification-bell-icon" id="notification-icon"></i>
+          <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+
+          <div class="notification-dropdown" id="notification-dropdown">
+            <div class="notification-header">
+              <span>Notifications</span>
+              <span class="mark-all-read" onclick="markAllAsRead()">Mark all read</span>
+            </div>
+            <div class="notification-list" id="notification-list">
+              <div class="notification-empty">
+                <i class="fa-solid fa-bell-slash"></i>
+                <p>No notifications</p>
+              </div>
+            </div>
+            <div class="notification-footer">
+              <a href="#" onclick="showAllNotifications(); return false;">View All Notifications</a>
             </div>
           </div>
-          <div class="notification-footer">
-            <a href="#" onclick="showAllNotifications(); return false;">View All Notifications</a>
+        </div>
+
+        <div class="profile-dropdown">
+          <i class="fa-solid fa-user-circle" id="profile-icon"></i>
+          <div class="dropdown-content" id="profile-dropdown">
+            <a href="/edit_profile">Profile</a>
+            <a href="/logout">Logout</a>
           </div>
         </div>
       </div>
-
-      <a href="/logout" class="logout-btn">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        Logout
-      </a>
+      {% else %}
+      <a href="/">Home</a>
+      <a href="/login">Portal</a>
+      {% endif %}
+      {% endblock %}
     </div>
   </nav>
 
@@ -946,7 +909,7 @@
             style="padding:0.5rem 0.6rem; border:1px solid #cbd5e1; border-radius:0.5rem;">
         </div>
 
-        <div style="display:flex; align-items:flex-end;">
+        <div style="display:flex; align-items:center;">
           <button type="submit" class="btn btn-respond" style="padding:0.55rem 1.2rem; border-radius:0.5rem;">
             Upload
           </button>
@@ -1440,7 +1403,7 @@
           <td>${ticket.category || 'N/A'}</td>
           <td><span class="status-badge ${priorityClass}">${ticket.priority || 'Medium'}</span></td>
           <td><span class="status-badge status-${statusClass}">${ticket.status}</span></td>
-          <td>${new Date(ticket.date_created).toLocaleDateString()}</td>
+          <td>${new Date(ticket.created_at).toLocaleDateString()}</td>
           <td>
             <button class="btn btn-view" onclick="viewTicket('${ticket._id}')">
               <i class="fa-solid fa-eye"></i> View
@@ -1537,7 +1500,7 @@
         if (!res.ok) return;
 
         const data = await res.json();
-        const appointments = data.appointments || [];
+        const appointments = data || [];
 
         const reminderContainer = document.getElementById('appointment-reminders');
         reminderContainer.innerHTML = '';
@@ -2050,14 +2013,13 @@
         <td>${m.title}</td>
         <td>${m.uploaded_by}</td>
         <td>${new Date(m.uploaded_at).toLocaleString()}</td>
-        <td>${
-          m.file_url
+        <td>${m.file_url
             ? `<a href="${m.file_url}" target="_blank">Open</a>`
             : (m.file_name
-                ? `<a href="/static/uploads/materials/${m.file_name}" target="_blank">Open</a>`
-                : (m.external_url ? `<a href="${m.external_url}" target="_blank">Open</a>` : '')
-              )
-        }</td>
+              ? `<a href="/static/uploads/materials/${m.file_name}" target="_blank">Open</a>`
+              : (m.external_url ? `<a href="${m.external_url}" target="_blank">Open</a>` : '')
+            )
+          }</td>
         <td>
           <button class="btn btn-respond" onclick="deleteMaterial('${m._id}')">Delete</button>
         </td>
@@ -2111,8 +2073,42 @@
     }
     loadCoursesForStaff();
     loadMaterialsForAllCourses();
+    const profileIcon = document.getElementById("profile-icon");
+    const profileDropdown = document.getElementById("profile-dropdown");
+    profileIcon.onclick = () => {
+      profileDropdown.classList.toggle("show");
+    };
   </script>
 
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const profileIcon = document.getElementById("profile-icon");
+    const profileDropdown = document.getElementById("profile-dropdown");
+
+    // If elements are not on this page, don't do anything
+    if (!profileIcon || !profileDropdown) {
+      console.warn("Profile icon or dropdown not found");
+      return;
+    }
+
+    // Toggle dropdown when clicking the icon
+    profileIcon.addEventListener("click", (e) => {
+      e.stopPropagation(); // prevent click from bubbling to document
+      profileDropdown.classList.toggle("show");
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (
+        profileDropdown.classList.contains("show") &&
+        !profileDropdown.contains(e.target) &&
+        e.target !== profileIcon
+      ) {
+        profileDropdown.classList.remove("show");
+      }
+    });
+  });
+</script>
 
 </html>

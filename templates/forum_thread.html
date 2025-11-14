@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>Discussion | Smart Assist</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/common.css') }}">
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -100,11 +101,6 @@
       <a href="/admin_home">Dashboard</a>
       {% endif %}
 
-      <a href="/forum">Community</a>
-      <a href="/edit_profile">
-        Profile
-      </a>
-      <a href="/logout">Logout</a>
       {% else %}
       <a href="/login">Portal</a>
       {% endif %}
