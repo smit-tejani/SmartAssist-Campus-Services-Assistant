@@ -69,12 +69,12 @@ async def admin_dashboard(
 
 
 @router.get("/assignment-checker", response_class=HTMLResponse)
-async def get_assignment_checker_page(request: Request):
+async def get_assignment_checker_page(request: Request, user: dict = Depends(role_required("student")),):
     """
     Serves the HTML page for the Assignment Checker.
     """
     # Note: Make sure "assignment_checker.html" is in your 'templates' directory
-    return templates.TemplateResponse("assignment_checker.html", {"request": request})
+    return templates.TemplateResponse("assignment_checker.html", {"request": request, "user": user})
 
 
 @router.get("/edit_profile", response_class=HTMLResponse)

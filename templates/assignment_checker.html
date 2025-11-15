@@ -6,6 +6,7 @@
   <title>Assignment Checker | Smart Assist</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', path='css/assignment_checker.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/common.css') }}">
 
 
 </head>
@@ -23,6 +24,7 @@
       {% if request.session.get('user') %}
       {% set u = request.session.get('user') %}
 
+      {# role-aware dashboard link #}
       {% if u.role == 'student' %}
       <a href="/student_home">Dashboard</a>
       {% elif u.role == 'staff' %}
@@ -30,10 +32,6 @@
       {% elif u.role == 'admin' %}
       <a href="/admin_home">Dashboard</a>
       {% endif %}
-
-      <a href="/forum">Community</a>
-      <a href="/edit_profile">Profile</a>
-      <a href="/logout">Logout</a>
       {% else %}
       <a href="/login">Portal</a>
       {% endif %}
@@ -104,7 +102,7 @@ must have author name"></textarea>
         </div>
 
         <div class="score-panel" id="scorePanel">
-          
+
           <div class="score-circle-wrap" style="margin: 0 auto 0.5rem;">
             <svg width="110" height="110">
               <circle class="circle-bg" cx="55" cy="55" r="45" fill="none"></circle>
@@ -122,8 +120,8 @@ must have author name"></textarea>
             <div class="line" id="fmt">--% formatting</div>
             <div style="font-size:.68rem; opacity:.75; margin-top:.3rem;">Based on the requirements you entered.</div>
           </div>
-            <div class="requirement-checklist" id="requirementChecklist">
-            </div>
+          <div class="requirement-checklist" id="requirementChecklist">
+          </div>
           <hr class="panel-divider">
 
           <div class="score-panel-details" id="scorePanelDetails">
@@ -262,7 +260,7 @@ must have author name"></textarea>
         const data = await res.json();
         renderResult(data);
 
-      } catch (err){
+      } catch (err) {
         console.error("Fetch error:", err);
         alert("A network error occurred.");
       } finally {
@@ -376,7 +374,7 @@ must have author name"></textarea>
 
       // --- ALL LOGIC MOVED HERE, WHERE IT BELONGS ---
       // 🔹 Call the new checklist renderer
-      renderChecklist(details); 
+      renderChecklist(details);
 
       // 🔹 pull snippets for wrong content
       const toFixList = (data.feedback && data.feedback.to_fix) ? data.feedback.to_fix : [];
@@ -466,11 +464,11 @@ must have author name"></textarea>
       } else {
         html += "<p style='font-size:.75rem; margin-top:.25rem;'>No specific improvement notes were flagged.</p>";
       }
-      
+
       // --- ALL THE INCORRECT, RECURSIVE LOGIC IS NOW GONE ---
       container.innerHTML = html;
     }
-    
+
     // init
     updateScore(0);
   </script>

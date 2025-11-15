@@ -148,9 +148,9 @@ async def update_appointment(appointment_id: str, request: Request):
             raise HTTPException(
                 status_code=404, detail="Appointment not found")
 
-        body = await request.form()
+        body = await request.json()
         update_fields = {}
-        for key in ["department", "subject", "date", "time_slot", "meeting_mode", "notes", "assigned_staff"]:
+        for key in ["department", "subject", "date", "time_slot", "meeting_mode", "notes", "assigned_staff", "location_mode"]:
             if key in body:
                 update_fields[key] = body.get(key)
 

@@ -662,6 +662,7 @@ appointmentForm.addEventListener("submit", async (e) => {
       appointmentFeedback.textContent = "Appointment booked successfully!";
       appointmentForm.reset();
       updateCounts();
+      loadAppointments()
       setTimeout(() => appointmentModal.classList.remove("show"), 1500);
     } else {
       appointmentFeedback.textContent =
