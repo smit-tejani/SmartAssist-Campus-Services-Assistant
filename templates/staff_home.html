@@ -339,17 +339,16 @@
 
     /* ==================== MODAL ==================== */
     .modal {
-      display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: rgba(0, 0, 0, 0.5);
-      z-index: 2000;
-      align-items: center;
+      display: flex;
       justify-content: center;
-      animation: fadeIn 0.3s;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 1000;
     }
 
     @keyframes fadeIn {
@@ -734,6 +733,11 @@
       background: #e53e3e;
       color: #ffffff;
     }
+
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
   </style>
 </head>
 
@@ -741,16 +745,19 @@
 
   <nav>
     <div class="nav-left">
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo"
-          style="width: 40px; height: 40px; object-fit: contain; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
-        <div>
-          <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
-          <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">
-            TAMUCC Campus Assistant
-          </p>
+      <a href="/" style="text-decoration: none; color: inherit;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+          <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo" style="width: 40px; height: 40px; object-fit: contain; border-radius: 10px; 
+          box-shadow: 0 8px 20px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.3);">
+
+          <div>
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
+            <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">
+              TAMUCC Campus Assistant
+            </p>
+          </div>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="nav-links">
@@ -830,7 +837,7 @@
 
     <!-- Stats -->
     <div class="stats">
-      <div class="stat">
+      <div class="stat" id="open-tickets-widget">
         <div>
           <div class="number" id="statPendingTickets">0</div>
           <div class="label">My Tickets</div>
@@ -1170,6 +1177,106 @@
             style="display:none;">
             <i class="fa-solid fa-check-circle"></i> Confirm Appointment
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ================= LIST OPEN TICKETS MODAL ================= -->
+  <div id="tickets-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="close-tickets-modal">&times;</span>
+      <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Open Tickets</h2>
+      <div id="tickets-list">
+        <!-- Tickets will be dynamically injected here -->
+        <div class="card" style="margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;">
+          <strong>Subject: Sample Ticket</strong>
+          <div>Category: Technical • Priority: <span style="color: red;">High</span></div>
+          <div>Status: <span style="color: orange;">In Progress</span></div>
+          <div>Date Created: 2025-10-20</div>
+          <div>Last Updated: 2025-10-21 by Staff A</div>
+          <div>Assigned Staff: Staff A</div>
+          <hr>
+          <div>Description:</div>
+          <p>This is a sample ticket description.</p>
+          <hr>
+          <div>Attachment: <a href="#">Download</a></div>
+          <div style="margin-top: 8px;">
+            <button
+              style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel
+              Ticket</button>
+          </div>
+        </div>
+
+        <!-- Open Tickets Example -->
+        <div class="card" style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <div><strong>Subject:</strong> Cannot access library portal</div>
+          <div><strong>Category:</strong> Technical • <strong>Priority:</strong> <span style="color: red;">High</span>
+          </div>
+          <div><strong>Status:</strong> <span style="color: orange;">In Progress</span></div>
+          <div><strong>Created:</strong> 2025-10-20</div>
+          <div><strong>Last Updated:</strong> 2025-10-21 by Staff A</div>
+          <div><strong>Assigned Staff:</strong> Staff A</div>
+          <hr>
+          <div><strong>Description:</strong></div>
+          <p>When I try to log in, I get an error message: "Access denied".</p>
+          <hr>
+          <div><strong>Attachment:</strong> <a href="#">Download</a></div>
+          <div style="margin-top: 8px;">
+            <button
+              style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel
+              Ticket</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= UPCOMING APPOINTMENTS MODAL ================= -->
+  <div id="appts-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="close-appts-modal">&times;</span>
+      <h2 class="text-2xl font-semibold text-tamuccTeal mb-4">Upcoming Appointments</h2>
+      <div id="appts-list">
+        <!-- Appointments will be injected here by JS -->
+        <div class="card" style="margin-bottom: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 8px;">
+          <strong>Type: Academic Advising</strong>
+          <div>Date & Time: 2025-10-25 10:00 AM</div>
+          <div>Status: <span style="color: green;">Confirmed (In 3 days)</span></div>
+          <div>Location/Mode: In-Person (Room 101)</div>
+          <p>Notes: Bring all relevant documents.</p>
+          <button
+            style="background: red; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Cancel
+            Appointment</button>
+          <button
+            style="background: orange; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+        </div>
+
+        <!-- Confirmed Appointment Example -->
+        <div class="card" style="border: 2px solid green; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <div><strong>Type:</strong> Academic Advising</div>
+          <div><strong>Date & Time:</strong> 2025-10-25 • 10:00 AM</div>
+          <div><strong>Status:</strong> <span style="color: green;">Confirmed (In 3 days)</span></div>
+          <div><strong>Location / Mode:</strong> Room 203, Admin Bldg</div>
+          <div><strong>Notes:</strong> Bring your course plan</div>
+          <div style="margin-top: 8px;">
+            <button
+              style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+            <button
+              style="background: orange; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Reschedule</button>
+          </div>
+        </div>
+
+        <!-- Pending Appointment Example -->
+        <div class="card" style="border: 2px solid yellow; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <div><strong>Type:</strong> Career Guidance</div>
+          <div><strong>Date & Time:</strong> 2025-10-27 • 2:00 PM</div>
+          <div><strong>Status:</strong> <span style="color: orange;">Confirmation Pending</span></div>
+          <div><strong>Location / Mode:</strong> To be assigned</div>
+          <div><strong>Notes:</strong> Optional prep info</div>
+          <div style="margin-top: 8px;">
+            <button
+              style="background: red; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2081,6 +2188,55 @@
   </script>
 
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const profileIcon = document.getElementById("profile-icon");
+    const profileDropdown = document.getElementById("profile-dropdown");
+
+    // If elements are not on this page, don't do anything
+    if (!profileIcon || !profileDropdown) {
+      console.warn("Profile icon or dropdown not found");
+      return;
+    }
+
+    // Toggle dropdown when clicking the icon
+    profileIcon.addEventListener("click", (e) => {
+      e.stopPropagation(); // prevent click from bubbling to document
+      profileDropdown.classList.toggle("show");
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (
+        profileDropdown.classList.contains("show") &&
+        !profileDropdown.contains(e.target) &&
+        e.target !== profileIcon
+      ) {
+        profileDropdown.classList.remove("show");
+      }
+    });
+  });
+  // Fetch tickets
+  // async function fetchTickets() {
+  //   ticketsList.innerHTML = "Loading...";
+  //   try {
+  //     renderTickets(data || []);
+  //   } catch (e) {
+  //     console.error(e);
+  //     ticketsList.innerHTML = "<p>Error loading tickets.</p>";
+  //   }
+  // }
+  // const openTicketsById = document.getElementById("open-tickets-widget");
+  // const ticketsModal = document.getElementById("tickets-modal");
+  // const ticketsList = document.getElementById("tickets-list");
+  // // wire up openers
+  // if (openTicketsById) {
+  //   openTicketsById.addEventListener("click", () => {
+  //     ticketsModal.classList.add("show");
+  //     fetchTickets();
+  //   });
+  // }
+</script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const profileIcon = document.getElementById("profile-icon");

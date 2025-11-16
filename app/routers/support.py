@@ -158,17 +158,20 @@ async def api_create_ticket(payload: TicketCreateRequest):
 
 
 @router.get("/api/tickets")
-async def api_tickets(status: str | None = None, student_email: str | None = None):
+async def api_tickets(status: str | None = None, assigned_staff_email: str | None = None):
     query = {}
     if status:
         query["status"] = {"$regex": f"^{status}$", "$options": "i"}
-    if student_email:
-        query["student_email"] = student_email
+    if assigned_staff_email:
+        query["student_email"] = assigned_staff_email
+    print(f"API /api/tickets query: {query}")
     tickets = list(tickets_collection.find(query).sort("created_at", -1))
+    print(f"API /api/tickets found {len(tickets)} tickets")
     for ticket in tickets:
         ticket["_id"] = str(ticket["_id"])
         if "attachment_id" in ticket:
             ticket["attachment_id"] = str(ticket["attachment_id"])
+    print(f"API /api/tickets returning tickets: {tickets}")
     return tickets
 
 
