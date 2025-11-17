@@ -747,7 +747,8 @@
     <div class="nav-left">
       <a href="/" style="text-decoration: none; color: inherit;">
         <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
-          <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo" style="width: 40px; height: 40px; object-fit: contain;">
+          <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo"
+            style="width: 40px; height: 40px; object-fit: contain;">
           <div>
             <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
             <p style="font-size: 0.7rem; opacity: 0.8; margin: 0; color: rgba(255,255,255,0.8);">
@@ -1584,7 +1585,7 @@
       ).length;
 
       const upcomingAppointments = allAppointments.filter(a =>
-        a.status === 'Confirmed' && new Date(a.date) >= new Date()
+        (a.status === 'Confirmed' || a.status === 'confirmed') && new Date(a.date) >= new Date()
       ).length;
 
       const resolvedToday = allTickets.filter(t => {
@@ -1891,25 +1892,27 @@
       try {
         const res = await fetch(`/api/appointments/${appointmentId}`);
         const appointment = await res.json();
+        var currentAappointment = appointment.appointment;
 
         currentAppointmentId = appointmentId;
 
         // Populate left column (read-only student info)
-        document.getElementById('appt-student').textContent = appointment.student_name || 'Unknown';
-        document.getElementById('appt-email').textContent = appointment.student_email || 'N/A';
-        document.getElementById('appt-department').textContent = appointment.department || 'N/A';
-        document.getElementById('appt-purpose').textContent = appointment.purpose || 'No purpose specified';
-        document.getElementById('appt-status-display').textContent = appointment.status || 'Pending';
+        document.getElementById('appt-student').textContent = currentAappointment.student_name || 'Unknown';
+        document.getElementById('appt-email').textContent = currentAappointment.student_email || 'N/A';
+        document.getElementById('appt-department').textContent = currentAappointment.department || 'N/A';
+        document.getElementById('appt-purpose').textContent = currentAappointment.purpose || 'No purpose specified';
+        document.getElementById('appt-status-display').textContent = currentAappointment.status || 'Pending';
 
         // Populate right column (editable fields)
-        document.getElementById('appt-date').value = appointment.date || '';
-        document.getElementById('appt-time-slot').value = appointment.time_slot || '9:00 AM - 10:00 AM';
-        document.getElementById('appt-meeting-mode').value = appointment.meeting_mode || 'No Preference';
-        document.getElementById('appt-location').value = appointment.location_mode || '';
+        document.getElementById('appt-date').value = currentAappointment.date || '';
+        document.getElementById('appt-time-slot').value = currentAappointment.time_slot || '9:00 AM - 10:00 AM';
+        document.getElementById('appt-meeting-mode').value = currentAappointment.meeting_mode || 'No Preference';
+        document.getElementById('appt-location').value = currentAappointment.location_mode || '';
+
 
         // Show/hide confirm button based on status
         const confirmBtn = document.getElementById('confirm-appointment-btn');
-        if (appointment.status === 'Pending') {
+        if (currentAappointment.status === 'Pending') {
           confirmBtn.style.display = 'inline-flex';
         } else {
           confirmBtn.style.display = 'none';
