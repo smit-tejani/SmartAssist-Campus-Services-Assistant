@@ -48,14 +48,14 @@
 <body class="bg-tamuccGray min-h-screen flex flex-col">
 
   <!-- Header -->
-  <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+  <header class="bg-tamuccBlue border-b border-gray-200 shadow-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
       <div class="flex items-center space-x-3">
-        <img src="{{ url_for('static', path='assets/images/kora.png') }}" alt="Kora Logo"
+        <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="Logo"
           class="h-10 w-10 object-contain rounded-lg shadow-sm">
         <div>
-          <h1 class="text-xl font-semibold text-gray-800">SmartAssist</h1>
-          <p class="text-xs text-gray-500">TAMUCC Campus Assistant</p>
+          <h1 class="text-xl text-white font-semibold text-gray-800">SmartAssist</h1>
+          <p class="text-xs text-white">TAMUCC Campus Assistant</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@
         </button>
 
         <a id="back-home-link" href="/guest_home"
-          class="text-sm text-tamuccBlue hover:text-tamuccTeal transition font-medium">
+          class="text-sm text-white hover:text-tamuccTeal transition font-medium">
           ← Back to Home
         </a>
       </div>
@@ -125,7 +125,8 @@
         <div class="flex items-start space-x-3">
           <div
             class="w-10 h-10 bg-gradient-to-br from-tamuccBlue to-tamuccTeal rounded-full flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
-            S</div>
+            <img src="{{ url_for('static', path='assets/images/kora.png') }}" alt="Kora Logo"
+          class="h-10 w-10 object-contain rounded-lg shadow-sm"></div>
           <div
             class="bg-white px-5 py-3 rounded-2xl rounded-tl-sm shadow-sm text-gray-800 max-w-[75%] border border-gray-100">
             <p>👋 Hi! I'm <strong class="text-tamuccBlue">Kora</strong>. How can I help you today?</p>
@@ -601,7 +602,8 @@
 
     // ---------- UI helpers ----------
     function avatar(letter, color = 'from-tamuccBlue to-tamuccTeal') {
-      return `<div class="w-10 h-10 bg-gradient-to-br ${color} rounded-full flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">${letter}</div>`;
+      return `<div class="w-10 h-10 bg-gradient-to-br ${color} rounded-full flex items-center justify-center text-white font-bold shadow-md flex-shrink-0"><img src="{{ url_for('static', path='assets/images/kora.png') }}" alt="Kora Logo"
+          class="h-10 w-10 object-contain rounded-lg shadow-sm"></div>`;
     }
     function escapeHTML(s) { return s.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
     function renderMarkdown(md) {
@@ -1708,6 +1710,11 @@ function startVoiceNavigation(leg, map) {
         } else if (sug.payload.action === 'show_campus_map') {
           // Optionally highlight the selected building on full campus map
           showCampusMap(sug.payload.destination || null);
+        } else if (sug.payload.action === 'show_answers' && sug.payload.answer_text) {
+          // This is our new custom action for quizzes
+          // Just append the answer text as a new bot message
+          appendMessage('bot', sug.payload.answer_text);
+          return; // Stop here
         }
 
       }
@@ -1885,9 +1892,10 @@ function answerWithLocationFromFrontend(location) {
     clearChat.addEventListener('click', () => {
       chatWindow.innerHTML = `
         <div class="flex items-start space-x-3">
-          <div class="w-10 h-10 bg-tamuccTeal rounded-full flex items-center justify-center text-white font-bold">S</div>
+          <div class="w-10 h-10 bg-tamuccTeal rounded-full flex items-center justify-center text-white font-bold"><img src="{{ url_for('static', path='assets/images/kora.png') }}" alt="Kora Logo"
+          class="h-10 w-10 object-contain rounded-lg shadow-sm"></div>
           <div class="bg-white px-4 py-2 rounded-2xl shadow text-gray-800 max-w-[70%]">
-            👋 Hi! I’m <strong>SmartAssist</strong>. How can I help you today?
+            👋 Hi! I’m <strong>Kora</strong>. How can I help you today?
           </div>
         </div>`;
       typingIndicator.classList.add('hidden');

@@ -2062,6 +2062,7 @@
 
     // Dedupe list item by data-id
     let item = chatList.querySelector(`.chat-list-item[data-id="${sid}"]`);
+    debugger
     if (!item) {
       item = document.createElement('div');
       item.classList.add('chat-list-item');

@@ -72,18 +72,13 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
 
     qlow = (question or "").lower()
 
-    # 1. Show stored quiz answers if requested
-    if any(k in qlow for k in ["show answer", "what are the answers", "reveal solution", "give answers"]):
-        last_quiz = request.session.get("last_quiz")
-        if not last_quiz:
-            return _create_response("I haven't given you a quiz yet. Ask me to 'generate a quiz' first!")
-        formatted_answers = ["Here are the answers and explanations for the last quiz:"]
-        for i, q in enumerate(last_quiz.get("quiz", []), 1):
-            formatted_answers.append(f"\n**{i}. {q.get('question')}**")
-            formatted_answers.append(f"   **Answer:** {q.get('answer')}")
-            formatted_answers.append(f"   **Explanation:** {q.get('explanation', 'No explanation provided.')}")
-        request.session.pop("last_quiz", None)
-        return _create_response("\n".join(formatted_answers))
+    # <--- CHANGED: This block is now handled by the frontend payload.
+    # 1. Show stored quiz answers if requested (REMOVED)
+    # if any(k in qlow for k in ["show answer", "what are the answers", "reveal solution", "give answers"]):
+    #     last_quiz = request.session.get("last_quiz")
+    #     ... (old session logic removed) ...
+    #     return _create_response("\n".join(formatted_answers))
+    # --->
 
     # 2. Identify student's courses
     regs = list(registrations_collection.find({"student_email": student_email}))
@@ -138,14 +133,13 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
 
     # 6. Show materials if the question explicitly asks for them
     if any(k in qlow for k in ["show materials", "list materials", "materials for"]):
-        # Return all materials with titles and links
+        # ... (this section is unchanged) ...
         mats = list(db.course_materials.find({"course_id": course_id, "visible": True}))
         if not mats:
             return _create_response(base_line + "\n\nNo materials have been uploaded for this course yet.")
         lines = [f"Materials for **{course_title}**:"]
         for m in mats:
             title = m.get("title") or m.get("file_name") or "Untitled"
-            # determine link
             file_url = None
             if m.get("file_url"):
                 file_url = m["file_url"]
@@ -159,20 +153,18 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
 
     # 7. Open a specific material file by title or file name
     if any(k in qlow for k in ["open", "download", "view"]):
-        # Try to identify the material by matching words in title or file name
+        # ... (this section is unchanged) ...
         mats = list(db.course_materials.find({"course_id": course_id, "visible": True}))
         target = None
         for m in mats:
             name = (m.get("title") or "").lower()
             fname = (m.get("file_name") or "").lower()
-            # If the query mentions the material title or file name, select it
             if name and name in qlow:
                 target = m
                 break
             if fname and fname in qlow:
                 target = m
                 break
-        # If no explicit match and only one material exists, pick it
         if not target and len(mats) == 1:
             target = mats[0]
         if target:
@@ -184,13 +176,13 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
             elif target.get("external_url"):
                 file_url = target["external_url"]
             if file_url:
-                # Include course and material context in the message
                 return _create_response(f"Here is your material from **{course_title}** – **{target.get('title') or target.get('file_name')}**: [{target.get('title') or target.get('file_name')}]({file_url})")
             else:
                 return _create_response("Sorry, I couldn't find a link for that material.")
 
     # 8. If there are no text documents, list materials and return
     if not texts:
+        # ... (this section is unchanged) ...
         mats = list(db.course_materials.find({"course_id": course_id, "visible": True}))
         if not mats:
             return _create_response(base_line + "\n\nNo materials have been uploaded for this course yet.")
@@ -213,6 +205,7 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
 
     # 9. If the question mentions a specific material by title/description, return info and link
     for m in texts:
+        # ... (this section is unchanged) ...
         title = (m.get("title") or "").lower()
         desc = (m.get("description") or "").lower()
         if (title and title in qlow) or (desc and desc in qlow):
@@ -250,44 +243,84 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
         # Determine material name and course title for context strings
         material_name = None
         if best_text_doc:
-            # Use material title if available; otherwise fallback to file_name
             material_name = best_text_doc.get("title") or best_text_doc.get("file_name")
         course_info_line = f" (Source: {course_title} – {material_name})" if material_name else f" (Course: {course_title})"
 
+        # <--- CHANGED: This entire 'is_quiz_request' block is rewritten --->
         if is_quiz_request:
             num_questions = extract_number(qlow)
-            # System prompt instructs the model to generate MCQs
+            # System prompt now demands a strict JSON format
             system_prompt = (
-                f"You are a teaching assistant. Based on the provided course material, generate {num_questions} multiple‑choice quiz questions. "
-                "Each question must have 4 options and a brief explanation for the correct answer."
+                f"You are a teaching assistant. Based on the provided course material, generate {num_questions} multiple-choice quiz questions. "
+                "Respond with *only* a valid JSON object in this exact format: "
+                '{"quiz": [{"question": "...", "options": ["A) ...", "B) ...", "C) ...", "D) ..."], "answer": "B) ...", "explanation": "..."}]}'
+                " Do not include any text before or after the JSON."
             )
             user_prompt = f"Course Material:\n{context}"
-            # Generate questions via llm_complete
+            
             raw = llm_complete(
                 messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
                 model=settings.followup_model,
                 temperature=0.3,
                 max_tokens=2000,
             )
-            # Attempt to parse JSON if present, otherwise return raw text
+            
+            # New logic: Parse JSON, split into questions and answers, and create a payload.
             try:
-                quiz_data = json.loads(raw)
-                request.session["last_quiz"] = quiz_data
-                formatted_questions = [f"Okay, I've generated {len(quiz_data.get('quiz', []))} practice questions. {course_info_line}"]
-                for i, q in enumerate(quiz_data.get("quiz", []), 1):
+                # Clean the raw output (in case of markdown fences)
+                clean_raw = raw.strip().strip("```json").strip("```")
+                quiz_data = json.loads(clean_raw)
+                
+                quiz_list = quiz_data.get("quiz", [])
+                if not quiz_list:
+                    raise ValueError("No 'quiz' key or empty quiz list in LLM response.")
+
+                # 1. Build the Questions-Only text
+                formatted_questions = [f"Okay, I've generated {len(quiz_list)} practice questions. {course_info_line}"]
+                for i, q in enumerate(quiz_list, 1):
+                    formatted_questions.append("")
                     formatted_questions.append(f"\n**{i}. {q.get('question')}**")
+                    formatted_questions.append("")
                     for opt in q.get("options", []):
+                        formatted_questions.append("")
                         formatted_questions.append(f"   - {opt}")
+
+                # 2. Build the Answers-Only text (for the payload)
+                formatted_answers = ["Here are the answers and explanations:"]
+                for i, q in enumerate(quiz_list, 1):
+                    formatted_answers.append("")
+                    formatted_answers.append(f"\n**{i}. {q.get('question')}**")
+                    formatted_answers.append("")
+                    formatted_answers.append(f"   **Answer:** {q.get('answer')}")
+                    formatted_answers.append("")
+                    formatted_answers.append(f"   **Explanation:** {q.get('explanation', 'No explanation provided.')}")
+                    formatted_answers.append("")
+
+                # 3. Create the payload-based followup
                 followups = [
-                    {"label": "Show me the answers", "payload": {"type": "faq", "query": "show me the answers"}}
+                    {
+                        "label": "Show me the answers", 
+                        "payload": {
+                            "type": "action", 
+                            "action": "show_answers",
+                            "answer_text": "\n".join(formatted_answers) # Embed answers in payload
+                        }
+                    }
                 ]
+
+                # 4. Return the questions + followup
                 return _create_response("\n".join(formatted_questions), followups)
-            except Exception:
-                # Store raw text for answer retrieval by stripping markdown
-                request.session["last_quiz"] = {"quiz": []}
-                return _create_response(f"Here are your quiz questions{course_info_line}:\n\n" + raw)
+
+            except Exception as e:
+                # If JSON fails or format is wrong, return a helpful error.
+                # *Do not* return the raw text, as it contains answers.
+                return _create_response(
+                    f"I tried to generate a quiz, but I ran into a formatting error. Please try asking again. (Debug: {e})"
+                )
+        # <--- END OF CHANGED BLOCK --- >
 
         if is_flashcard_request:
+            # ... (this section is unchanged) ...
             num_cards = extract_number(qlow)
             system_prompt = (
                 f"You are a teaching assistant. Based on the provided material, generate {num_cards} key terms and their definitions as flashcards. "
@@ -303,6 +336,7 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
             return _create_response(f"Here are your flashcards{course_info_line}:\n\n" + raw)
 
         if is_summary_request:
+            # ... (this section is unchanged) ...
             system_prompt = "You are a teaching assistant. Summarize the provided course material in a few key bullet points."
             user_prompt = f"Course Material:\n{context}"
             summary = llm_complete(
@@ -314,6 +348,7 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
             return _create_response(f"Here is a summary of the material{course_info_line}:\n\n" + summary)
 
         # Standard question: answer from context
+        # ... (this section is unchanged) ...
         system_prompt = (
             "You are a helpful and clever course assistant.\n"
             "1. Ground your answer strictly in the provided course material.\n"
@@ -334,9 +369,7 @@ async def answer_from_student_scope(request: Request, question: str, student_ema
             {"label": "Make flashcards for this", "payload": {"type": "faq", "query": f"make flashcards for {question}"}},
             {"label": "Summarize this topic", "payload": {"type": "faq", "query": f"summarize {question}"}},
         ]
-        # Prepend course and material context to the answer
         answer_with_source = f"According to {course_title} – {material_name}, {answer}" if material_name else answer
         return _create_response(answer_with_source, followups)
     except Exception as exc:
-        # If anything goes wrong, return a generic error
         return _create_response(f"I ran into an error trying to process that: {exc}. Please try a different question.")

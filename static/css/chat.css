@@ -1,5 +1,7 @@
 /* === Flashcard / quiz layouts for My Learning mode === */
-
+.bg-blue {
+  background: #0067a5 !important; /* Tailwind's blue-800 */
+}
 .learning-header {
   font-size: 0.95rem;
   font-weight: 500;
