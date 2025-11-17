@@ -1987,7 +1987,7 @@
     };
   }
 
-  connectWebSocket();
+  // connectWebSocket();
 </script>
 
 <script>
@@ -2218,7 +2218,7 @@
     try {
       const res = await fetch('/api/admin/live_chats'); // returns [{session_id, status, name?}]
       const sessions = await res.json();
-      sessions.forEach((s) => {
+      sessions.filter(s => s.status === 'queued' || s.status === 'live').forEach((s) => {
         upsertSession(s);
       });
       // Don't auto-select any session - let admin choose which chat to join

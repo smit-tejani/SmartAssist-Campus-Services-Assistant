@@ -218,7 +218,15 @@ async def end_chat(session_id: str):
 
 @router.get("/api/admin/live_chats")
 async def list_live_chats():
-    docs = list(live_chat_sessions.find({}, {"_id": 0}))
-    order = {"queued": 0, "live": 1, "closed": 2}
+    # Only return active sessions
+    docs = list(
+        live_chat_sessions.find(
+            {"status": {"$in": ["queued", "live"]}},  # ⬅ filter here
+            {"_id": 0},
+        )
+    )
+    # Optional: keep a clear order (queued first, then live)
+    order = {"queued": 0, "live": 1}
     docs.sort(key=lambda x: order.get(x.get("status", "queued"), 9))
     return docs
+
