@@ -26,51 +26,64 @@ async def post_register(
     """
     Register a new user.
 
-    This handler performs basic validation on the provided email and password
-    before creating the account.  It ensures that:
-
-    - Passwords match.
-    - Email follows a simple pattern (contains one '@' and at least one dot).
-    - Password meets complexity requirements (minimum length and contains
-      uppercase, lowercase, digit and special characters).
-    - The email is not already registered.
-
-    If any check fails, the user is returned to the registration page with
-    an appropriate error message.  Otherwise a new user document is created.
-    Note: passwords are currently stored in plaintext; a real system should
-    hash passwords before storage.
+    Rules:
+    - Email must be TAMU-CC: ends with @tamucc.edu or @islander.tamucc.edu.
+    - Password must be at least 6 characters.
+    - Password and confirm password must match.
+    - Email must be unique.
     """
-    # Password match check
+
+    # --- Normalise inputs ---
+    email = email.strip().lower()
+    full_name = full_name.strip()
+    role = role.strip()
+
+    # 1) Enforce TAMU-CC email domains
+    if not (email.endswith("@tamucc.edu") or email.endswith("@islander.tamucc.edu")):
+        return templates.TemplateResponse(
+            "register.html",
+            {
+                "request": request,
+                "error": "Please use your TAMU-CC email (ending with @tamucc.edu or @islander.tamucc.edu).",
+            },
+            status_code=400,
+        )
+
+    # 2) Password length (keep 6-character rule)
+    if len(password) < 6:
+        return templates.TemplateResponse(
+            "register.html",
+            {
+                "request": request,
+                "error": "Password must be at least 6 characters long.",
+            },
+            status_code=400,
+        )
+
+    # 3) Confirm password matches
     if password != confirm_password:
         return templates.TemplateResponse(
             "register.html",
-            {"request": request, "error": "Passwords do not match!"},
+            {
+                "request": request,
+                "error": "Passwords do not match.",
+            },
+            status_code=400,
         )
 
-    # Email format validation using a simple regex
-    import re  # local import to avoid global side effect
-    email_regex = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
-    if not re.match(email_regex, email):
+    # 4) Email uniqueness in Mongo (NO await here – PyMongo)
+    existing_user = users_collection.find_one({"email": email})
+    if existing_user:
         return templates.TemplateResponse(
             "register.html",
-            {"request": request, "error": "Invalid email format!"},
+            {
+                "request": request,
+                "error": "An account already exists with this email.",
+            },
+            status_code=400,
         )
 
-    # Password complexity: at least 8 characters, one uppercase, one lowercase, one digit, one special char
-    if len(password) < 8 or not re.search(r"[A-Z]", password) or not re.search(r"[a-z]", password) or not re.search(r"\d", password) or not re.search(r"[^A-Za-z0-9]", password):
-        return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "error": "Password must be at least 8 characters long and include uppercase, lowercase, digit and special character."},
-        )
-
-    # Check if email already exists
-    if users_collection.find_one({"email": email}):
-        return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "error": "Email already registered!"},
-        )
-
-    # Insert user (note: password stored as-is; consider hashing in production)
+    # 5) Insert user (note: password stored as-is; you should hash in production)
     users_collection.insert_one(
         {
             "full_name": full_name,
@@ -85,7 +98,6 @@ async def post_register(
         "login.html",
         {"request": request, "message": "Registration successful! Please login."},
     )
-
 
 @router.post("/login")
 async def post_login(
