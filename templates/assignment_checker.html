@@ -8,7 +8,236 @@
   <link rel="stylesheet" href="{{ url_for('static', path='css/assignment_checker.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', path='css/common.css') }}">
 
+  <!-- Presentation-friendly overrides -->
+  <style>
+    body {
+      background: radial-gradient(circle at top left, #0f8ccf 0, #005b96 35%, #004466 70%, #00324a 100%);
+      min-height: 100vh;
+      color: #fdfdfd;
+    }
 
+    /* Wrapper / layout */
+    .ac-wrapper {
+      max-width: 1200px;
+      margin: 1.5rem auto 2rem;
+      padding: 1.5rem 2rem 2rem;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 900px) {
+      .ac-wrapper {
+        padding: 1rem;
+      }
+    }
+
+    .ac-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.1fr);
+      gap: 1.75rem;
+      margin-top: 1.2rem;
+    }
+
+    @media (max-width: 900px) {
+      .ac-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ac-left,
+    .ac-right {
+      background: rgba(0, 20, 45, 0.72);
+      border-radius: 18px;
+      padding: 1.2rem 1.4rem 1.4rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Header */
+    .ac-header h2 {
+      font-size: 2.15rem;
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.01em;
+    }
+
+    .ac-header p {
+      font-size: 1rem;
+      opacity: 0.92;
+    }
+
+    /* Left side labels / textareas */
+    .ac-section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.1rem;
+    }
+
+    .ac-section-note {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-bottom: 0.3rem;
+    }
+
+    .ac-label {
+      font-size: 0.95rem;
+      margin-top: 0.4rem;
+      margin-bottom: 0.25rem;
+      display: inline-block;
+    }
+
+    .ac-textarea {
+      font-size: 0.95rem;
+      min-height: 120px;
+      line-height: 1.45;
+    }
+
+    .ac-helper {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 0.3rem;
+    }
+
+    .ac-run-row {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .ac-run-hint {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .ac-btn {
+      padding: 0.65rem 1.4rem;
+      font-size: 0.98rem;
+      border-radius: 999px;
+    }
+
+    .upload-zone {
+      font-size: 0.95rem;
+      padding: 1.35rem 1rem;
+    }
+
+    .upload-zone span {
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    /* Right side – preview */
+    .preview-box {
+      background: #021722;
+      border-radius: 16px;
+      padding: 0.9rem 1rem 1rem;
+      margin-bottom: 1rem;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    .preview-title {
+      font-size: 1.02rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    .preview-desc {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      opacity: 0.88;
+    }
+
+    /* Score panel */
+    .score-panel {
+      background: #021118;
+      border-radius: 16px;
+      padding: 1.1rem 1.2rem 1.2rem;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      font-size: 0.95rem;
+    }
+
+    .score-circle-wrap {
+      transform: scale(1.1);
+    }
+
+    .circle-center-text {
+      font-size: 1.8rem !important;
+      font-weight: 700;
+    }
+
+    .score-meta-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .score-meta .line {
+      font-size: 0.9rem;
+      margin: 0.08rem 0;
+    }
+
+    .requirement-checklist {
+      margin-top: 0.65rem;
+      font-size: 0.9rem;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      padding: 0.3rem 0.35rem;
+      border-radius: 6px;
+      margin-bottom: 0.2rem;
+    }
+
+    .checklist-item .icon {
+      font-size: 1.05rem;
+      margin-top: 0.05rem;
+    }
+
+    .checklist-item.passed {
+      background: rgba(0, 180, 120, 0.12);
+    }
+
+    .checklist-item.failed {
+      background: rgba(220, 0, 0, 0.13);
+    }
+
+    .panel-divider {
+      margin: 0.7rem 0;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .score-panel-details h4 {
+      font-size: 1.02rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .score-panel-details h5 {
+      font-size: 0.9rem;
+      margin-top: 0.4rem;
+    }
+
+    .score-panel-details p,
+    .feedback-item,
+    .feedback-blockquote {
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .feedback-blockquote {
+      margin: 0.18rem 0 0.3rem;
+    }
+
+    /* Loader overlay text a bit bigger */
+    .loader-box div:last-child {
+      font-size: 0.95rem;
+      margin-top: 0.3rem;
+    }
+
+    /* Footer */
+    footer {
+      font-size: 0.85rem;
+    }
+  </style>
 </head>
 
 <body>
@@ -16,7 +245,8 @@
     <div class="nav-left">
       <a href="/" style="text-decoration: none; color: inherit;">
         <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
-          <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo" style="width: 40px; height: 40px; object-fit: contain;">
+          <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="SmartAssist Logo"
+            style="width: 40px; height: 40px; object-fit: contain;">
 
           <div>
             <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0;">SmartAssist</h1>
@@ -34,7 +264,6 @@
       {% if request.session.get('user') %}
       {% set u = request.session.get('user') %}
 
-      {# role-aware dashboard link #}
       {% if u.role == 'student' %}
       <a href="/student_home">Dashboard</a>
       {% elif u.role == 'staff' %}
@@ -65,11 +294,11 @@
       <section class="ac-left">
         <div>
           <div class="ac-section-title">Upload assignment</div>
-          <div class="ac-section-note">Drag & drop or browse a file from your system.</div>
+          <div class="ac-section-note">Drag &amp; drop or browse a file from your system.</div>
           <div class="upload-zone" id="uploadZone">
             <span>Drop file here or</span>
             <button class="ac-btn" id="pickFileBtn" type="button">Browse</button>
-            <small style="font-size:.7rem; color:#555;">Supported: .txt, .pdf, .doc, .docx, .png, .jpg</small>
+            <small style="font-size:.78rem; color:#ccd5e1;">Supported: .txt, .pdf, .doc, .docx, .png, .jpg</small>
             <input type="file" id="fileInput" style="display:none;"
               accept=".txt,.pdf,.doc,.docx,.png,.jpg,.jpeg,.webp" />
           </div>
@@ -128,10 +357,11 @@ must have author name"></textarea>
             <div class="line" id="reqMissing">Missing: --</div>
             <div class="line" id="plag">--% plagiarism</div>
             <div class="line" id="fmt">--% formatting</div>
-            <div style="font-size:.68rem; opacity:.75; margin-top:.3rem;">Based on the requirements you entered.</div>
+            <div style="font-size:.78rem; opacity:.8; margin-top:.3rem;">Based on the requirements you entered.</div>
           </div>
-          <div class="requirement-checklist" id="requirementChecklist">
-          </div>
+
+          <div class="requirement-checklist" id="requirementChecklist"></div>
+
           <hr class="panel-divider">
 
           <div class="score-panel-details" id="scorePanelDetails">
@@ -148,6 +378,7 @@ must have author name"></textarea>
     &copy; {{ now().year if now is defined else "2025" }} Smart Assist. All rights reserved.
   </footer>
 
+  <!-- JS: unchanged behaviour -->
   <script>
     const loader = document.getElementById("pageLoader");
     const fileInput = document.getElementById("fileInput");
@@ -302,18 +533,15 @@ must have author name"></textarea>
       });
     }
 
-    // NEW function to fix invisible character mismatches
     function normalizePunctuation(str) {
       if (!str) return "";
       return str
-        .replace(/[\u2013\u2014]/g, '-') // Replace en-dash and em-dash with a simple hyphen
-        .replace(/[\u2018\u2019]/g, "'") // Replace smart single quotes with a simple apostrophe
-        .replace(/[\u201C\u201D]/g, '"'); // Replace smart double quotes with a simple quote
+        .replace(/[\u2013\u2014]/g, '-')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"');
     }
 
-    // Show wrong / mismatching content based only on snippets from the backend
     function renderHighlights(fullText, fixes) {
-      // Only use items that actually have a snippet
       const items = (fixes || []).filter(
         f => f && f.snippet && f.snippet.trim()
       );
@@ -351,7 +579,7 @@ must have author name"></textarea>
               ${snippet}
             </mark>
             
-            <div style="font-size:.7rem; opacity:.9; margin-top: .4rem; padding-top: .3rem; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:.8rem; opacity:.9; margin-top: .4rem; padding-top: .3rem; border-top: 1px solid rgba(255,255,255,0.1);">
               <strong>Feedback:</strong> ${feedback}
             </div>
           </div>
@@ -359,16 +587,13 @@ must have author name"></textarea>
       });
 
       previewContent.innerHTML = html;
-      previewContent.scrollTop = 0; // Force repaint and scroll to top
+      previewContent.scrollTop = 0;
     }
 
-    // --- *** THIS FUNCTION IS NOW CORRECT *** ---
     function renderResult(data) {
-      // show both preview + score area
       if (previewBox) previewBox.style.display = "block";
-      if (scorePanel) scorePanel.style.display = "block"; // Changed to block
+      if (scorePanel) scorePanel.style.display = "block";
 
-      // update numbers
       const scoreValue = data.score ?? 0;
       updateScore(scoreValue);
       if (plag) plag.textContent = (data.plagiarism ?? "--") + "% plagiarism";
@@ -382,17 +607,10 @@ must have author name"></textarea>
       if (reqMatched) reqMatched.textContent = `Requirements matched: ${passed} / ${totalReq}`;
       if (reqMissing) reqMissing.textContent = `Missing: ${failed}`;
 
-      // --- ALL LOGIC MOVED HERE, WHERE IT BELONGS ---
-      // 🔹 Call the new checklist renderer
       renderChecklist(details);
 
-      // 🔹 pull snippets for wrong content
       const toFixList = (data.feedback && data.feedback.to_fix) ? data.feedback.to_fix : [];
-
-      // 🔹 render the "Wrong content" box
       renderHighlights(data.full_text || "Could not load preview.", toFixList);
-
-      // 🔹 render the "Detailed Feedback" box (Met / Notes)
       renderFixList(data);
     }
 
@@ -405,7 +623,6 @@ must have author name"></textarea>
       scoreText.textContent = (score || 0) + "%";
     }
 
-    // --- NEW FUNCTION to build the checklist ---
     function renderChecklist(details) {
       const container = document.getElementById("requirementChecklist");
       if (!container) return;
@@ -428,21 +645,19 @@ must have author name"></textarea>
           }
         });
       } else {
-        html = `<p style="font-size: .75rem; text-align: center; opacity: .8;">No specific requirements were checked.</p>`;
+        html = `<p style="font-size: .78rem; text-align: center; opacity: .8;">No specific requirements were checked.</p>`;
       }
       container.innerHTML = html;
     }
 
-    // --- *** THIS FUNCTION IS NOW CORRECT *** ---
     function renderFixList(data) {
       const feedback = data.feedback || {};
       const container = document.getElementById("scorePanelDetails");
-      if (!container) return; // Safety check
+      if (!container) return;
 
       let html = "<h4>Detailed Feedback</h4>";
 
-      // --- SECTION 1: "MET" (Positive Feedback) ---
-      html += "<h5 style='margin-top:.6rem; font-size:.84rem;'>What you did well (Met)</h5>";
+      html += "<h5 style='margin-top:.6rem;'>What you did well (Met)</h5>";
       if (feedback.met && feedback.met.length) {
         html += "<ul style='padding-left:1rem;'>";
         feedback.met.forEach(item => {
@@ -455,11 +670,10 @@ must have author name"></textarea>
         });
         html += "</ul>";
       } else {
-        html += "<p style='font-size:.75rem; margin-top:.25rem;'>No specific positive points were flagged.</p>";
+        html += "<p style='font-size:.8rem; margin-top:.25rem;'>No specific positive points were flagged.</p>";
       }
 
-      // --- SECTION 2: "NOTES" (Improvement Feedback) ---
-      html += "<h5 style='margin-top:.6rem; font-size:.84rem;'>Where to improve (Notes)</h5>";
+      html += "<h5 style='margin-top:.6rem;'>Where to improve (Notes)</h5>";
       if (feedback.notes && feedback.notes.length) {
         html += "<ul style='padding-left:1rem;'>";
         feedback.notes.forEach(item => {
@@ -472,14 +686,12 @@ must have author name"></textarea>
         });
         html += "</ul>";
       } else {
-        html += "<p style='font-size:.75rem; margin-top:.25rem;'>No specific improvement notes were flagged.</p>";
+        html += "<p style='font-size:.8rem; margin-top:.25rem;'>No specific improvement notes were flagged.</p>";
       }
 
-      // --- ALL THE INCORRECT, RECURSIVE LOGIC IS NOW GONE ---
       container.innerHTML = html;
     }
 
-    // init
     updateScore(0);
   </script>
 </body>
