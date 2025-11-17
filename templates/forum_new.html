@@ -78,7 +78,7 @@
 
 <body>
 
-  <!-- header (was in partials/header.html earlier) -->
+  <!-- header -->
   <nav>
     <div class="nav-left">
       <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="Smart Assist Logo" class="logo">
@@ -91,7 +91,6 @@
       {% if request.session.get('user') %}
       {% set u = request.session.get('user') %}
 
-      {# role-aware dashboard link #}
       {% if u.role == 'student' %}
       <a href="/student_home">Dashboard</a>
       {% elif u.role == 'staff' %}
@@ -109,37 +108,38 @@
   <!-- main -->
   <main class="flex-1">
     <div
-      class="min-h-[calc(100vh-60px)] bg-gradient-to-br from-tamuccBlue via-tamuccTeal to-tamuccLight flex justify-center py-6 px-4">
+      class="min-h-[calc(100vh-60px)] bg-gradient-to-br from-tamuccBlue via-tamuccTeal to-tamuccLight flex justify-center py-8 px-4">
       <div
-        class="w-full max-w-5xl bg-white/85 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 flex flex-col">
+        class="w-full max-w-5xl bg-white/85 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 flex flex-col text-[15px] md:text-base">
         <!-- header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-white/40">
+        <div class="flex items-center justify-between px-7 py-5 border-b border-white/40">
           <div>
-            <p class="text-xs text-gray-500 mb-1">Community forum</p>
-            <h1 class="text-lg font-semibold text-tamuccBlue">Start a new discussion</h1>
-            <p class="text-xs text-gray-500">Describe the issue / notice clearly so others can reply.</p>
+            <p class="text-sm text-gray-500 mb-1">Community forum</p>
+            <h1 class="text-2xl font-semibold text-tamuccBlue">Start a new discussion</h1>
+            <p class="text-sm text-gray-600 mt-1">Describe the issue / notice clearly so others can reply.</p>
           </div>
-          <a href="/forum" class="text-xs text-tamuccBlue hover:underline">← Back to forum</a>
+          <a href="/forum" class="text-sm text-tamuccBlue hover:underline">← Back to forum</a>
         </div>
 
         <!-- body -->
-        <div class="grid grid-cols-12 gap-6 p-6">
+        <div class="grid grid-cols-12 gap-6 p-6 md:p-7">
           <!-- form -->
           <div class="col-span-12 md:col-span-8">
-            <form method="post" action="/forum/new" class="space-y-4" id="new-forum-form">
+            <form method="post" action="/forum/new" class="space-y-4 md:space-y-5" id="new-forum-form">
               <!-- title -->
               <div>
-                <label class="block text-sm font-medium text-tamuccBlue mb-1">Title <span
+                <label class="block text-sm md:text-base font-semibold text-tamuccBlue mb-1.5">Title <span
                     class="text-red-500">*</span></label>
-                <input type="text" name="title" required placeholder="e.g. Is the library open on Sunday during exams?"
-                  class="w-full bg-white/80 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70">
+                <input type="text" name="title" required
+                  placeholder="e.g. Is the library open on Sunday during exams?"
+                  class="w-full bg-white/80 border border-gray-200 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70">
               </div>
 
               <!-- category + quick chips -->
               <div>
-                <label class="block text-sm font-medium text-tamuccBlue mb-1">Category</label>
+                <label class="block text-sm md:text-base font-semibold text-tamuccBlue mb-1.5">Category</label>
                 <select name="category_slug" id="category-select"
-                  class="w-full bg-white/80 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70">
+                  class="w-full bg-white/80 border border-gray-200 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70">
                   {% if categories %}
                   {% for c in categories %}
                   <option value="{{ c.slug }}">{{ c.name }}</option>
@@ -148,21 +148,21 @@
                   <option value="general">General</option>
                   {% endif %}
                 </select>
-                <p class="text-[11px] text-gray-400 mt-1">Tip: pick IT support for Wi-Fi / LMS issues, Hostel for
-                  mess/hostel related questions.</p>
+                <p class="text-xs md:text-sm text-gray-400 mt-1.5">Tip: pick IT support for Wi-Fi / LMS issues, Hostel
+                  for mess/hostel related questions.</p>
 
                 <!-- quick buttons -->
-                <div class="flex flex-wrap gap-2 mt-2">
+                <div class="flex flex-wrap gap-2 mt-3">
                   <button type="button" data-cat="it-support"
-                    class="inline-flex items-center px-3 py-1 rounded-full bg-tamuccTeal/10 text-tamuccTeal text-xs hover:bg-tamuccTeal/20">
+                    class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-tamuccTeal/10 text-tamuccTeal text-xs md:text-sm font-medium hover:bg-tamuccTeal/20">
                     IT support
                   </button>
                   <button type="button" data-cat="hostel"
-                    class="inline-flex items-center px-3 py-1 rounded-full bg-tamuccTeal/10 text-tamuccTeal text-xs hover:bg-tamuccTeal/20">
+                    class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-tamuccTeal/10 text-tamuccTeal text-xs md:text-sm font-medium hover:bg-tamuccTeal/20">
                     Hostel / mess
                   </button>
                   <button type="button" data-cat="general"
-                    class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs hover:bg-gray-200">
+                    class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-gray-100 text-gray-700 text-xs md:text-sm font-medium hover:bg-gray-200">
                     General
                   </button>
                 </div>
@@ -170,61 +170,62 @@
 
               <!-- tags -->
               <div>
-                <label class="block text-sm font-medium text-tamuccBlue mb-1">
-                  Tags <span class="text-gray-400 text-[11px]">(comma separated)</span>
+                <label class="block text-sm md:text-base font-semibold text-tamuccBlue mb-1.5">
+                  Tags <span class="text-gray-400 text-[11px] align-middle">(comma separated)</span>
                 </label>
                 <input type="text" name="tags" placeholder="wifi, hostel, exam, campus"
-                  class="w-full bg-white/80 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70">
+                  class="w-full bg-white/80 border border-gray-200 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70">
               </div>
 
               <!-- body -->
               <div>
-                <label class="block text-sm font-medium text-tamuccBlue mb-1">Description</label>
+                <label class="block text-sm md:text-base font-semibold text-tamuccBlue mb-1.5">Description</label>
                 <textarea name="body" rows="6" id="body-textarea"
                   placeholder="Explain the doubt / notice / problem. Add time, place, and who it affects..."
-                  class="w-full bg-white/80 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70"></textarea>
-                <div class="flex justify-between items-center mt-1">
-                  <p class="text-[11px] text-gray-400">Be specific so another student can answer in 1 reply.</p>
-                  <p class="text-[11px] text-gray-400"><span id="body-count">0</span> chars</p>
+                  class="w-full bg-white/80 border border-gray-200 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70"></textarea>
+                <div class="flex justify-between items-center mt-1.5">
+                  <p class="text-xs md:text-sm text-gray-400">Be specific so another student can answer in 1 reply.</p>
+                  <p class="text-xs md:text-sm text-gray-400"><span id="body-count">0</span> chars</p>
                 </div>
               </div>
 
               <!-- anonymous -->
-              <div class="flex items-center gap-2 bg-white/50 border border-gray-200 rounded-lg px-3 py-2">
+              <div
+                class="flex items-center gap-3 bg-white/60 border border-gray-200 rounded-lg px-3.5 py-2.5 md:px-4 md:py-3">
                 <input id="anon-toggle" name="anonymous" type="checkbox" value="1"
                   class="h-4 w-4 text-tamuccTeal border-gray-300 rounded focus:ring-tamuccTeal/60">
-                <label for="anon-toggle" class="text-sm text-gray-700">
+                <label for="anon-toggle" class="text-sm md:text-base text-gray-700">
                   Post as anonymous
-                  <span class="block text-[11px] text-gray-400">Your name will be hidden in the forum list, but we can
-                    still track for abuse.</span>
+                  <span class="block text-[11px] md:text-xs text-gray-400">Your name will be hidden in the forum list,
+                    but we can still track for abuse.</span>
                 </label>
               </div>
 
               <!-- submit -->
               <div class="flex items-center gap-3">
                 <button type="submit"
-                  class="bg-tamuccTeal text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-tamuccLight transition">
+                  class="bg-tamuccTeal text-white px-5 py-2.5 rounded-lg text-sm md:text-base font-semibold hover:bg-tamuccLight transition">
                   Publish
                 </button>
-                <a href="/forum" class="text-xs text-gray-500 hover:text-gray-700">Cancel</a>
+                <a href="/forum" class="text-xs md:text-sm text-gray-500 hover:text-gray-700">Cancel</a>
               </div>
             </form>
           </div>
 
           <!-- side info -->
-          <div class="col-span-12 md:col-span-4 space-y-3">
-            <div class="bg-white/65 border border-gray-200 rounded-xl p-4">
-              <h2 class="text-sm font-semibold text-tamuccBlue mb-2">Good post checklist</h2>
-              <ul class="text-xs text-gray-600 space-y-1.5">
+          <div class="col-span-12 md:col-span-4 space-y-4">
+            <div class="bg-white/65 border border-gray-200 rounded-xl p-4 md:p-5">
+              <h2 class="text-sm md:text-base font-semibold text-tamuccBlue mb-2">Good post checklist</h2>
+              <ul class="text-xs md:text-sm text-gray-600 space-y-1.5">
                 <li>• Write a clear, searchable title</li>
                 <li>• Choose the right category</li>
                 <li>• Add location / time if it’s a campus notice</li>
-                <li>• Add 1-3 tags (wifi, hostel, exam)</li>
+                <li>• Add 1–3 tags (wifi, hostel, exam)</li>
               </ul>
             </div>
-            <div class="bg-white/50 border border-gray-200 rounded-xl p-4">
-              <h2 class="text-sm font-semibold text-tamuccBlue mb-2">Why this matters</h2>
-              <p class="text-xs text-gray-600">
+            <div class="bg-white/50 border border-gray-200 rounded-xl p-4 md:p-5">
+              <h2 class="text-sm md:text-base font-semibold text-tamuccBlue mb-2">Why this matters</h2>
+              <p class="text-xs md:text-sm text-gray-600">
                 Students will see this first in the community feed. Clear posts get faster replies.
               </p>
             </div>

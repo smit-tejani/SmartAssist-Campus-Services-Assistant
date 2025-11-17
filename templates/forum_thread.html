@@ -79,7 +79,7 @@
 
 <body>
 
-  <!-- header (was in partials/header.html earlier) -->
+  <!-- header -->
   <nav>
     <div class="nav-left">
       <img src="{{ url_for('static', path='assets/images/logo.png') }}" alt="Smart Assist Logo" class="logo">
@@ -92,7 +92,6 @@
       {% if request.session.get('user') %}
       {% set u = request.session.get('user') %}
 
-      {# role-aware dashboard link #}
       {% if u.role == 'student' %}
       <a href="/student_home">Dashboard</a>
       {% elif u.role == 'staff' %}
@@ -110,43 +109,44 @@
   <!-- main -->
   <main class="flex-1">
     <div
-      class="min-h-[calc(100vh-60px)] bg-gradient-to-br from-tamuccBlue via-tamuccTeal to-tamuccLight flex justify-center py-6 px-4">
+      class="min-h-[calc(100vh-60px)] bg-gradient-to-br from-tamuccBlue via-tamuccTeal to-tamuccLight flex justify-center py-8 px-4">
       <div
-        class="w-full max-w-5xl bg-white/85 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 flex flex-col">
+        class="w-full max-w-5xl bg-white/85 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 flex flex-col text-[15px] md:text-base">
         <!-- header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-white/40">
+        <div class="flex items-start md:items-center justify-between gap-3 px-7 py-5 border-b border-white/40">
           <div>
-            <p class="text-xs text-gray-500 mb-1">Community discussion</p>
-            <h1 class="text-lg font-semibold text-tamuccBlue">{{ post.title }}</h1>
-            <div class="flex gap-2 items-center mt-1 text-[11px] text-gray-500">
-              <span>by {{ post.author_name or "Student" }}</span>
+            <p class="text-sm text-gray-500 mb-1">Community discussion</p>
+            <h1 class="text-2xl md:text-3xl font-semibold text-tamuccBlue leading-snug">{{ post.title }}</h1>
+            <div class="flex flex-wrap gap-2 items-center mt-2 text-xs md:text-sm text-gray-600">
+              <span>by <span class="font-medium text-gray-800">{{ post.author_name or "Student" }}</span></span>
               {% if post.created_at %}
               <span>• {{ post.created_at.strftime('%b %d, %Y %H:%M') }}</span>
               {% endif %}
               {% if post.category_slug %}
-              <span class="px-2 py-0.5 bg-tamuccTeal/10 text-tamuccTeal rounded-full text-[10px]">
+              <span class="px-2.5 py-0.5 bg-tamuccTeal/10 text-tamuccTeal rounded-full text-[11px] md:text-xs font-medium">
                 {{ post.category_slug }}
               </span>
               {% endif %}
               {% if post.views %}
-              <span>{{ post.views }} views</span>
+              <span>• {{ post.views }} views</span>
               {% endif %}
             </div>
           </div>
-          <a href="/forum" class="text-xs text-tamuccBlue hover:underline">← Back to forum</a>
+          <a href="/forum" class="text-sm text-tamuccBlue hover:underline whitespace-nowrap">← Back to forum</a>
         </div>
 
         <!-- content -->
-        <div class="grid grid-cols-12 gap-6 p-6">
+        <div class="grid grid-cols-12 gap-6 p-6 md:p-7">
           <!-- main -->
-          <div class="col-span-12 md:col-span-8 space-y-4">
+          <div class="col-span-12 md:col-span-8 space-y-5">
             <!-- post body -->
-            <div class="bg-white/70 border border-gray-100 rounded-xl p-4">
-              <p class="text-sm text-gray-700 whitespace-pre-line">{{ post.body or "" }}</p>
+            <div class="bg-white/75 border border-gray-100 rounded-xl p-4 md:p-5">
+              <p class="text-sm md:text-base text-gray-800 leading-relaxed whitespace-pre-line">{{ post.body or "" }}</p>
               {% if post.tags %}
               <div class="flex gap-2 mt-3 flex-wrap">
                 {% for t in post.tags %}
-                <span class="px-2 py-0.5 bg-gray-100 rounded-full text-[11px] text-gray-700">{{ t }}</span>
+                <span
+                  class="px-2.5 py-0.5 bg-gray-100 rounded-full text-[11px] md:text-xs text-gray-700 font-medium">{{ t }}</span>
                 {% endfor %}
               </div>
               {% endif %}
@@ -154,37 +154,37 @@
 
             <!-- replies -->
             <div class="space-y-3">
-              <h2 class="text-sm font-semibold text-tamuccBlue">{{ comments|length }} Replies</h2>
+              <h2 class="text-base md:text-lg font-semibold text-tamuccBlue">{{ comments|length }} Replies</h2>
               {% for c in comments %}
               <div class="flex gap-3">
                 <div
-                  class="w-9 h-9 bg-tamuccTeal text-white rounded-full flex items-center justify-center text-xs font-bold">
+                  class="w-9 h-9 md:w-10 md:h-10 bg-tamuccTeal text-white rounded-full flex items-center justify-center text-xs md:text-sm font-bold">
                   {{ (c.author_name or "S")[:1] }}
                 </div>
-                <div class="flex-1 bg-white/70 border border-gray-100 rounded-xl p-3">
-                  <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                    <span class="font-semibold text-gray-700">{{ c.author_name or "Student" }}</span>
+                <div class="flex-1 bg-white/75 border border-gray-100 rounded-xl p-3.5 md:p-4">
+                  <div class="flex flex-wrap items-center gap-2 text-xs md:text-sm text-gray-500 mb-1.5">
+                    <span class="font-semibold text-gray-800">{{ c.author_name or "Student" }}</span>
                     {% if c.created_at %}
                     <span>{{ c.created_at.strftime('%b %d, %Y %H:%M') }}</span>
                     {% endif %}
                   </div>
-                  <p class="text-sm text-gray-700">{{ c.body }}</p>
+                  <p class="text-sm md:text-base text-gray-800 leading-relaxed">{{ c.body }}</p>
                 </div>
               </div>
               {% else %}
-              <p class="text-xs text-gray-500">No replies yet. Be the first 👇</p>
+              <p class="text-xs md:text-sm text-gray-500">No replies yet. Be the first 👇</p>
               {% endfor %}
             </div>
 
             <!-- reply box -->
-            <div class="bg-white/70 border border-gray-100 rounded-xl p-4">
-              <h3 class="text-sm font-semibold text-tamuccBlue mb-2">Reply</h3>
-              <form method="post" action="/forum/{{ post._id }}/comment" class="space-y-2">
+            <div class="bg-white/75 border border-gray-100 rounded-xl p-4 md:p-5">
+              <h3 class="text-base font-semibold text-tamuccBlue mb-2">Reply</h3>
+              <form method="post" action="/forum/{{ post._id }}/comment" class="space-y-3">
                 <textarea name="body" rows="3" required
-                  class="w-full bg-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70"
+                  class="w-full bg-gray-100 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-tamuccTeal/70"
                   placeholder="Write your reply..."></textarea>
                 <button type="submit"
-                  class="bg-tamuccTeal text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-tamuccLight transition">
+                  class="bg-tamuccTeal text-white px-5 py-2.5 rounded-lg text-sm md:text-base font-semibold hover:bg-tamuccLight transition">
                   Post reply
                 </button>
               </form>
@@ -192,10 +192,10 @@
           </div>
 
           <!-- side -->
-          <div class="col-span-12 md:col-span-4 space-y-3">
-            <div class="bg-white/65 border border-gray-100 rounded-xl p-4">
-              <h3 class="text-sm font-semibold text-tamuccBlue mb-2">Categories</h3>
-              <ul class="space-y-1 text-sm">
+          <div class="col-span-12 md:col-span-4 space-y-4">
+            <div class="bg-white/65 border border-gray-100 rounded-xl p-4 md:p-5">
+              <h3 class="text-sm md:text-base font-semibold text-tamuccBlue mb-2">Categories</h3>
+              <ul class="space-y-1.5 text-sm md:text-base">
                 {% for c in categories %}
                 <li>
                   <a href="/forum?category={{ c.slug }}" class="text-gray-700 hover:underline">{{ c.name }}</a>
@@ -204,16 +204,7 @@
               </ul>
             </div>
 
-            <!-- optional: related posts -->
-            {#
-            <div class="bg-white/65 border border-gray-100 rounded-xl p-4">
-              <h3 class="text-sm font-semibold text-tamuccBlue mb-2">Related</h3>
-              <ul class="space-y-1 text-xs text-gray-600">
-                <li><a href="#" class="hover:underline">Wi-Fi slow in Block B?</a></li>
-                <li><a href="#" class="hover:underline">How to raise IT ticket?</a></li>
-              </ul>
-            </div>
-            #}
+            {# optional related section left commented #}
           </div>
         </div>
       </div>
