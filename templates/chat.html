@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartAssist Chat | TAMUCC Campus Assistant</title>
-
+<link rel="stylesheet" href="{{ url_for('static', path='css/chat.css') }}">
   <!-- Poppins Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -725,9 +725,7 @@ async function sendToBot(text) {
         }
         const registered = await coursesRes.json();
 
-        // Prepare a human-friendly response.  If the student is not registered for any
-        // courses, let them know.  Otherwise, list each course with its title, CRN and
-        // term if available.  We gracefully handle missing fields.
+        // Prepare a human-friendly response.
         let responseLines = [];
         if (!Array.isArray(registered) || registered.length === 0) {
           responseLines.push("It looks like you're not registered for any courses at the moment.");
@@ -745,8 +743,6 @@ async function sendToBot(text) {
             responseLines.push(`${idx + 1}. ${title}${detailsStr}`);
           });
         }
-        // Append the message from the bot with the compiled list.  No follow-ups
-        // are provided in this special case.
         appendMessage('bot', responseLines.join('\n'));
         return;
       } catch (err) {
@@ -754,7 +750,12 @@ async function sendToBot(text) {
         // If anything goes wrong, fall back to the usual LLM handling.
       }
     }
+
+    // ⛔️ THE BROKEN BLOCK YOU MENTIONED (starting with 'const cardHtml...')
+    // ⛔️ HAS BEEN REMOVED FROM HERE.
+    // ⛔️ It was causing a syntax error and crashing the function.
   }
+
 
   // 1) Explicit full campus map request
   if (
@@ -1024,7 +1025,18 @@ function startVoiceNavigation(leg, map) {
       }
 
       // Ensure final content is fully rendered
-      contentDiv.innerHTML = renderMarkdown(fullText);
+      // Ensure final content is fully rendered
+      const flashcardHtml = buildFlashcardsHtml(fullText);
+
+      if (chatMode === 'learning' && flashcardHtml) {
+        // If it looks like flashcards, use the special renderer
+        contentDiv.innerHTML = flashcardHtml;
+        // Remove the 'prose' class so flashcard CSS can take over
+        contentDiv.classList.remove('prose', 'prose-sm', 'max-w-none');
+      } else {
+        // Otherwise, use the standard markdown renderer
+        contentDiv.innerHTML = renderMarkdown(fullText);
+      }
       enhanceLinks(row);
 
       // 🔹 If a "Show 3D Walking Map" follow-up exists, only show that one
@@ -1883,6 +1895,108 @@ function answerWithLocationFromFrontend(location) {
       liveStatus.classList.add('hidden');
     });
   </script>
+  <script>
+
+  // Simple HTML escaper so we can safely build custom HTML
+  function escapeHtml(str) {
+    return (str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  /**
+   * Try to convert a learning-mode answer into nice flashcard HTML.
+   *
+   * Supports patterns like:
+   * Here are your flashcards (Source: ...):
+   * Term 1: definition...
+   * Term 2: definition...
+   *
+   * OR the markdown version:
+   * - **Term 1**: definition...
+   * - **Term 2**: definition...
+   *
+   * Returns a HTML string, or null if it doesn't look like flashcards.
+   */
+  function buildFlashcardsHtml(answerText) {
+    if (!answerText) return null;
+
+    // 💡 KEY FIX:
+    // First, check if the *entire response* mentions "flashcard" or "quiz".
+    // If not, it's a normal answer, so return null to use the
+    // standard markdown renderer.
+    const wholeTextLower = answerText.toLowerCase();
+    const isFlashcardRequest = wholeTextLower.includes("flashcard")/*  || wholeTextLower.includes("quiz") */;
+
+    if (!isFlashcardRequest) {
+      return null; // This is a normal answer, not a flashcard set.
+    }
+    
+    // --- From here, we assume it IS a flashcard response ---
+
+    const rawLines = answerText.split("\n").map(l => l.trim()).filter(Boolean);
+    if (!rawLines.length) return null;
+
+    let header = "";
+    const cardLines = [];
+
+    // Treat the first line as a header if it mentions keywords
+    // (This is mostly for styling, the check above is the real gate)
+    const firstLower = rawLines[0].toLowerCase();
+    if (firstLower.includes("flashcard") || firstLower.includes("quiz")) {
+      header = rawLines[0];
+      rawLines.shift(); // Remove header line from card list
+    }
+
+    // Collect card lines
+    for (let line of rawLines) {
+      // Remove bullet marker like "- " or "* "
+      line = line.replace(/^[-*]\s*/, "");
+
+      // Match either "Term: def" or "**Term**: def"
+      const m = line.match(/^\*{0,2}(.+?)\*{0,2}\s*:\s*(.+)$/);
+      if (m) {
+        const term = m[1].trim();
+        const def = m[2].trim();
+        if (term && def) {
+          cardLines.push({ term, def });
+        }
+      }
+    }
+
+    // If we had the keywords but failed to parse any actual cards,
+    // just give up and render as normal markdown.
+    if (!cardLines.length) {
+      return null; 
+    }
+
+    // --- If we are here, it's a valid flashcard response ---
+
+    let html = "";
+
+    if (header) {
+      html += `<div class="learning-header">${escapeHtml(header)}</div>`;
+    }
+
+    html += `<div class="flashcard-grid">`;
+    for (const card of cardLines) {
+      html += `
+        <div class="flashcard">
+          <div class="flashcard-front">${escapeHtml(card.term)}</div>
+          <div class="flashcard-back">${escapeHtml(card.def)}</div>
+        </div>
+      `;
+    }
+    html += `</div>`;
+
+    return html;
+  }
+
+</script>
+
 </body>
 
 </html>

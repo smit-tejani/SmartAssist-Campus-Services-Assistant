@@ -18,6 +18,66 @@ router = APIRouter()
 
 ALLOWED_MODES = {"uni", "learning"}
 
+def _format_learning_answer(text: str) -> str:
+    """
+    Clean up answers returned in My Learning mode so they look like
+    readable markdown bullet points.
+
+    Expected pattern (what the LLM usually returns):
+
+        Here are your flashcards (Source: <file>):
+        Term 1: definition...
+        Term 2: definition...
+        ...
+
+    We detect `label: value` lines and turn them into:
+
+        Here are your flashcards (Source: <file>):
+
+        - **Term 1**: definition...
+        - **Term 2**: definition...
+    """
+    if not text:
+        return ""
+
+    # Split into non-empty lines
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    if not lines:
+        return ""
+
+    header_lines: list[str] = []
+    bullet_candidates: list[str] = []
+
+    for line in lines:
+        # A simple heuristic: if the line has a colon, treat it as "Term: definition"
+        if ":" in line:
+            bullet_candidates.append(line)
+        else:
+            header_lines.append(line)
+
+    # If we didn’t find any colon-based lines, just return original text
+    if not bullet_candidates:
+        return text
+
+    out: list[str] = []
+
+    # Keep all header / intro lines as a single paragraph at the top
+    if header_lines:
+        out.append(" ".join(header_lines))
+        out.append("")  # blank line before bullets
+
+    # Turn "Term: definition" → "- **Term**: definition"
+    for line in bullet_candidates:
+        term, desc = line.split(":", 1)
+        term = term.strip()
+        desc = desc.strip()
+        if term and desc:
+            out.append(f"- **{term}**: {desc}")
+        else:
+            # fallback if split is weird
+            out.append(line)
+
+    return "\n".join(out)
 
 def _normalize_mode(raw: str | None) -> str:
     value = (raw or "uni").strip().lower()
@@ -159,16 +219,18 @@ async def chat_question(request: Request, question: str = Form(...), mode: str =
         user = request.session.get("user") or {}
         email = user.get("email")
         resp_obj = await answer_from_student_scope(request, question, email)
-        answer = resp_obj.get("answer", "")
+
+        raw_answer = resp_obj.get("answer", "")          # <- original text from LLM
+        answer = _format_learning_answer(raw_answer)     # <- formatted markdown
+
         chips = resp_obj.get("suggested_followups", [])
         suggest_live_chat = resp_obj.get("suggest_live_chat", False)
-        # Note: map followups are not relevant for learning mode
         return {
             "answer": answer,
-            "suggest_live_chat": suggest_live_chat,
             "suggested_followups": chips,
-            "mode": normalized_mode,
+            "suggest_live_chat": suggest_live_chat,
         }
+
 
     # University mode: use the standard RAG pipeline
     answer, _ = get_answer(question, mode=normalized_mode)
@@ -216,7 +278,11 @@ async def chat_question_stream(request: Request, question: str = Form(...), mode
         user = request.session.get("user") or {}
         email = user.get("email")
         resp_obj = await answer_from_student_scope(request, question, email)
-        answer = resp_obj.get("answer", "")
+
+        # 🔹 NEW: format the raw answer for My Learning mode
+        raw_answer = resp_obj.get("answer", "")
+        answer = _format_learning_answer(raw_answer)
+
         chips = resp_obj.get("suggested_followups", [])
         suggest_live_chat = resp_obj.get("suggest_live_chat", False)
 
@@ -286,6 +352,7 @@ async def chat_question_stream(request: Request, question: str = Form(...), mode
             "X-Accel-Buffering": "no",
         },
     )
+
 
 
 class TicketAnalysisRequest(BaseModel):
