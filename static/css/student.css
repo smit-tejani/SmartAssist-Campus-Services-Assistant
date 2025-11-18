@@ -157,7 +157,7 @@ body {
 }
 
 /* ==================== CHATBOT BUTTON ==================== */
-.chatbot-btn {
+/* .chatbot-btn {
   position: fixed;
   bottom: 30px;
   right: 30px;
@@ -172,7 +172,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 103, 165, 0.3);
   transition: all 0.3s ease;
   z-index: 999;
-}
+} */
 
 .chatbot-btn:hover {
   background: #00a99d;
@@ -840,4 +840,79 @@ select:focus {
 
 .tab-content.active {
   display: block;
+}
+.chatbot-wrapper {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  z-index: 9999;
+}
+
+/* "Try me" pill */
+.chatbot-label {
+  background: #0067a5;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+  opacity: 0;
+  transform: translateX(20px);
+  animation: chatbot-slide-in-out 5s ease-in-out infinite;
+}
+
+.chatbot-label::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent #0067a5;
+}
+
+/* Blue circular button */
+.chatbot-btn {
+  width: 60px;
+  height: 60px;
+  background: #0067a5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 103, 165, 0.3);
+}
+
+/* Bot icon inside */
+.chatbot-icon {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+/* Slide-in / out animation */
+@keyframes chatbot-slide-in-out {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
 }

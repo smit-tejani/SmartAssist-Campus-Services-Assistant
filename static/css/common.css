@@ -133,7 +133,6 @@ nav {
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid #e2e8f0;
 }
 
 nav h1 {

@@ -402,9 +402,8 @@
 </div>
 
 <!-- Chatbot Button -->
-<button class="chatbot-btn" onclick="window.location.href='/chat'">
-  <i class="fa-solid fa-comments"></i>
-</button>
+<img src="{{ url_for('static', path='assets/images/kora.png') }}" alt="Kora Logo"
+          class="h-10 w-10 object-contain rounded-lg shadow-sm chatbot-btn" onclick="window.location.href='chat'">
 
 </body>
 </html>
